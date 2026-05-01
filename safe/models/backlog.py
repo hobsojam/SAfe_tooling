@@ -1,6 +1,6 @@
 from enum import Enum
-from uuid import uuid4
-from pydantic import BaseModel, Field, computed_field
+from pydantic import Field, computed_field
+from safe.models.base import SAFeBaseModel
 
 
 class FeatureStatus(str, Enum):
@@ -11,8 +11,7 @@ class FeatureStatus(str, Enum):
     DONE = "done"
 
 
-class Feature(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class Feature(SAFeBaseModel):
     name: str
     description: str = ""
     pi_id: str | None = None
@@ -44,8 +43,7 @@ class StoryStatus(str, Enum):
     ACCEPTED = "accepted"
 
 
-class Story(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class Story(SAFeBaseModel):
     name: str
     description: str = ""
     feature_id: str

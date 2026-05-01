@@ -4,8 +4,9 @@ from tinydb import TinyDB, Query
 
 T = TypeVar("T", bound=BaseModel)
 
-# Computed fields that should never be persisted — recomputed on load
-_COMPUTED_FIELDS = {"wsjf_score", "cost_of_delay", "available_capacity", "is_committed"}
+# Module-level singleton avoids rebuilding Query() on every method call — TinyDB
+# Query objects are stateless field-accessor proxies, so sharing one is safe.
+_Q = Query()
 
 
 class ReferentialIntegrityError(Exception):
@@ -18,32 +19,32 @@ class Repository(Generic[T]):
         self._model = model
 
     def save(self, entity: T) -> T:
-        data = entity.model_dump(mode="json", exclude=_COMPUTED_FIELDS)
-        Q = Query()
-        self._table.upsert(data, Q.id == entity.id)
+        # Derive exclusions from Pydantic metadata rather than a hardcoded set so
+        # new computed fields on any model are automatically excluded without a
+        # corresponding update here.
+        exclude = set(entity.__class__.model_computed_fields.keys())
+        data = entity.model_dump(mode="json", exclude=exclude)
+        self._table.upsert(data, _Q.id == entity.id)
         return entity
 
     def get(self, entity_id: str) -> T | None:
-        Q = Query()
-        result = self._table.get(Q.id == entity_id)
+        result = self._table.get(_Q.id == entity_id)
         return self._model.model_validate(result) if result else None
 
     def get_all(self) -> list[T]:
         return [self._model.model_validate(r) for r in self._table.all()]
 
     def find(self, **kwargs) -> list[T]:
-        Q = Query()
+        if not kwargs:
+            raise ValueError("find() requires at least one filter — use get_all() for unrestricted access")
         cond = None
         for k, v in kwargs.items():
-            clause = getattr(Q, k) == v
+            clause = getattr(_Q, k) == v
             cond = clause if cond is None else (cond & clause)
-        results = self._table.search(cond) if cond else self._table.all()
-        return [self._model.model_validate(r) for r in results]
+        return [self._model.model_validate(r) for r in self._table.search(cond)]
 
     def delete(self, entity_id: str) -> bool:
-        Q = Query()
-        removed = self._table.remove(Q.id == entity_id)
-        return len(removed) > 0
+        return len(self._table.remove(_Q.id == entity_id)) > 0
 
     def count(self) -> int:
         return len(self._table)
