@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "safe-tooling"
+version = "0.1.0"
+description = "CLI tools for SAFe PI Planning"
+requires-python = ">=3.11"
+dependencies = [
+    "typer[all]>=0.12",
+    "pydantic>=2.7",
+    "tinydb>=4.8",
+    "openpyxl>=3.1",
+]
+
+[project.scripts]
+safe = "safe.cli.main:app"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
