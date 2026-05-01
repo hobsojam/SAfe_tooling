@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Build / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# Tool data (stored outside repo at ~/.safe_tooling/)
