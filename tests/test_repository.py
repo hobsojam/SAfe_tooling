@@ -5,18 +5,19 @@ from tinydb import TinyDB
 
 import safe.store.db as db_module
 from safe.store.db import get_db, close_db
-from safe.store.repository import Repository, ReferentialIntegrityError
+from safe.store.repository import Repository
 from safe.store.repos import Repos
 from safe.models.art import ART, Team
-from safe.models.pi import PI, Iteration, PIStatus
-from safe.models.backlog import Feature, FeatureStatus
+from safe.models.backlog import Feature
 from safe.models.dependency import Dependency, DependencyStatus
 from safe.models.capacity_plan import CapacityPlan
 
 
 @pytest.fixture
 def db(tmp_path: Path) -> TinyDB:
-    return TinyDB(tmp_path / "test.json")
+    db = TinyDB(tmp_path / "test.json")
+    yield db
+    db.close()
 
 
 @pytest.fixture
@@ -58,6 +59,12 @@ def test_get_all(db: TinyDB) -> None:
     assert repo.count() == 2
     names = {t.name for t in repo.get_all()}
     assert names == {"Alpha", "Beta"}
+
+
+def test_find_no_kwargs_raises(db: TinyDB) -> None:
+    repo: Repository[Team] = Repository(db, "teams", Team)
+    with pytest.raises(ValueError, match="get_all"):
+        repo.find()
 
 
 def test_delete(db: TinyDB) -> None:

@@ -1,6 +1,10 @@
 import typer
 from rich.console import Console
 
+from safe.logic.wsjf import wsjf, cost_of_delay
+from safe.logic.capacity import available_capacity
+from safe.logic.predictability import art_predictability, predictability_rating
+
 app = typer.Typer(name="safe", help="SAFe PI Planning tools", no_args_is_help=True)
 console = Console()
 
@@ -21,7 +25,6 @@ def wsjf_score(
     job_size: int = typer.Option(..., "--job-size", "-j", help="Job Size (1-13)"),
 ):
     """Calculate WSJF score for a single Feature."""
-    from safe.logic.wsjf import wsjf, cost_of_delay
     cod = cost_of_delay(user_value, time_criticality, risk_reduction)
     score = wsjf(user_value, time_criticality, risk_reduction, job_size)
     console.print(f"Cost of Delay : [bold]{cod}[/bold]")
@@ -36,7 +39,6 @@ def capacity_calc(
     overhead_pct: float = typer.Option(0.2, "--overhead", help="Overhead fraction (default 0.20)"),
 ):
     """Calculate available team capacity for an iteration."""
-    from safe.logic.capacity import available_capacity, capacity_warning
     cap = available_capacity(team_size, iteration_days, pto_days, overhead_pct)
     console.print(f"Available Capacity : [bold green]{cap}[/bold green] person-days")
 
@@ -47,14 +49,12 @@ def pi_predictability(
     actual: list[int] = typer.Option(..., "--actual", "-a", help="Actual BV per team (repeat flag)"),
 ):
     """Calculate ART PI Predictability."""
-    from safe.logic.predictability import art_predictability, predictability_rating
     if len(planned) != len(actual):
         console.print("[red]Error: --planned and --actual must be provided the same number of times[/red]")
         raise typer.Exit(1)
     score = art_predictability(list(zip(actual, planned)))
     rating = predictability_rating(score)
-    color = {"green": "green", "yellow": "yellow", "red": "red"}[rating]
-    console.print(f"ART Predictability : [bold {color}]{score}%[/bold {color}]")
+    console.print(f"ART Predictability : [bold {rating}]{score}%[/bold {rating}]")
 
 
 if __name__ == "__main__":

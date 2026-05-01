@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
-from uuid import uuid4
-from pydantic import BaseModel, Field
+from pydantic import Field
+from safe.models.base import SAFeBaseModel
 
 
 class ROAMStatus(str, Enum):
@@ -12,8 +12,7 @@ class ROAMStatus(str, Enum):
     UNROAMED = "unroamed"
 
 
-class Risk(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class Risk(SAFeBaseModel):
     description: str
     pi_id: str
     team_id: str | None = None

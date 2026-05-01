@@ -1,9 +1,8 @@
-from uuid import uuid4
-from pydantic import BaseModel, Field, computed_field
+from pydantic import Field, computed_field
+from safe.models.base import SAFeBaseModel
 
 
-class PIObjective(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class PIObjective(SAFeBaseModel):
     description: str
     team_id: str
     pi_id: str

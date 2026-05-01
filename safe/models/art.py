@@ -1,16 +1,14 @@
-from uuid import uuid4
-from pydantic import BaseModel, Field
+from pydantic import Field
+from safe.models.base import SAFeBaseModel
 
 
-class Team(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class Team(SAFeBaseModel):
     name: str
     member_count: int = Field(ge=1)
     art_id: str | None = None
     velocity_history: list[int] = []
 
 
-class ART(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class ART(SAFeBaseModel):
     name: str
     team_ids: list[str] = []

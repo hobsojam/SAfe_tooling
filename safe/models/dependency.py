@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
-from uuid import uuid4
-from pydantic import BaseModel, Field
+from pydantic import Field
+from safe.models.base import SAFeBaseModel
 
 
 class DependencyStatus(str, Enum):
@@ -12,8 +12,7 @@ class DependencyStatus(str, Enum):
     MITIGATED = "mitigated"
 
 
-class Dependency(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class Dependency(SAFeBaseModel):
     description: str
     pi_id: str
     feature_id: str | None = None

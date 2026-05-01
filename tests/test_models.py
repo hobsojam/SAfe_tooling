@@ -384,7 +384,8 @@ class TestCapacityPlan:
 # ---------------------------------------------------------------------------
 
 def test_models_package_exports_all():
-    from safe.models import (
+    # Verifying all public names are importable from the package — the import itself is the assertion
+    from safe.models import (  # noqa: F401
         ART, Team,
         PI, Iteration, PIStatus,
         Feature, FeatureStatus, Story, StoryStatus,
@@ -393,10 +394,3 @@ def test_models_package_exports_all():
         Dependency, DependencyStatus,
         CapacityPlan,
     )
-    # Just verifying imports work — if any are missing the import itself fails
-    assert all(x is not None for x in [
-        ART, Team, PI, Iteration, PIStatus,
-        Feature, FeatureStatus, Story, StoryStatus,
-        PIObjective, Risk, ROAMStatus,
-        Dependency, DependencyStatus, CapacityPlan,
-    ])

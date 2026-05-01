@@ -1,9 +1,9 @@
-from uuid import uuid4
-from pydantic import BaseModel, Field, computed_field
+from pydantic import Field, computed_field
+from safe.logic.capacity import available_capacity as _available_capacity
+from safe.models.base import SAFeBaseModel
 
 
-class CapacityPlan(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
+class CapacityPlan(SAFeBaseModel):
     team_id: str
     iteration_id: str
     pi_id: str
@@ -15,5 +15,4 @@ class CapacityPlan(BaseModel):
     @computed_field
     @property
     def available_capacity(self) -> float:
-        from safe.logic.capacity import available_capacity
-        return available_capacity(self.team_size, self.iteration_days, self.pto_days, self.overhead_pct)
+        return _available_capacity(self.team_size, self.iteration_days, self.pto_days, self.overhead_pct)
