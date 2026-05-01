@@ -25,4 +25,5 @@ class Repos:
 
 
 def get_repos(db: TinyDB | None = None) -> Repos:
-    return Repos(db or get_db())
+    # TinyDB defines __len__, so an empty database is falsy — use identity check.
+    return Repos(db if db is not None else get_db())

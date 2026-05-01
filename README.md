@@ -17,8 +17,8 @@ pip install -e ".[dev]"
 | WSJF Calculator (stateless) | Working | `safe wsjf score` |
 | Capacity Planner (stateless) | Working | `safe capacity calc` |
 | PI Predictability (stateless) | Working | `safe pi predictability` |
-| Persistence layer | Working | — |
-| ART / Team / PI setup | Planned | `safe art`, `safe team`, `safe pi` |
+| ART / Team setup | Working | `safe art`, `safe team` |
+| PI / Iteration setup | Working | `safe pi`, `safe pi iteration` |
 | Program Backlog Manager | Planned | `safe feature`, `safe backlog` |
 | Capacity Planner (stateful) | Planned | `safe capacity set/show` |
 | PI Objectives Tracker | Planned | `safe objective` |
@@ -27,6 +27,49 @@ pip install -e ".[dev]"
 | PI Board | Planned | `safe board` |
 
 ## Usage
+
+All stateful commands accept `--db-path PATH` to override the default database location (`~/.safe_tooling/db.json`).
+
+### ART setup
+
+```bash
+safe art create --name "Platform ART"
+# Created ART Platform ART (id: abc-123)
+
+safe art list
+safe art show <id>
+```
+
+### Team setup
+
+```bash
+safe team create --name "Alpha" --members 6 --art-id <art-id>
+# Created team Alpha (id: def-456)
+
+safe team list
+safe team list --art-id <art-id>   # filter by ART
+safe team show <id>
+safe team delete <id>
+```
+
+### PI lifecycle
+
+```bash
+safe pi create --name "PI 2026.1" --art-id <art-id> --start 2026-01-05 --end 2026-03-27
+safe pi list --art-id <art-id>
+safe pi activate <id>   # planning → active (one active PI per ART enforced)
+safe pi close <id>      # active → closed
+safe pi show <id>
+```
+
+### Iterations
+
+```bash
+safe pi iteration add --pi-id <pi-id> --number 1 --start 2026-01-05 --end 2026-01-16
+safe pi iteration add --pi-id <pi-id> --number 5 --start 2026-03-16 --end 2026-03-27 --ip
+safe pi iteration list --pi-id <pi-id>
+safe pi iteration delete <id>
+```
 
 ### WSJF Score
 
@@ -70,7 +113,12 @@ pytest --cov=safe
 safe/
   models/       Pydantic models (ART, Team, PI, Feature, Story, ...)
   logic/        Pure business logic (WSJF, capacity, predictability)
-  cli/          Typer CLI commands
+  cli/
+    main.py     Root Typer app; wsjf score, capacity calc; --db-path global option
+    state.py    Shared CLI state (db_path)
+    art.py      safe art commands
+    team.py     safe team commands
+    pi.py       safe pi and safe pi iteration commands
   store/        TinyDB persistence (Repository[T], get_repos())
 tests/          pytest test suite
 pyproject.toml

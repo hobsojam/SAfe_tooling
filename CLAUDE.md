@@ -87,6 +87,7 @@ Run CLI: `safe --help`
 safe/
   models/
     __init__.py          # re-exports all models — import from here
+    base.py              # SAFeBaseModel — shared id field (uuid4 default)
     art.py               # ART, Team
     pi.py                # PI, Iteration, PIStatus
     backlog.py           # Feature, FeatureStatus, Story, StoryStatus
@@ -99,7 +100,12 @@ safe/
     capacity.py          # available_capacity(), load_percentage(), capacity_warning()
     predictability.py    # team_predictability(), art_predictability(), predictability_rating()
   cli/
-    main.py              # root Typer app; wsjf score, capacity calc, pi predictability
+    main.py              # root Typer app; --db-path callback; wsjf score, capacity calc
+    state.py             # shared CLI state: db_path (set by --db-path, read by _repos())
+    art.py               # safe art create / show / list
+    team.py              # safe team create / show / list / delete
+    pi.py                # safe pi create / show / list / activate / close / predictability
+                         # safe pi iteration add / list / delete
   store/
     db.py                # get_db(path?), close_db() — singleton TinyDB
     repository.py        # Repository[T] — generic save/get/find/delete
@@ -109,6 +115,10 @@ tests/
   test_capacity.py
   test_predictability.py
   test_repository.py
+  test_cli.py            # stateless wsjf / capacity / pi predictability commands
+  test_art_commands.py
+  test_team_commands.py
+  test_pi_commands.py
 pyproject.toml
 ```
 
@@ -116,31 +126,37 @@ pyproject.toml
 
 **Models**
 - All models live in `safe/models/`; import via `safe.models` (the `__init__.py`), not individual files.
-- Every entity has an `id: str` field with a `uuid4` default.
-- Computed fields (`wsjf_score`, `cost_of_delay`, `available_capacity`, `is_committed`) use Pydantic `@computed_field`. They are **never stored** — the repository excludes them on `save()` and they are recomputed on `model_validate()`.
+- Every entity inherits `SAFeBaseModel` (`safe/models/base.py`), which provides the `id: str` field with a `uuid4` default.
+- Computed fields (`wsjf_score`, `cost_of_delay`, `available_capacity`, `is_committed`) use Pydantic `@computed_field`. They are **never stored** — `Repository.save()` derives exclusions at runtime via `model_computed_fields.keys()` and they are recomputed on `model_validate()`.
 - `date` fields serialise to ISO strings via `model_dump(mode="json")` and round-trip correctly through `model_validate`.
 
 **Persistence**
 - All storage goes through `Repository[T]` in `safe/store/repository.py`. No code should call `TinyDB` directly outside `store/`.
-- Use `get_repos()` to obtain all repositories. Pass a `TinyDB` instance (from `get_db(tmp_path)`) in tests to avoid touching the real database.
+- Use `get_repos()` to obtain all repositories. Pass a `TinyDB` instance (from `get_db(path)`) in tests to avoid touching the real database. **Important:** use `db if db is not None else get_db()` — not `db or get_db()` — because TinyDB defines `__len__` and an empty database is falsy.
 - `save()` is an upsert keyed on `id`. Deletion of entities referenced by others should check for downstream references first.
+- When creating relationships (e.g. adding a team to an ART), perform the dual-write explicitly: save the child entity first, then update and save the parent's ID list.
 
 **Logic**
 - Business logic lives in pure functions in `safe/logic/`. No I/O, no TinyDB, no Rich imports.
 - CLI modules (`safe/cli/`) are the only place Rich rendering happens.
 - CLI commands call logic functions; logic functions accept model objects or plain scalars.
 
+**CLI structure**
+- Each CLI module (`art.py`, `team.py`, `pi.py`) owns its own `console = Console()` and a `_repos()` helper that reads `state.db_path`.
+- The root callback in `main.py` sets `state.db_path` when `--db-path` is passed; all sub-apps pick it up via `safe.cli.state`.
+- Tests that patch Rich output must monkeypatch the specific module's `console`, not just `main.console`.
+
 **Testing**
 - Repository tests use `tmp_path` fixture to get a fresh TinyDB per test.
 - Logic tests are pure unit tests with no I/O.
-- CLI tests use `typer.testing.CliRunner` with a `--db-path` pointing to a tmp file.
+- CLI tests use `typer.testing.CliRunner` with `--db-path` pointing to a tmp file. Each test module includes an `autouse` `reset_state` fixture that sets `state.db_path = None` before and after each test to prevent state leaking between invocations.
 
 ## Build Phases
 
 | Phase | Scope | Status |
 |-------|-------|--------|
 | 1 | Persistence foundation — `Repository[T]`, model extensions, new models | **Done** |
-| 2 | ART / Team / PI setup commands | Not started |
+| 2 | ART / Team / PI setup commands | **Done** |
 | 3 | Program Backlog Manager + stateful WSJF | Not started |
 | 4 | Capacity Planner (stateful) | Not started |
 | 5 | PI Objectives Tracker | Not started |

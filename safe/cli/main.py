@@ -1,20 +1,34 @@
+from pathlib import Path
+
 import typer
 from rich.console import Console
 
+import safe.cli.state as state
+from safe.cli.art import art_app
+from safe.cli.team import team_app
+from safe.cli.pi import pi_app
 from safe.logic.wsjf import wsjf, cost_of_delay
 from safe.logic.capacity import available_capacity
-from safe.logic.predictability import art_predictability, predictability_rating
 
 app = typer.Typer(name="safe", help="SAFe PI Planning tools", no_args_is_help=True)
 console = Console()
 
 wsjf_app = typer.Typer(help="WSJF scoring and backlog prioritization")
 capacity_app = typer.Typer(help="Team capacity planning")
-pi_app = typer.Typer(help="PI objectives and predictability")
 
+app.add_typer(art_app, name="art")
+app.add_typer(team_app, name="team")
+app.add_typer(pi_app, name="pi")
 app.add_typer(wsjf_app, name="wsjf")
 app.add_typer(capacity_app, name="capacity")
-app.add_typer(pi_app, name="pi")
+
+
+@app.callback()
+def main_callback(
+    db_path: Path | None = typer.Option(None, "--db-path", help="Path to database file (default: ~/.safe_tooling/db.json)"),
+):
+    if db_path is not None:
+        state.db_path = db_path
 
 
 @wsjf_app.command("score")
@@ -41,20 +55,6 @@ def capacity_calc(
     """Calculate available team capacity for an iteration."""
     cap = available_capacity(team_size, iteration_days, pto_days, overhead_pct)
     console.print(f"Available Capacity : [bold green]{cap}[/bold green] person-days")
-
-
-@pi_app.command("predictability")
-def pi_predictability(
-    planned: list[int] = typer.Option(..., "--planned", "-p", help="Planned BV per team (repeat flag)"),
-    actual: list[int] = typer.Option(..., "--actual", "-a", help="Actual BV per team (repeat flag)"),
-):
-    """Calculate ART PI Predictability."""
-    if len(planned) != len(actual):
-        console.print("[red]Error: --planned and --actual must be provided the same number of times[/red]")
-        raise typer.Exit(1)
-    score = art_predictability(list(zip(actual, planned)))
-    rating = predictability_rating(score)
-    console.print(f"ART Predictability : [bold {rating}]{score}%[/bold {rating}]")
 
 
 if __name__ == "__main__":

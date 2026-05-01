@@ -1,0 +1,182 @@
+import pytest
+from io import StringIO
+from pathlib import Path
+from rich.console import Console
+from typer.testing import CliRunner
+
+import safe.cli.team as team_module
+import safe.cli.state as state
+from safe.cli.main import app
+from safe.store.db import get_db
+from safe.store.repos import get_repos
+
+runner = CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def reset_state():
+    state.db_path = None
+    yield
+    state.db_path = None
+
+
+@pytest.fixture
+def db_path(tmp_path: Path) -> Path:
+    return tmp_path / "test.json"
+
+
+@pytest.fixture(autouse=True)
+def patch_console(monkeypatch):
+    buf = StringIO()
+    test_console = Console(file=buf, highlight=False, markup=False)
+    monkeypatch.setattr(team_module, "console", test_console)
+    yield buf
+
+
+def invoke(db_path: Path, *args):
+    return runner.invoke(app, ["--db-path", str(db_path)] + list(args))
+
+
+def repos_for(db_path: Path):
+    return get_repos(get_db(db_path))
+
+
+def _create_art(db_path: Path, name: str = "Platform ART"):
+    invoke(db_path, "art", "create", "--name", name)
+    return repos_for(db_path).arts.get_all()[0]
+
+
+# ---------------------------------------------------------------------------
+# team create
+# ---------------------------------------------------------------------------
+
+class TestTeamCreate:
+    def test_exit_code_success(self, db_path, patch_console):
+        result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        assert result.exit_code == 0
+
+    def test_name_in_output(self, db_path, patch_console):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        assert "Alpha" in patch_console.getvalue()
+
+    def test_stored_in_db(self, db_path, patch_console):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        teams = repos_for(db_path).teams.get_all()
+        assert len(teams) == 1
+        assert teams[0].name == "Alpha"
+        assert teams[0].member_count == 6
+
+    def test_create_with_art_id(self, db_path, patch_console):
+        art = _create_art(db_path)
+        result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", art.id)
+        assert result.exit_code == 0
+        team = repos_for(db_path).teams.get_all()[0]
+        assert team.art_id == art.id
+
+    def test_create_with_art_updates_art(self, db_path, patch_console):
+        art = _create_art(db_path)
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", art.id)
+        updated_art = repos_for(db_path).arts.get(art.id)
+        assert len(updated_art.team_ids) == 1
+
+    def test_invalid_art_id_exits_1(self, db_path, patch_console):
+        result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", "bad-id")
+        assert result.exit_code == 1
+
+    def test_missing_name_exits_nonzero(self, db_path, patch_console):
+        result = invoke(db_path, "team", "create", "--members", "6")
+        assert result.exit_code != 0
+
+    def test_missing_members_exits_nonzero(self, db_path, patch_console):
+        result = invoke(db_path, "team", "create", "--name", "Alpha")
+        assert result.exit_code != 0
+
+
+# ---------------------------------------------------------------------------
+# team show
+# ---------------------------------------------------------------------------
+
+class TestTeamShow:
+    def _create_team(self, db_path):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        return repos_for(db_path).teams.get_all()[0]
+
+    def test_shows_name(self, db_path, patch_console):
+        team = self._create_team(db_path)
+        invoke(db_path, "team", "show", team.id)
+        assert "Alpha" in patch_console.getvalue()
+
+    def test_shows_member_count(self, db_path, patch_console):
+        team = self._create_team(db_path)
+        invoke(db_path, "team", "show", team.id)
+        assert "6" in patch_console.getvalue()
+
+    def test_exit_code_success(self, db_path, patch_console):
+        team = self._create_team(db_path)
+        result = invoke(db_path, "team", "show", team.id)
+        assert result.exit_code == 0
+
+    def test_missing_id_exits_1(self, db_path, patch_console):
+        result = invoke(db_path, "team", "show", "nonexistent")
+        assert result.exit_code == 1
+
+
+# ---------------------------------------------------------------------------
+# team list
+# ---------------------------------------------------------------------------
+
+class TestTeamList:
+    def test_empty(self, db_path, patch_console):
+        invoke(db_path, "team", "list")
+        assert "No teams found" in patch_console.getvalue()
+
+    def test_lists_all(self, db_path, patch_console):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        invoke(db_path, "team", "create", "--name", "Beta", "--members", "5")
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "team", "list")
+        output = patch_console.getvalue()
+        assert "Alpha" in output
+        assert "Beta" in output
+
+    def test_filter_by_art(self, db_path, patch_console):
+        art = _create_art(db_path)
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", art.id)
+        invoke(db_path, "team", "create", "--name", "Beta", "--members", "5")
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "team", "list", "--art-id", art.id)
+        output = patch_console.getvalue()
+        assert "Alpha" in output
+        assert "Beta" not in output
+
+
+# ---------------------------------------------------------------------------
+# team delete
+# ---------------------------------------------------------------------------
+
+class TestTeamDelete:
+    def test_exit_code_success(self, db_path, patch_console):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        team = repos_for(db_path).teams.get_all()[0]
+        result = invoke(db_path, "team", "delete", team.id)
+        assert result.exit_code == 0
+
+    def test_removed_from_db(self, db_path, patch_console):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        team = repos_for(db_path).teams.get_all()[0]
+        invoke(db_path, "team", "delete", team.id)
+        assert repos_for(db_path).teams.count() == 0
+
+    def test_removed_from_art(self, db_path, patch_console):
+        art = _create_art(db_path)
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", art.id)
+        team = repos_for(db_path).teams.get_all()[0]
+        invoke(db_path, "team", "delete", team.id)
+        updated_art = repos_for(db_path).arts.get(art.id)
+        assert team.id not in updated_art.team_ids
+
+    def test_missing_id_exits_1(self, db_path, patch_console):
+        result = invoke(db_path, "team", "delete", "nonexistent")
+        assert result.exit_code == 1

@@ -2,7 +2,7 @@
 CLI tests using Typer's CliRunner.
 
 Rich's Console is created at module level pointing to the real stdout, which
-the CliRunner's buffer does not capture. We monkeypatch safe.cli.main.console
+the CliRunner's buffer does not capture. We monkeypatch each module's console
 with a Console backed by a StringIO so assertions on output are reliable.
 """
 import pytest
@@ -11,6 +11,7 @@ from rich.console import Console
 from typer.testing import CliRunner
 
 import safe.cli.main as main_module
+import safe.cli.pi as pi_module
 from safe.cli.main import app
 
 runner = CliRunner()
@@ -18,10 +19,11 @@ runner = CliRunner()
 
 @pytest.fixture(autouse=True)
 def patch_console(monkeypatch):
-    """Replace the module-level Rich console with one writing to a StringIO."""
+    """Replace module-level Rich consoles with ones writing to a shared StringIO."""
     buf = StringIO()
     test_console = Console(file=buf, highlight=False, markup=False)
     monkeypatch.setattr(main_module, "console", test_console)
+    monkeypatch.setattr(pi_module, "console", test_console)
     yield buf
 
 
