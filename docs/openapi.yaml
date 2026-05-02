@@ -10,9 +10,8 @@ info:
 
     All entity IDs are UUID strings. Dates are ISO 8601 strings (YYYY-MM-DD).
 
-    Computed fields (`wsjf_score`, `cost_of_delay`, `available_capacity`,
-    `is_committed`) are returned in responses but must not be sent in request
-    bodies â€” the server derives them and ignores any supplied value.
+    Computed fields (wsjf_score, cost_of_delay, available_capacity) are
+    returned in responses but must not be sent in request bodies.
 
 servers:
   - url: http://localhost:8000
@@ -23,7 +22,7 @@ tags:
     description: Agile Release Trains
   - name: teams
     description: ART Teams
-  - name: pis
+  - name: pi
     description: Program Increments
   - name: iterations
     description: PI Iterations
@@ -59,7 +58,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ARTList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/ART"
 
     post:
       tags: [arts]
@@ -150,15 +151,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TeamList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
 
     post:
       tags: [teams]
       summary: Create a team
       operationId: create_team
       description: |
-        If `art_id` is supplied the team is linked to that ART and the ART's
-        `team_ids` list is updated atomically.
+        If art_id is supplied the team is linked to that ART and the ART's
+        team_ids list is updated atomically.
       requestBody:
         required: true
         content:
@@ -222,7 +225,7 @@ paths:
       tags: [teams]
       summary: Delete a team
       operationId: delete_team
-      description: Also removes the team from its ART's `team_ids` list.
+      description: Also removes the team from its ART's team_ids list.
       responses:
         "204":
           description: Deleted
@@ -235,7 +238,7 @@ paths:
 
   /pi:
     get:
-      tags: [pis]
+      tags: [pi]
       summary: List PIs
       operationId: list_pis
       parameters:
@@ -248,7 +251,7 @@ paths:
         - name: status
           in: query
           schema:
-            $ref: "#/components/schemas/pitatus"
+            $ref: "#/components/schemas/PIStatus"
           description: Filter by status
       responses:
         "200":
@@ -256,10 +259,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PIList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/PI"
 
     post:
-      tags: [pis]
+      tags: [pi]
       summary: Create a PI
       operationId: create_pi
       requestBody:
@@ -288,7 +293,7 @@ paths:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     get:
-      tags: [pis]
+      tags: [pi]
       summary: Get a PI
       operationId: get_pi
       responses:
@@ -301,10 +306,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
     patch:
-      tags: [pis]
+      tags: [pi]
       summary: Update PI metadata (name, dates)
       operationId: update_pi
-      description: Status transitions must use `/activate` or `/close`.
+      description: Status transitions must use /activate or /close.
       requestBody:
         required: true
         content:
@@ -323,7 +328,7 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
     delete:
-      tags: [pis]
+      tags: [pi]
       summary: Delete a PI
       operationId: delete_pi
       responses:
@@ -336,12 +341,12 @@ paths:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     post:
-      tags: [pis]
-      summary: Activate a PI (planning â†’ active)
+      tags: [pi]
+      summary: Activate a PI (planning -> active)
       operationId: activate_pi
       description: |
-        Fails with 409 if the PI is not in `planning` status, or if another
-        PI for the same ART is already `active`.
+        Fails with 409 if the PI is not in planning status, or if another
+        PI for the same ART is already active.
       responses:
         "200":
           description: Activated PI
@@ -362,10 +367,10 @@ paths:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     post:
-      tags: [pis]
-      summary: Close a PI (active â†’ closed)
+      tags: [pi]
+      summary: Close a PI (active -> closed)
       operationId: close_pi
-      description: Fails with 409 if the PI is not in `active` status.
+      description: Fails with 409 if the PI is not in active status.
       responses:
         "200":
           description: Closed PI
@@ -383,25 +388,31 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   # ---------------------------------------------------------------------------
-  # Iterations (nested under PI)
+  # Iterations (top-level; pi_id is a field and filter param)
   # ---------------------------------------------------------------------------
 
-  /pi/{pi_id}/iterations:
-    parameters:
-      - $ref: "#/components/parameters/pi_id"
+  /iterations:
     get:
       tags: [iterations]
-      summary: List iterations for a PI
+      summary: List iterations
       operationId: list_iterations
+      parameters:
+        - name: pi_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: PI to list iterations for
       responses:
         "200":
           description: Iterations sorted by number
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IterationList"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Iteration"
 
     post:
       tags: [iterations]
@@ -409,7 +420,7 @@ paths:
       operationId: create_iteration
       description: |
         Iteration dates must fall within the PI's date range.
-        Also appends the iteration id to `PI.iteration_ids`.
+        Also appends the iteration id to PI.iteration_ids.
       requestBody:
         required: true
         content:
@@ -424,13 +435,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/Iteration"
         "404":
-          $ref: "#/components/responses/NotFound"
+          description: PI not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "422":
           $ref: "#/components/responses/ValidationError"
 
-  /pi/{pi_id}/iterations/{iteration_id}:
+  /iterations/{iteration_id}:
     parameters:
-      - $ref: "#/components/parameters/pi_id"
       - $ref: "#/components/parameters/iteration_id"
     get:
       tags: [iterations]
@@ -470,7 +484,7 @@ paths:
       tags: [iterations]
       summary: Delete an iteration
       operationId: delete_iteration
-      description: Also removes the iteration id from `PI.iteration_ids`.
+      description: Also removes the iteration id from PI.iteration_ids.
       responses:
         "204":
           description: Deleted
@@ -480,32 +494,6 @@ paths:
   # ---------------------------------------------------------------------------
   # Features
   # ---------------------------------------------------------------------------
-
-  /features/ranked:
-    get:
-      tags: [features]
-      summary: List features ranked by WSJF score (highest first)
-      operationId: list_features_ranked
-      parameters:
-        - name: pi_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by PI
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by team
-      responses:
-        "200":
-          description: Features sorted by wsjf_score descending
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FeatureList"
 
   /features:
     get:
@@ -530,13 +518,22 @@ paths:
           schema:
             $ref: "#/components/schemas/FeatureStatus"
           description: Filter by status
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [wsjf_desc, name_asc]
+            default: wsjf_desc
+          description: "wsjf_desc = ranked by WSJF score (default), name_asc = alphabetical"
       responses:
         "200":
           description: List of features
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FeatureList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feature"
 
     post:
       tags: [features]
@@ -644,7 +641,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StoryList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Story"
 
     post:
       tags: [stories]
@@ -746,7 +745,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PIObjectiveList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/PIObjective"
 
     post:
       tags: [objectives]
@@ -848,7 +849,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RiskList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Risk"
 
     post:
       tags: [risks]
@@ -956,7 +959,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DependencyList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dependency"
 
     post:
       tags: [dependencies]
@@ -1059,7 +1064,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CapacityPlanList"
+                type: array
+                items:
+                  $ref: "#/components/schemas/CapacityPlan"
 
     post:
       tags: [capacity-plans]
@@ -1132,53 +1139,14 @@ paths:
   # Stateless Compute
   # ---------------------------------------------------------------------------
 
-  /compute/wsjf:
-    post:
-      tags: [compute]
-      summary: Calculate WSJF score (stateless)
-      operationId: compute_wsjf
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WSJFRequest"
-      responses:
-        "200":
-          description: WSJF calculation result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WSJFResponse"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  /compute/capacity:
-    post:
-      tags: [compute]
-      summary: Calculate available team capacity (stateless)
-      operationId: compute_capacity
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CapacityRequest"
-      responses:
-        "200":
-          description: Capacity calculation result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CapacityResponse"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
   /compute/predictability:
     post:
       tags: [compute]
       summary: Calculate ART PI predictability (stateless)
       operationId: compute_predictability
+      description: |
+        Calculates predictability from planned vs actual business value across
+        all teams. Use this during Inspect & Adapt before closing a PI.
       requestBody:
         required: true
         content:
@@ -1366,17 +1334,6 @@ components:
         name:
           type: string
 
-    ARTList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/ART"
-        total:
-          type: integer
-
     # --- Team ---
 
     Team:
@@ -1438,17 +1395,6 @@ components:
           items:
             type: integer
 
-    TeamList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Team"
-        total:
-          type: integer
-
     # --- PI ---
 
     PI:
@@ -1473,7 +1419,7 @@ components:
           format: date
           example: "2026-03-27"
         status:
-          $ref: "#/components/schemas/pitatus"
+          $ref: "#/components/schemas/PIStatus"
         iteration_ids:
           type: array
           items:
@@ -1498,7 +1444,7 @@ components:
 
     PIUpdate:
       type: object
-      description: Only name and dates can be updated; use /activate and /close for status.
+      description: Status transitions use /activate and /close, not this endpoint.
       properties:
         name:
           type: string
@@ -1508,17 +1454,6 @@ components:
         end_date:
           type: string
           format: date
-
-    PIList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/PI"
-        total:
-          type: integer
 
     # --- Iteration ---
 
@@ -1551,8 +1486,11 @@ components:
 
     IterationCreate:
       type: object
-      required: [number, start_date, end_date]
+      required: [pi_id, number, start_date, end_date]
       properties:
+        pi_id:
+          type: string
+          format: uuid
         number:
           type: integer
           minimum: 1
@@ -1585,17 +1523,6 @@ components:
           format: date
         is_ip:
           type: boolean
-
-    IterationList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Iteration"
-        total:
-          type: integer
 
     # --- Feature ---
 
@@ -1753,17 +1680,6 @@ components:
           minimum: 1
           maximum: 13
 
-    FeatureList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Feature"
-        total:
-          type: integer
-
     # --- Story ---
 
     Story:
@@ -1846,17 +1762,6 @@ components:
         acceptance_criteria:
           type: string
 
-    StoryList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Story"
-        total:
-          type: integer
-
     # --- PIObjective ---
 
     PIObjective:
@@ -1868,7 +1773,6 @@ components:
         - pi_id
         - planned_business_value
         - is_stretch
-        - is_committed
         - feature_ids
       properties:
         id:
@@ -1895,10 +1799,7 @@ components:
         is_stretch:
           type: boolean
           default: false
-        is_committed:
-          type: boolean
-          readOnly: true
-          description: "Computed: true when is_stretch is false"
+          description: "Committed when false, stretch when true"
         feature_ids:
           type: array
           items:
@@ -1957,17 +1858,6 @@ components:
           items:
             type: string
             format: uuid
-
-    PIObjectiveList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/PIObjective"
-        total:
-          type: integer
 
     # --- Risk ---
 
@@ -2052,17 +1942,6 @@ components:
           nullable: true
         mitigation_notes:
           type: string
-
-    RiskList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Risk"
-        total:
-          type: integer
 
     # --- Dependency ---
 
@@ -2175,17 +2054,6 @@ components:
           format: date
           nullable: true
 
-    DependencyList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Dependency"
-        total:
-          type: integer
-
     # --- CapacityPlan ---
 
     CapacityPlan:
@@ -2235,7 +2103,7 @@ components:
           type: number
           format: float
           readOnly: true
-          description: "Computed: (team_size Ã— iteration_days âˆ’ pto_days) Ã— (1 âˆ’ overhead_pct)"
+          description: "Computed: (team_size x iteration_days - pto_days) x (1 - overhead_pct)"
 
     CapacityPlanCreate:
       type: object
@@ -2288,87 +2156,7 @@ components:
           minimum: 0.0
           maximum: 1.0
 
-    CapacityPlanList:
-      type: object
-      required: [items, total]
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/CapacityPlan"
-        total:
-          type: integer
-
     # --- Stateless compute ---
-
-    WSJFRequest:
-      type: object
-      required:
-        - user_business_value
-        - time_criticality
-        - risk_reduction_opportunity_enablement
-        - job_size
-      properties:
-        user_business_value:
-          type: integer
-          minimum: 1
-          maximum: 10
-        time_criticality:
-          type: integer
-          minimum: 1
-          maximum: 10
-        risk_reduction_opportunity_enablement:
-          type: integer
-          minimum: 1
-          maximum: 10
-        job_size:
-          type: integer
-          minimum: 1
-          maximum: 13
-
-    WSJFResponse:
-      type: object
-      required: [cost_of_delay, wsjf_score]
-      properties:
-        cost_of_delay:
-          type: integer
-          example: 16
-        wsjf_score:
-          type: number
-          format: float
-          example: 4.0
-
-    CapacityRequest:
-      type: object
-      required: [team_size]
-      properties:
-        team_size:
-          type: integer
-          minimum: 1
-        iteration_days:
-          type: integer
-          minimum: 1
-          default: 10
-        pto_days:
-          type: number
-          format: float
-          minimum: 0.0
-          default: 0.0
-        overhead_pct:
-          type: number
-          format: float
-          minimum: 0.0
-          maximum: 1.0
-          default: 0.2
-
-    CapacityResponse:
-      type: object
-      required: [available_capacity]
-      properties:
-        available_capacity:
-          type: number
-          format: float
-          example: 40.0
 
     PredictabilityTeamResult:
       type: object
@@ -2403,4 +2191,4 @@ components:
         rating:
           type: string
           enum: [green, yellow, red]
-          description: "green â‰¥ 80 %, yellow 60â€“79 %, red < 60 %"
+          description: "green >= 80%, yellow 60-79%, red < 60%"
