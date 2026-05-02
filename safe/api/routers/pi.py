@@ -1,0 +1,74 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+
+from safe.api.deps import get_repos_dep
+from safe.api.schemas import PICreate, PIUpdate
+from safe.models.pi import PI, PIStatus
+from safe.store.repos import Repos
+
+router = APIRouter(prefix="/pi", tags=["PIs"])
+
+
+def _get_or_404(repos: Repos, pi_id: str) -> PI:
+    pi = repos.pis.get(pi_id)
+    if pi is None:
+        raise HTTPException(status_code=404, detail=f"PI '{pi_id}' not found")
+    return pi
+
+
+@router.get("", response_model=list[PI])
+def list_pis(
+    art_id: str | None = Query(default=None),
+    repos: Repos = Depends(get_repos_dep),
+):
+    if art_id is not None:
+        return repos.pis.find(art_id=art_id)
+    return repos.pis.get_all()
+
+
+@router.post("", response_model=PI, status_code=201)
+def create_pi(body: PICreate, repos: Repos = Depends(get_repos_dep)):
+    if repos.arts.get(body.art_id) is None:
+        raise HTTPException(status_code=404, detail=f"ART '{body.art_id}' not found")
+    pi = PI(**body.model_dump())
+    return repos.pis.save(pi)
+
+
+@router.get("/{pi_id}", response_model=PI)
+def get_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+    return _get_or_404(repos, pi_id)
+
+
+@router.patch("/{pi_id}", response_model=PI)
+def update_pi(pi_id: str, body: PIUpdate, repos: Repos = Depends(get_repos_dep)):
+    pi = _get_or_404(repos, pi_id)
+    updated = pi.model_copy(update=body.model_dump(exclude_unset=True))
+    return repos.pis.save(updated)
+
+
+@router.delete("/{pi_id}", status_code=204)
+def delete_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+    _get_or_404(repos, pi_id)
+    repos.pis.delete(pi_id)
+
+
+@router.post("/{pi_id}/activate", response_model=PI)
+def activate_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+    pi = _get_or_404(repos, pi_id)
+    if pi.status != PIStatus.PLANNING:
+        raise HTTPException(status_code=409, detail=f"PI '{pi_id}' is {pi.status.value}, not planning")
+
+    active = repos.pis.find(art_id=pi.art_id, status=PIStatus.ACTIVE)
+    if active:
+        raise HTTPException(status_code=409, detail=f"ART already has an active PI '{active[0].id}'")
+
+    updated = pi.model_copy(update={"status": PIStatus.ACTIVE})
+    return repos.pis.save(updated)
+
+
+@router.post("/{pi_id}/close", response_model=PI)
+def close_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+    pi = _get_or_404(repos, pi_id)
+    if pi.status != PIStatus.ACTIVE:
+        raise HTTPException(status_code=409, detail=f"PI '{pi_id}' is {pi.status.value}, not active")
+    updated = pi.model_copy(update={"status": PIStatus.CLOSED})
+    return repos.pis.save(updated)
