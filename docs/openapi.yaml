@@ -12,7 +12,7 @@ info:
 
     Computed fields (`wsjf_score`, `cost_of_delay`, `available_capacity`,
     `is_committed`) are returned in responses but must not be sent in request
-    bodies — the server derives them and ignores any supplied value.
+    bodies â€” the server derives them and ignores any supplied value.
 
 servers:
   - url: http://localhost:8000
@@ -233,7 +233,7 @@ paths:
   # Program Increments
   # ---------------------------------------------------------------------------
 
-  /pis:
+  /pi:
     get:
       tags: [pis]
       summary: List PIs
@@ -248,7 +248,7 @@ paths:
         - name: status
           in: query
           schema:
-            $ref: "#/components/schemas/PIStatus"
+            $ref: "#/components/schemas/pitatus"
           description: Filter by status
       responses:
         "200":
@@ -284,7 +284,7 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
 
-  /pis/{pi_id}:
+  /pi/{pi_id}:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     get:
@@ -332,12 +332,12 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
-  /pis/{pi_id}/activate:
+  /pi/{pi_id}/activate:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     post:
       tags: [pis]
-      summary: Activate a PI (planning → active)
+      summary: Activate a PI (planning â†’ active)
       operationId: activate_pi
       description: |
         Fails with 409 if the PI is not in `planning` status, or if another
@@ -358,12 +358,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /pis/{pi_id}/close:
+  /pi/{pi_id}/close:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     post:
       tags: [pis]
-      summary: Close a PI (active → closed)
+      summary: Close a PI (active â†’ closed)
       operationId: close_pi
       description: Fails with 409 if the PI is not in `active` status.
       responses:
@@ -386,7 +386,7 @@ paths:
   # Iterations (nested under PI)
   # ---------------------------------------------------------------------------
 
-  /pis/{pi_id}/iterations:
+  /pi/{pi_id}/iterations:
     parameters:
       - $ref: "#/components/parameters/pi_id"
     get:
@@ -428,7 +428,7 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
 
-  /pis/{pi_id}/iterations/{iteration_id}:
+  /pi/{pi_id}/iterations/{iteration_id}:
     parameters:
       - $ref: "#/components/parameters/pi_id"
       - $ref: "#/components/parameters/iteration_id"
@@ -1473,7 +1473,7 @@ components:
           format: date
           example: "2026-03-27"
         status:
-          $ref: "#/components/schemas/PIStatus"
+          $ref: "#/components/schemas/pitatus"
         iteration_ids:
           type: array
           items:
@@ -2235,7 +2235,7 @@ components:
           type: number
           format: float
           readOnly: true
-          description: "Computed: (team_size × iteration_days − pto_days) × (1 − overhead_pct)"
+          description: "Computed: (team_size Ã— iteration_days âˆ’ pto_days) Ã— (1 âˆ’ overhead_pct)"
 
     CapacityPlanCreate:
       type: object
@@ -2403,4 +2403,4 @@ components:
         rating:
           type: string
           enum: [green, yellow, red]
-          description: "green ≥ 80 %, yellow 60–79 %, red < 60 %"
+          description: "green â‰¥ 80 %, yellow 60â€“79 %, red < 60 %"
