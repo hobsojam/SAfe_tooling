@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - safe_data:/data
+    environment:
+      SAFE_DB_PATH: /data/db.json
+
+volumes:
+  safe_data:
