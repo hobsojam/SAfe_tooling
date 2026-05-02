@@ -1,5 +1,7 @@
 # SAFe Tooling — Project Context
 
+@CLAUDE_SECURITY.md
+
 ## Purpose
 
 This project builds tooling to support planning, tracking, and execution activities within the **Scaled Agile Framework (SAFe)**. The primary focus is on Program Increment (PI) Planning and related ceremonies/artifacts.

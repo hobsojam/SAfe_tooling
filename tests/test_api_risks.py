@@ -1,0 +1,64 @@
+def _create_art(client):
+    return client.post("/art", json={"name": "ART"}).json()["id"]
+
+
+def _create_pi(client, art_id):
+    return client.post("/pi", json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"}).json()["id"]
+
+
+def _create_risk(client, pi_id, **overrides):
+    return client.post("/risks", json={"description": "Data loss risk", "pi_id": pi_id, **overrides})
+
+
+def test_create_returns_201(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    r = _create_risk(client, pi_id)
+    assert r.status_code == 201
+    assert r.json()["roam_status"] == "unroamed"
+
+
+def test_list_filter_by_pi(client):
+    art_id = _create_art(client)
+    pi1 = _create_pi(client, art_id)
+    pi2 = client.post("/pi", json={"name": "PI 2", "art_id": art_id, "start_date": "2026-04-06", "end_date": "2026-06-26"}).json()["id"]
+    _create_risk(client, pi1)
+    _create_risk(client, pi2)
+    risks = client.get(f"/risks?pi_id={pi1}").json()
+    assert len(risks) == 1
+
+
+def test_get_unknown_returns_404(client):
+    assert client.get("/risks/no-such-id").status_code == 404
+
+
+def test_roam_sets_status(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    rid = _create_risk(client, pi_id).json()["id"]
+    r = client.post(f"/risks/{rid}/roam", json={"roam_status": "owned", "owner": "Alice"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["roam_status"] == "owned"
+    assert body["owner"] == "Alice"
+
+
+def test_roam_unknown_returns_404(client):
+    assert client.post("/risks/no-such-id/roam", json={"roam_status": "resolved"}).status_code == 404
+
+
+def test_patch_description(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    rid = _create_risk(client, pi_id).json()["id"]
+    r = client.patch(f"/risks/{rid}", json={"description": "Updated risk"})
+    assert r.status_code == 200
+    assert r.json()["description"] == "Updated risk"
+
+
+def test_delete_returns_204(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    rid = _create_risk(client, pi_id).json()["id"]
+    assert client.delete(f"/risks/{rid}").status_code == 204
+    assert client.get(f"/risks/{rid}").status_code == 404

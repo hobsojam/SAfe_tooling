@@ -1,0 +1,2194 @@
+openapi: "3.1.0"
+
+info:
+  title: SAFe Tooling API
+  version: "1.0.0"
+  description: |
+    REST API for the SAFe Tooling platform. Manages ARTs, Teams, Program
+    Increments, Features, Stories, PI Objectives, Risks, Dependencies, and
+    Capacity Plans.
+
+    All entity IDs are UUID strings. Dates are ISO 8601 strings (YYYY-MM-DD).
+
+    Computed fields (wsjf_score, cost_of_delay, available_capacity) are
+    returned in responses but must not be sent in request bodies.
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+tags:
+  - name: arts
+    description: Agile Release Trains
+  - name: teams
+    description: ART Teams
+  - name: pi
+    description: Program Increments
+  - name: iterations
+    description: PI Iterations
+  - name: features
+    description: Program Backlog Features
+  - name: stories
+    description: User Stories
+  - name: objectives
+    description: PI Objectives
+  - name: risks
+    description: ROAM Risk Register
+  - name: dependencies
+    description: Cross-team Dependencies
+  - name: capacity-plans
+    description: Team Capacity Plans
+  - name: compute
+    description: Stateless calculations (no persistence)
+
+paths:
+
+  # ---------------------------------------------------------------------------
+  # ARTs
+  # ---------------------------------------------------------------------------
+
+  /arts:
+    get:
+      tags: [arts]
+      summary: List all ARTs
+      operationId: list_arts
+      responses:
+        "200":
+          description: List of ARTs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ART"
+
+    post:
+      tags: [arts]
+      summary: Create an ART
+      operationId: create_art
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ARTCreate"
+      responses:
+        "201":
+          description: Created ART
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ART"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /arts/{art_id}:
+    parameters:
+      - $ref: "#/components/parameters/art_id"
+    get:
+      tags: [arts]
+      summary: Get an ART
+      operationId: get_art
+      responses:
+        "200":
+          description: ART details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ART"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [arts]
+      summary: Update an ART
+      operationId: update_art
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ARTUpdate"
+      responses:
+        "200":
+          description: Updated ART
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ART"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [arts]
+      summary: Delete an ART
+      operationId: delete_art
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Teams
+  # ---------------------------------------------------------------------------
+
+  /teams:
+    get:
+      tags: [teams]
+      summary: List teams
+      operationId: list_teams
+      parameters:
+        - name: art_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by ART
+      responses:
+        "200":
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+
+    post:
+      tags: [teams]
+      summary: Create a team
+      operationId: create_team
+      description: |
+        If art_id is supplied the team is linked to that ART and the ART's
+        team_ids list is updated atomically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamCreate"
+      responses:
+        "201":
+          description: Created team
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "404":
+          description: ART not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /teams/{team_id}:
+    parameters:
+      - $ref: "#/components/parameters/team_id"
+    get:
+      tags: [teams]
+      summary: Get a team
+      operationId: get_team
+      responses:
+        "200":
+          description: Team details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [teams]
+      summary: Update a team
+      operationId: update_team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamUpdate"
+      responses:
+        "200":
+          description: Updated team
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [teams]
+      summary: Delete a team
+      operationId: delete_team
+      description: Also removes the team from its ART's team_ids list.
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Program Increments
+  # ---------------------------------------------------------------------------
+
+  /pi:
+    get:
+      tags: [pi]
+      summary: List PIs
+      operationId: list_pis
+      parameters:
+        - name: art_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by ART
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/PIStatus"
+          description: Filter by status
+      responses:
+        "200":
+          description: List of PIs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PI"
+
+    post:
+      tags: [pi]
+      summary: Create a PI
+      operationId: create_pi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PICreate"
+      responses:
+        "201":
+          description: Created PI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PI"
+        "404":
+          description: ART not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /pi/{pi_id}:
+    parameters:
+      - $ref: "#/components/parameters/pi_id"
+    get:
+      tags: [pi]
+      summary: Get a PI
+      operationId: get_pi
+      responses:
+        "200":
+          description: PI details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PI"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [pi]
+      summary: Update PI metadata (name, dates)
+      operationId: update_pi
+      description: Status transitions must use /activate or /close.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PIUpdate"
+      responses:
+        "200":
+          description: Updated PI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PI"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [pi]
+      summary: Delete a PI
+      operationId: delete_pi
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /pi/{pi_id}/activate:
+    parameters:
+      - $ref: "#/components/parameters/pi_id"
+    post:
+      tags: [pi]
+      summary: Activate a PI (planning -> active)
+      operationId: activate_pi
+      description: |
+        Fails with 409 if the PI is not in planning status, or if another
+        PI for the same ART is already active.
+      responses:
+        "200":
+          description: Activated PI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PI"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: PI is not in planning status, or another PI is already active
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /pi/{pi_id}/close:
+    parameters:
+      - $ref: "#/components/parameters/pi_id"
+    post:
+      tags: [pi]
+      summary: Close a PI (active -> closed)
+      operationId: close_pi
+      description: Fails with 409 if the PI is not in active status.
+      responses:
+        "200":
+          description: Closed PI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PI"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: PI is not active
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ---------------------------------------------------------------------------
+  # Iterations (top-level; pi_id is a field and filter param)
+  # ---------------------------------------------------------------------------
+
+  /iterations:
+    get:
+      tags: [iterations]
+      summary: List iterations
+      operationId: list_iterations
+      parameters:
+        - name: pi_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: PI to list iterations for
+      responses:
+        "200":
+          description: Iterations sorted by number
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Iteration"
+
+    post:
+      tags: [iterations]
+      summary: Add an iteration to a PI
+      operationId: create_iteration
+      description: |
+        Iteration dates must fall within the PI's date range.
+        Also appends the iteration id to PI.iteration_ids.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IterationCreate"
+      responses:
+        "201":
+          description: Created iteration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Iteration"
+        "404":
+          description: PI not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /iterations/{iteration_id}:
+    parameters:
+      - $ref: "#/components/parameters/iteration_id"
+    get:
+      tags: [iterations]
+      summary: Get an iteration
+      operationId: get_iteration
+      responses:
+        "200":
+          description: Iteration details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Iteration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [iterations]
+      summary: Update an iteration
+      operationId: update_iteration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IterationUpdate"
+      responses:
+        "200":
+          description: Updated iteration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Iteration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [iterations]
+      summary: Delete an iteration
+      operationId: delete_iteration
+      description: Also removes the iteration id from PI.iteration_ids.
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Features
+  # ---------------------------------------------------------------------------
+
+  /features:
+    get:
+      tags: [features]
+      summary: List features
+      operationId: list_features
+      parameters:
+        - name: pi_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by PI
+        - name: team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by team
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/FeatureStatus"
+          description: Filter by status
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [wsjf_desc, name_asc]
+            default: wsjf_desc
+          description: "wsjf_desc = ranked by WSJF score (default), name_asc = alphabetical"
+      responses:
+        "200":
+          description: List of features
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feature"
+
+    post:
+      tags: [features]
+      summary: Add a feature to the backlog
+      operationId: create_feature
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeatureCreate"
+      responses:
+        "201":
+          description: Created feature (includes computed cost_of_delay and wsjf_score)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feature"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /features/{feature_id}:
+    parameters:
+      - $ref: "#/components/parameters/feature_id"
+    get:
+      tags: [features]
+      summary: Get a feature
+      operationId: get_feature
+      responses:
+        "200":
+          description: Feature details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feature"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [features]
+      summary: Update a feature
+      operationId: update_feature
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeatureUpdate"
+      responses:
+        "200":
+          description: Updated feature
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feature"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [features]
+      summary: Delete a feature
+      operationId: delete_feature
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Stories
+  # ---------------------------------------------------------------------------
+
+  /stories:
+    get:
+      tags: [stories]
+      summary: List stories
+      operationId: list_stories
+      parameters:
+        - name: feature_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by feature
+        - name: team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by team
+        - name: iteration_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by iteration
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/StoryStatus"
+          description: Filter by status
+      responses:
+        "200":
+          description: List of stories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Story"
+
+    post:
+      tags: [stories]
+      summary: Create a story
+      operationId: create_story
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StoryCreate"
+      responses:
+        "201":
+          description: Created story
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Story"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /stories/{story_id}:
+    parameters:
+      - $ref: "#/components/parameters/story_id"
+    get:
+      tags: [stories]
+      summary: Get a story
+      operationId: get_story
+      responses:
+        "200":
+          description: Story details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Story"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [stories]
+      summary: Update a story
+      operationId: update_story
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StoryUpdate"
+      responses:
+        "200":
+          description: Updated story
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Story"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [stories]
+      summary: Delete a story
+      operationId: delete_story
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # PI Objectives
+  # ---------------------------------------------------------------------------
+
+  /objectives:
+    get:
+      tags: [objectives]
+      summary: List PI objectives
+      operationId: list_objectives
+      parameters:
+        - name: pi_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by PI
+        - name: team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by team
+        - name: is_stretch
+          in: query
+          schema:
+            type: boolean
+          description: "true = stretch only, false = committed only"
+      responses:
+        "200":
+          description: List of PI objectives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PIObjective"
+
+    post:
+      tags: [objectives]
+      summary: Create a PI objective
+      operationId: create_objective
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PIObjectiveCreate"
+      responses:
+        "201":
+          description: Created PI objective
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PIObjective"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /objectives/{objective_id}:
+    parameters:
+      - $ref: "#/components/parameters/objective_id"
+    get:
+      tags: [objectives]
+      summary: Get a PI objective
+      operationId: get_objective
+      responses:
+        "200":
+          description: PI objective details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PIObjective"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [objectives]
+      summary: Update a PI objective (includes scoring actual business value)
+      operationId: update_objective
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PIObjectiveUpdate"
+      responses:
+        "200":
+          description: Updated PI objective
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PIObjective"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [objectives]
+      summary: Delete a PI objective
+      operationId: delete_objective
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Risks
+  # ---------------------------------------------------------------------------
+
+  /risks:
+    get:
+      tags: [risks]
+      summary: List risks
+      operationId: list_risks
+      parameters:
+        - name: pi_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by PI
+        - name: team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by team
+        - name: roam_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ROAMStatus"
+          description: Filter by ROAM status
+      responses:
+        "200":
+          description: List of risks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Risk"
+
+    post:
+      tags: [risks]
+      summary: Raise a risk
+      operationId: create_risk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiskCreate"
+      responses:
+        "201":
+          description: Created risk
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Risk"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /risks/{risk_id}:
+    parameters:
+      - $ref: "#/components/parameters/risk_id"
+    get:
+      tags: [risks]
+      summary: Get a risk
+      operationId: get_risk
+      responses:
+        "200":
+          description: Risk details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Risk"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [risks]
+      summary: Update a risk (includes ROAM disposition)
+      operationId: update_risk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiskUpdate"
+      responses:
+        "200":
+          description: Updated risk
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Risk"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [risks]
+      summary: Delete a risk
+      operationId: delete_risk
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Dependencies
+  # ---------------------------------------------------------------------------
+
+  /dependencies:
+    get:
+      tags: [dependencies]
+      summary: List dependencies
+      operationId: list_dependencies
+      parameters:
+        - name: pi_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by PI
+        - name: from_team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by requesting team
+        - name: to_team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by providing team
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/DependencyStatus"
+          description: Filter by status
+      responses:
+        "200":
+          description: List of dependencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dependency"
+
+    post:
+      tags: [dependencies]
+      summary: Create a dependency
+      operationId: create_dependency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DependencyCreate"
+      responses:
+        "201":
+          description: Created dependency
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dependency"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /dependencies/{dependency_id}:
+    parameters:
+      - $ref: "#/components/parameters/dependency_id"
+    get:
+      tags: [dependencies]
+      summary: Get a dependency
+      operationId: get_dependency
+      responses:
+        "200":
+          description: Dependency details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dependency"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [dependencies]
+      summary: Update a dependency
+      operationId: update_dependency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DependencyUpdate"
+      responses:
+        "200":
+          description: Updated dependency
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dependency"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [dependencies]
+      summary: Delete a dependency
+      operationId: delete_dependency
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Capacity Plans
+  # ---------------------------------------------------------------------------
+
+  /capacity-plans:
+    get:
+      tags: [capacity-plans]
+      summary: List capacity plans
+      operationId: list_capacity_plans
+      parameters:
+        - name: pi_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by PI
+        - name: team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by team
+        - name: iteration_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by iteration
+      responses:
+        "200":
+          description: List of capacity plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CapacityPlan"
+
+    post:
+      tags: [capacity-plans]
+      summary: Create a capacity plan
+      operationId: create_capacity_plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapacityPlanCreate"
+      responses:
+        "201":
+          description: Created capacity plan (includes computed available_capacity)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapacityPlan"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /capacity-plans/{plan_id}:
+    parameters:
+      - $ref: "#/components/parameters/plan_id"
+    get:
+      tags: [capacity-plans]
+      summary: Get a capacity plan
+      operationId: get_capacity_plan
+      responses:
+        "200":
+          description: Capacity plan details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapacityPlan"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [capacity-plans]
+      summary: Update a capacity plan
+      operationId: update_capacity_plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapacityPlanUpdate"
+      responses:
+        "200":
+          description: Updated capacity plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapacityPlan"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [capacity-plans]
+      summary: Delete a capacity plan
+      operationId: delete_capacity_plan
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ---------------------------------------------------------------------------
+  # Stateless Compute
+  # ---------------------------------------------------------------------------
+
+  /compute/predictability:
+    post:
+      tags: [compute]
+      summary: Calculate ART PI predictability (stateless)
+      operationId: compute_predictability
+      description: |
+        Calculates predictability from planned vs actual business value across
+        all teams. Use this during Inspect & Adapt before closing a PI.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictabilityRequest"
+      responses:
+        "200":
+          description: Predictability result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictabilityResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+
+# =============================================================================
+# Components
+# =============================================================================
+
+components:
+
+  # ---------------------------------------------------------------------------
+  # Reusable parameters
+  # ---------------------------------------------------------------------------
+
+  parameters:
+    art_id:
+      name: art_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    team_id:
+      name: team_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    pi_id:
+      name: pi_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    iteration_id:
+      name: iteration_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    feature_id:
+      name: feature_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    story_id:
+      name: story_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    objective_id:
+      name: objective_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    risk_id:
+      name: risk_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    dependency_id:
+      name: dependency_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    plan_id:
+      name: plan_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  # ---------------------------------------------------------------------------
+  # Reusable responses
+  # ---------------------------------------------------------------------------
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: Request body failed validation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  # ---------------------------------------------------------------------------
+  # Schemas
+  # ---------------------------------------------------------------------------
+
+  schemas:
+
+    # --- Shared ---
+
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail:
+          type: string
+          example: "PI 'abc-123' not found"
+
+    # --- Enums ---
+
+    PIStatus:
+      type: string
+      enum: [planning, active, closed]
+
+    FeatureStatus:
+      type: string
+      enum: [funnel, analyzing, backlog, implementing, done]
+
+    StoryStatus:
+      type: string
+      enum: [not_started, in_progress, done, accepted]
+
+    ROAMStatus:
+      type: string
+      enum: [unroamed, resolved, owned, accepted, mitigated]
+
+    DependencyStatus:
+      type: string
+      enum: [identified, resolved, owned, accepted, mitigated]
+
+    # --- ART ---
+
+    ART:
+      type: object
+      required: [id, name, team_ids]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Platform ART
+        team_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    ARTCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: Platform ART
+
+    ARTUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+
+    # --- Team ---
+
+    Team:
+      type: object
+      required: [id, name, member_count, velocity_history]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Alpha
+        member_count:
+          type: integer
+          minimum: 1
+        art_id:
+          type: string
+          format: uuid
+          nullable: true
+        velocity_history:
+          type: array
+          items:
+            type: integer
+          example: [42, 38, 40]
+
+    TeamCreate:
+      type: object
+      required: [name, member_count]
+      properties:
+        name:
+          type: string
+        member_count:
+          type: integer
+          minimum: 1
+        art_id:
+          type: string
+          format: uuid
+          nullable: true
+        velocity_history:
+          type: array
+          items:
+            type: integer
+          default: []
+
+    TeamUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        member_count:
+          type: integer
+          minimum: 1
+        art_id:
+          type: string
+          format: uuid
+          nullable: true
+        velocity_history:
+          type: array
+          items:
+            type: integer
+
+    # --- PI ---
+
+    PI:
+      type: object
+      required: [id, name, art_id, start_date, end_date, status, iteration_ids]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: PI 2026.1
+        art_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+          example: "2026-01-05"
+        end_date:
+          type: string
+          format: date
+          example: "2026-03-27"
+        status:
+          $ref: "#/components/schemas/PIStatus"
+        iteration_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    PICreate:
+      type: object
+      required: [name, art_id, start_date, end_date]
+      properties:
+        name:
+          type: string
+        art_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    PIUpdate:
+      type: object
+      description: Status transitions use /activate and /close, not this endpoint.
+      properties:
+        name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    # --- Iteration ---
+
+    Iteration:
+      type: object
+      required: [id, pi_id, number, start_date, end_date, is_ip]
+      properties:
+        id:
+          type: string
+          format: uuid
+        pi_id:
+          type: string
+          format: uuid
+        number:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+          default: ""
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_ip:
+          type: boolean
+          default: false
+          description: True for the Innovation & Planning iteration
+
+    IterationCreate:
+      type: object
+      required: [pi_id, number, start_date, end_date]
+      properties:
+        pi_id:
+          type: string
+          format: uuid
+        number:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+          default: ""
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_ip:
+          type: boolean
+          default: false
+
+    IterationUpdate:
+      type: object
+      properties:
+        number:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_ip:
+          type: boolean
+
+    # --- Feature ---
+
+    Feature:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - user_business_value
+        - time_criticality
+        - risk_reduction_opportunity_enablement
+        - job_size
+        - cost_of_delay
+        - wsjf_score
+        - story_ids
+        - dependency_ids
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Single Sign-On
+        description:
+          type: string
+          default: ""
+        pi_id:
+          type: string
+          format: uuid
+          nullable: true
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          $ref: "#/components/schemas/FeatureStatus"
+        acceptance_criteria:
+          type: string
+          default: ""
+        user_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+        time_criticality:
+          type: integer
+          minimum: 1
+          maximum: 10
+        risk_reduction_opportunity_enablement:
+          type: integer
+          minimum: 1
+          maximum: 10
+        job_size:
+          type: integer
+          minimum: 1
+          maximum: 13
+        cost_of_delay:
+          type: integer
+          readOnly: true
+          description: "Computed: user_business_value + time_criticality + risk_reduction_opportunity_enablement"
+        wsjf_score:
+          type: number
+          format: float
+          readOnly: true
+          description: "Computed: cost_of_delay / job_size (rounded to 2 dp)"
+        story_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        dependency_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    FeatureCreate:
+      type: object
+      required:
+        - name
+        - user_business_value
+        - time_criticality
+        - risk_reduction_opportunity_enablement
+        - job_size
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          default: ""
+        pi_id:
+          type: string
+          format: uuid
+          nullable: true
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          $ref: "#/components/schemas/FeatureStatus"
+          default: backlog
+        acceptance_criteria:
+          type: string
+          default: ""
+        user_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+        time_criticality:
+          type: integer
+          minimum: 1
+          maximum: 10
+        risk_reduction_opportunity_enablement:
+          type: integer
+          minimum: 1
+          maximum: 10
+        job_size:
+          type: integer
+          minimum: 1
+          maximum: 13
+
+    FeatureUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        pi_id:
+          type: string
+          format: uuid
+          nullable: true
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          $ref: "#/components/schemas/FeatureStatus"
+        acceptance_criteria:
+          type: string
+        user_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+        time_criticality:
+          type: integer
+          minimum: 1
+          maximum: 10
+        risk_reduction_opportunity_enablement:
+          type: integer
+          minimum: 1
+          maximum: 10
+        job_size:
+          type: integer
+          minimum: 1
+          maximum: 13
+
+    # --- Story ---
+
+    Story:
+      type: object
+      required: [id, name, feature_id, team_id, points, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: As a user I can reset my password
+        description:
+          type: string
+          default: ""
+        feature_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
+        points:
+          type: integer
+          minimum: 1
+        status:
+          $ref: "#/components/schemas/StoryStatus"
+        acceptance_criteria:
+          type: string
+          default: ""
+
+    StoryCreate:
+      type: object
+      required: [name, feature_id, team_id, points]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          default: ""
+        feature_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
+        points:
+          type: integer
+          minimum: 1
+        status:
+          $ref: "#/components/schemas/StoryStatus"
+          default: not_started
+        acceptance_criteria:
+          type: string
+          default: ""
+
+    StoryUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
+        points:
+          type: integer
+          minimum: 1
+        status:
+          $ref: "#/components/schemas/StoryStatus"
+        acceptance_criteria:
+          type: string
+
+    # --- PIObjective ---
+
+    PIObjective:
+      type: object
+      required:
+        - id
+        - description
+        - team_id
+        - pi_id
+        - planned_business_value
+        - is_stretch
+        - feature_ids
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          example: Ship the authentication feature
+        team_id:
+          type: string
+          format: uuid
+        pi_id:
+          type: string
+          format: uuid
+        planned_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+        actual_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+          nullable: true
+        is_stretch:
+          type: boolean
+          default: false
+          description: "Committed when false, stretch when true"
+        feature_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    PIObjectiveCreate:
+      type: object
+      required: [description, team_id, pi_id, planned_business_value]
+      properties:
+        description:
+          type: string
+        team_id:
+          type: string
+          format: uuid
+        pi_id:
+          type: string
+          format: uuid
+        planned_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+        actual_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+          nullable: true
+        is_stretch:
+          type: boolean
+          default: false
+        feature_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          default: []
+
+    PIObjectiveUpdate:
+      type: object
+      properties:
+        description:
+          type: string
+        planned_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+        actual_business_value:
+          type: integer
+          minimum: 1
+          maximum: 10
+          nullable: true
+        is_stretch:
+          type: boolean
+        feature_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    # --- Risk ---
+
+    Risk:
+      type: object
+      required: [id, description, pi_id, roam_status, raised_date]
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          example: Auth service may not be ready in time
+        pi_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        feature_id:
+          type: string
+          format: uuid
+          nullable: true
+        roam_status:
+          $ref: "#/components/schemas/ROAMStatus"
+        owner:
+          type: string
+          nullable: true
+          example: Jane Smith
+        mitigation_notes:
+          type: string
+          default: ""
+        raised_date:
+          type: string
+          format: date
+
+    RiskCreate:
+      type: object
+      required: [description, pi_id]
+      properties:
+        description:
+          type: string
+        pi_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        feature_id:
+          type: string
+          format: uuid
+          nullable: true
+        roam_status:
+          $ref: "#/components/schemas/ROAMStatus"
+          default: unroamed
+        owner:
+          type: string
+          nullable: true
+        mitigation_notes:
+          type: string
+          default: ""
+
+    RiskUpdate:
+      type: object
+      properties:
+        description:
+          type: string
+        team_id:
+          type: string
+          format: uuid
+          nullable: true
+        feature_id:
+          type: string
+          format: uuid
+          nullable: true
+        roam_status:
+          $ref: "#/components/schemas/ROAMStatus"
+        owner:
+          type: string
+          nullable: true
+        mitigation_notes:
+          type: string
+
+    # --- Dependency ---
+
+    Dependency:
+      type: object
+      required:
+        - id
+        - description
+        - pi_id
+        - from_team_id
+        - to_team_id
+        - status
+        - raised_date
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          example: Team Alpha needs the API gateway from Team Infra
+        pi_id:
+          type: string
+          format: uuid
+        feature_id:
+          type: string
+          format: uuid
+          nullable: true
+        from_team_id:
+          type: string
+          format: uuid
+          description: The team that needs the dependency
+        to_team_id:
+          type: string
+          format: uuid
+          description: The team that must provide the dependency
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Iteration by which the dependency must be delivered
+        status:
+          $ref: "#/components/schemas/DependencyStatus"
+        owner:
+          type: string
+          nullable: true
+        resolution_notes:
+          type: string
+          default: ""
+        raised_date:
+          type: string
+          format: date
+        needed_by_date:
+          type: string
+          format: date
+          nullable: true
+
+    DependencyCreate:
+      type: object
+      required: [description, pi_id, from_team_id, to_team_id]
+      properties:
+        description:
+          type: string
+        pi_id:
+          type: string
+          format: uuid
+        feature_id:
+          type: string
+          format: uuid
+          nullable: true
+        from_team_id:
+          type: string
+          format: uuid
+        to_team_id:
+          type: string
+          format: uuid
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
+        needed_by_date:
+          type: string
+          format: date
+          nullable: true
+        owner:
+          type: string
+          nullable: true
+
+    DependencyUpdate:
+      type: object
+      properties:
+        description:
+          type: string
+        feature_id:
+          type: string
+          format: uuid
+          nullable: true
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          $ref: "#/components/schemas/DependencyStatus"
+        owner:
+          type: string
+          nullable: true
+        resolution_notes:
+          type: string
+        needed_by_date:
+          type: string
+          format: date
+          nullable: true
+
+    # --- CapacityPlan ---
+
+    CapacityPlan:
+      type: object
+      required:
+        - id
+        - team_id
+        - iteration_id
+        - pi_id
+        - team_size
+        - iteration_days
+        - pto_days
+        - overhead_pct
+        - available_capacity
+      properties:
+        id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        iteration_id:
+          type: string
+          format: uuid
+        pi_id:
+          type: string
+          format: uuid
+        team_size:
+          type: integer
+          minimum: 1
+        iteration_days:
+          type: integer
+          minimum: 1
+          default: 10
+        pto_days:
+          type: number
+          format: float
+          minimum: 0.0
+          default: 0.0
+        overhead_pct:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          default: 0.2
+        available_capacity:
+          type: number
+          format: float
+          readOnly: true
+          description: "Computed: (team_size x iteration_days - pto_days) x (1 - overhead_pct)"
+
+    CapacityPlanCreate:
+      type: object
+      required: [team_id, iteration_id, pi_id, team_size]
+      properties:
+        team_id:
+          type: string
+          format: uuid
+        iteration_id:
+          type: string
+          format: uuid
+        pi_id:
+          type: string
+          format: uuid
+        team_size:
+          type: integer
+          minimum: 1
+        iteration_days:
+          type: integer
+          minimum: 1
+          default: 10
+        pto_days:
+          type: number
+          format: float
+          minimum: 0.0
+          default: 0.0
+        overhead_pct:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          default: 0.2
+
+    CapacityPlanUpdate:
+      type: object
+      properties:
+        team_size:
+          type: integer
+          minimum: 1
+        iteration_days:
+          type: integer
+          minimum: 1
+        pto_days:
+          type: number
+          format: float
+          minimum: 0.0
+        overhead_pct:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+
+    # --- Stateless compute ---
+
+    PredictabilityTeamResult:
+      type: object
+      required: [planned_business_value, actual_business_value]
+      properties:
+        planned_business_value:
+          type: integer
+          minimum: 1
+        actual_business_value:
+          type: integer
+          minimum: 0
+
+    PredictabilityRequest:
+      type: object
+      required: [teams]
+      properties:
+        teams:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/PredictabilityTeamResult"
+
+    PredictabilityResponse:
+      type: object
+      required: [score_pct, rating]
+      properties:
+        score_pct:
+          type: number
+          format: float
+          description: ART predictability as a percentage
+          example: 85.0
+        rating:
+          type: string
+          enum: [green, yellow, red]
+          description: "green >= 80%, yellow 60-79%, red < 60%"

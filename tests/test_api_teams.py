@@ -1,0 +1,101 @@
+import pytest
+
+
+def _create_art(client, name="Platform ART"):
+    return client.post("/art", json={"name": name}).json()["id"]
+
+
+def test_list_empty(client):
+    r = client.get("/team")
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_create_returns_201(client):
+    r = client.post("/team", json={"name": "Alpha", "member_count": 6})
+    assert r.status_code == 201
+    body = r.json()
+    assert body["name"] == "Alpha"
+    assert body["member_count"] == 6
+    assert body["art_id"] is None
+
+
+def test_create_with_art_id(client):
+    art_id = _create_art(client)
+    r = client.post("/team", json={"name": "Beta", "member_count": 7, "art_id": art_id})
+    assert r.status_code == 201
+    assert r.json()["art_id"] == art_id
+
+
+def test_create_updates_art_team_ids(client):
+    art_id = _create_art(client)
+    team_id = client.post("/team", json={"name": "Gamma", "member_count": 5, "art_id": art_id}).json()["id"]
+    art = client.get(f"/art/{art_id}").json()
+    assert team_id in art["team_ids"]
+
+
+def test_create_with_unknown_art_returns_404(client):
+    r = client.post("/team", json={"name": "Orphan", "member_count": 5, "art_id": "no-such-art"})
+    assert r.status_code == 404
+
+
+def test_create_member_count_zero_returns_422(client):
+    r = client.post("/team", json={"name": "Bad", "member_count": 0})
+    assert r.status_code == 422
+
+
+def test_get_returns_team(client):
+    team_id = client.post("/team", json={"name": "Delta", "member_count": 8}).json()["id"]
+    r = client.get(f"/team/{team_id}")
+    assert r.status_code == 200
+    assert r.json()["id"] == team_id
+
+
+def test_get_unknown_returns_404(client):
+    r = client.get("/team/no-such-id")
+    assert r.status_code == 404
+
+
+def test_list_filter_by_art_id(client):
+    art1 = _create_art(client, "ART 1")
+    art2 = _create_art(client, "ART 2")
+    client.post("/team", json={"name": "T1", "member_count": 5, "art_id": art1})
+    client.post("/team", json={"name": "T2", "member_count": 5, "art_id": art2})
+    client.post("/team", json={"name": "T3", "member_count": 5, "art_id": art1})
+
+    teams = client.get(f"/team?art_id={art1}").json()
+    assert len(teams) == 2
+    assert all(t["art_id"] == art1 for t in teams)
+
+
+def test_patch_name(client):
+    team_id = client.post("/team", json={"name": "Old", "member_count": 5}).json()["id"]
+    r = client.patch(f"/team/{team_id}", json={"name": "New"})
+    assert r.status_code == 200
+    assert r.json()["name"] == "New"
+    assert r.json()["member_count"] == 5
+
+
+def test_patch_unknown_returns_404(client):
+    r = client.patch("/team/no-such-id", json={"name": "X"})
+    assert r.status_code == 404
+
+
+def test_delete_returns_204(client):
+    team_id = client.post("/team", json={"name": "Temp", "member_count": 4}).json()["id"]
+    r = client.delete(f"/team/{team_id}")
+    assert r.status_code == 204
+    assert client.get(f"/team/{team_id}").status_code == 404
+
+
+def test_delete_removes_from_art_team_ids(client):
+    art_id = _create_art(client)
+    team_id = client.post("/team", json={"name": "Gone", "member_count": 5, "art_id": art_id}).json()["id"]
+    client.delete(f"/team/{team_id}")
+    art = client.get(f"/art/{art_id}").json()
+    assert team_id not in art["team_ids"]
+
+
+def test_delete_unknown_returns_404(client):
+    r = client.delete("/team/no-such-id")
+    assert r.status_code == 404
