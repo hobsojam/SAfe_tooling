@@ -1,6 +1,7 @@
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
@@ -47,8 +48,19 @@ def _create_art(db_path: Path) -> str:
 
 
 def _create_pi(db_path: Path, art_id: str, name: str = "PI 2026.1") -> str:
-    invoke(db_path, "pi", "create", "--name", name, "--art-id", art_id,
-           "--start", "2026-01-05", "--end", "2026-03-27")
+    invoke(
+        db_path,
+        "pi",
+        "create",
+        "--name",
+        name,
+        "--art-id",
+        art_id,
+        "--start",
+        "2026-01-05",
+        "--end",
+        "2026-03-27",
+    )
     return repos_for(db_path).pis.get_all()[0].id
 
 
@@ -56,43 +68,100 @@ def _create_pi(db_path: Path, art_id: str, name: str = "PI 2026.1") -> str:
 # pi create
 # ---------------------------------------------------------------------------
 
+
 class TestPiCreate:
     def test_exit_code_success(self, db_path, patch_console):
         art_id = _create_art(db_path)
-        result = invoke(db_path, "pi", "create", "--name", "PI 2026.1",
-                        "--art-id", art_id, "--start", "2026-01-05", "--end", "2026-03-27")
+        result = invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 2026.1",
+            "--art-id",
+            art_id,
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
         assert result.exit_code == 0
 
     def test_name_in_output(self, db_path, patch_console):
         art_id = _create_art(db_path)
-        invoke(db_path, "pi", "create", "--name", "PI 2026.1",
-               "--art-id", art_id, "--start", "2026-01-05", "--end", "2026-03-27")
+        invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 2026.1",
+            "--art-id",
+            art_id,
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
         assert "PI 2026.1" in patch_console.getvalue()
 
     def test_stored_in_db(self, db_path, patch_console):
         art_id = _create_art(db_path)
-        invoke(db_path, "pi", "create", "--name", "PI 2026.1",
-               "--art-id", art_id, "--start", "2026-01-05", "--end", "2026-03-27")
+        invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 2026.1",
+            "--art-id",
+            art_id,
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
         pis = repos_for(db_path).pis.get_all()
         assert len(pis) == 1
         assert pis[0].name == "PI 2026.1"
         assert pis[0].art_id == art_id
 
     def test_invalid_art_id_exits_1(self, db_path, patch_console):
-        result = invoke(db_path, "pi", "create", "--name", "PI 2026.1",
-                        "--art-id", "bad-id", "--start", "2026-01-05", "--end", "2026-03-27")
+        result = invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 2026.1",
+            "--art-id",
+            "bad-id",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
         assert result.exit_code == 1
 
     def test_invalid_date_exits_nonzero(self, db_path, patch_console):
         art_id = _create_art(db_path)
-        result = invoke(db_path, "pi", "create", "--name", "PI 2026.1",
-                        "--art-id", art_id, "--start", "not-a-date", "--end", "2026-03-27")
+        result = invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 2026.1",
+            "--art-id",
+            art_id,
+            "--start",
+            "not-a-date",
+            "--end",
+            "2026-03-27",
+        )
         assert result.exit_code != 0
 
 
 # ---------------------------------------------------------------------------
 # pi show
 # ---------------------------------------------------------------------------
+
 
 class TestPiShow:
     def test_shows_name(self, db_path, patch_console):
@@ -122,6 +191,7 @@ class TestPiShow:
 # pi list
 # ---------------------------------------------------------------------------
 
+
 class TestPiList:
     def test_empty(self, db_path, patch_console):
         invoke(db_path, "pi", "list")
@@ -140,8 +210,19 @@ class TestPiList:
         invoke(db_path, "art", "create", "--name", "Other ART")
         other_art_id = [a.id for a in repos_for(db_path).arts.get_all() if a.id != art_id][0]
         _create_pi(db_path, art_id, "PI 2026.1")
-        invoke(db_path, "pi", "create", "--name", "PI Other",
-               "--art-id", other_art_id, "--start", "2026-01-05", "--end", "2026-03-27")
+        invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI Other",
+            "--art-id",
+            other_art_id,
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
         patch_console.truncate(0)
         patch_console.seek(0)
         invoke(db_path, "pi", "list", "--art-id", art_id)
@@ -153,6 +234,7 @@ class TestPiList:
 # ---------------------------------------------------------------------------
 # pi activate / close
 # ---------------------------------------------------------------------------
+
 
 class TestPiActivate:
     def test_planning_to_active(self, db_path, patch_console):
@@ -174,8 +256,19 @@ class TestPiActivate:
         pi_id1 = _create_pi(db_path, art_id, "PI 2026.1")
         invoke(db_path, "pi", "activate", pi_id1)
         # create a second PI for the same ART
-        invoke(db_path, "pi", "create", "--name", "PI 2026.2",
-               "--art-id", art_id, "--start", "2026-04-01", "--end", "2026-06-30")
+        invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 2026.2",
+            "--art-id",
+            art_id,
+            "--start",
+            "2026-04-01",
+            "--end",
+            "2026-06-30",
+        )
         pi_id2 = [p.id for p in repos_for(db_path).pis.get_all() if p.id != pi_id1][0]
         result = invoke(db_path, "pi", "activate", pi_id2)
         assert result.exit_code == 1
@@ -218,21 +311,44 @@ class TestPiClose:
 # pi iteration add / list / delete
 # ---------------------------------------------------------------------------
 
+
 class TestIterationAdd:
     def test_exit_code_success(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        result = invoke(db_path, "pi", "iteration", "add",
-                        "--pi-id", pi_id, "--number", "1",
-                        "--start", "2026-01-05", "--end", "2026-01-16")
+        result = invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         assert result.exit_code == 0
 
     def test_stored_in_db(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "1",
-               "--start", "2026-01-05", "--end", "2026-01-16")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         iterations = repos_for(db_path).iterations.get_all()
         assert len(iterations) == 1
         assert iterations[0].number == 1
@@ -240,33 +356,78 @@ class TestIterationAdd:
     def test_updates_pi_iteration_ids(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "1",
-               "--start", "2026-01-05", "--end", "2026-01-16")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         pi = repos_for(db_path).pis.get(pi_id)
         assert len(pi.iteration_ids) == 1
 
     def test_ip_flag(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "5",
-               "--start", "2026-03-16", "--end", "2026-03-27", "--ip")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "5",
+            "--start",
+            "2026-03-16",
+            "--end",
+            "2026-03-27",
+            "--ip",
+        )
         it = repos_for(db_path).iterations.get_all()[0]
         assert it.is_ip is True
 
     def test_dates_outside_pi_exits_1(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        result = invoke(db_path, "pi", "iteration", "add",
-                        "--pi-id", pi_id, "--number", "1",
-                        "--start", "2025-12-01", "--end", "2025-12-12")
+        result = invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2025-12-01",
+            "--end",
+            "2025-12-12",
+        )
         assert result.exit_code == 1
 
     def test_invalid_pi_exits_1(self, db_path, patch_console):
-        result = invoke(db_path, "pi", "iteration", "add",
-                        "--pi-id", "bad-id", "--number", "1",
-                        "--start", "2026-01-05", "--end", "2026-01-16")
+        result = invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            "bad-id",
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         assert result.exit_code == 1
 
 
@@ -280,12 +441,34 @@ class TestIterationList:
     def test_lists_iterations(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "1",
-               "--start", "2026-01-05", "--end", "2026-01-16")
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "2",
-               "--start", "2026-01-19", "--end", "2026-01-30")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "2",
+            "--start",
+            "2026-01-19",
+            "--end",
+            "2026-01-30",
+        )
         patch_console.truncate(0)
         patch_console.seek(0)
         invoke(db_path, "pi", "iteration", "list", "--pi-id", pi_id)
@@ -302,9 +485,20 @@ class TestIterationDelete:
     def test_exit_code_success(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "1",
-               "--start", "2026-01-05", "--end", "2026-01-16")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         it_id = repos_for(db_path).iterations.get_all()[0].id
         result = invoke(db_path, "pi", "iteration", "delete", it_id)
         assert result.exit_code == 0
@@ -312,9 +506,20 @@ class TestIterationDelete:
     def test_removed_from_db(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "1",
-               "--start", "2026-01-05", "--end", "2026-01-16")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         it_id = repos_for(db_path).iterations.get_all()[0].id
         invoke(db_path, "pi", "iteration", "delete", it_id)
         assert repos_for(db_path).iterations.count() == 0
@@ -322,9 +527,20 @@ class TestIterationDelete:
     def test_removes_from_pi(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)
-        invoke(db_path, "pi", "iteration", "add",
-               "--pi-id", pi_id, "--number", "1",
-               "--start", "2026-01-05", "--end", "2026-01-16")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         it_id = repos_for(db_path).iterations.get_all()[0].id
         invoke(db_path, "pi", "iteration", "delete", it_id)
         pi = repos_for(db_path).pis.get(pi_id)

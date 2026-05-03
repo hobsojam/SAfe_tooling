@@ -35,8 +35,9 @@ def create_team(body: TeamCreate, repos: Repos = Depends(get_repos_dep)):
 
     if body.art_id is not None:
         art = repos.arts.get(body.art_id)
-        art = art.model_copy(update={"team_ids": art.team_ids + [team.id]})
-        repos.arts.save(art)
+        if art is not None:
+            art = art.model_copy(update={"team_ids": art.team_ids + [team.id]})
+            repos.arts.save(art)
 
     return team
 

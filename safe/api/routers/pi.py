@@ -55,11 +55,15 @@ def delete_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
 def activate_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
     pi = _get_or_404(repos, pi_id)
     if pi.status != PIStatus.PLANNING:
-        raise HTTPException(status_code=409, detail=f"PI '{pi_id}' is {pi.status.value}, not planning")
+        raise HTTPException(
+            status_code=409, detail=f"PI '{pi_id}' is {pi.status.value}, not planning"
+        )
 
     active = repos.pis.find(art_id=pi.art_id, status=PIStatus.ACTIVE)
     if active:
-        raise HTTPException(status_code=409, detail=f"ART already has an active PI '{active[0].id}'")
+        raise HTTPException(
+            status_code=409, detail=f"ART already has an active PI '{active[0].id}'"
+        )
 
     updated = pi.model_copy(update={"status": PIStatus.ACTIVE})
     return repos.pis.save(updated)
@@ -69,6 +73,8 @@ def activate_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
 def close_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
     pi = _get_or_404(repos, pi_id)
     if pi.status != PIStatus.ACTIVE:
-        raise HTTPException(status_code=409, detail=f"PI '{pi_id}' is {pi.status.value}, not active")
+        raise HTTPException(
+            status_code=409, detail=f"PI '{pi_id}' is {pi.status.value}, not active"
+        )
     updated = pi.model_copy(update={"status": PIStatus.CLOSED})
     return repos.pis.save(updated)

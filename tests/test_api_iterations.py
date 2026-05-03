@@ -1,20 +1,29 @@
-import pytest
-
-
 def _create_art(client):
     return client.post("/art", json={"name": "ART"}).json()["id"]
 
 
 def _create_pi(client, art_id, start="2026-01-05", end="2026-03-27"):
-    return client.post("/pi", json={
-        "name": "PI 1", "art_id": art_id, "start_date": start, "end_date": end,
-    }).json()["id"]
+    return client.post(
+        "/pi",
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": start,
+            "end_date": end,
+        },
+    ).json()["id"]
 
 
 def _create_iteration(client, pi_id, number=1, start="2026-01-05", end="2026-01-16"):
-    return client.post("/iterations", json={
-        "pi_id": pi_id, "number": number, "start_date": start, "end_date": end,
-    })
+    return client.post(
+        "/iterations",
+        json={
+            "pi_id": pi_id,
+            "number": number,
+            "start_date": start,
+            "end_date": end,
+        },
+    )
 
 
 class TestIterationCreate:
@@ -36,33 +45,58 @@ class TestIterationCreate:
         assert iter_id in pi["iteration_ids"]
 
     def test_unknown_pi_returns_404(self, client):
-        r = client.post("/iterations", json={
-            "pi_id": "no-such-pi", "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16",
-        })
+        r = client.post(
+            "/iterations",
+            json={
+                "pi_id": "no-such-pi",
+                "number": 1,
+                "start_date": "2026-01-05",
+                "end_date": "2026-01-16",
+            },
+        )
         assert r.status_code == 404
 
     def test_dates_outside_pi_range_returns_422(self, client):
         art_id = _create_art(client)
         pi_id = _create_pi(client, art_id, start="2026-01-05", end="2026-03-27")
-        r = client.post("/iterations", json={
-            "pi_id": pi_id, "number": 1, "start_date": "2025-12-01", "end_date": "2026-01-16",
-        })
+        r = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 1,
+                "start_date": "2025-12-01",
+                "end_date": "2026-01-16",
+            },
+        )
         assert r.status_code == 422
 
     def test_end_date_beyond_pi_returns_422(self, client):
         art_id = _create_art(client)
         pi_id = _create_pi(client, art_id, start="2026-01-05", end="2026-03-27")
-        r = client.post("/iterations", json={
-            "pi_id": pi_id, "number": 5, "start_date": "2026-03-16", "end_date": "2026-04-10",
-        })
+        r = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 5,
+                "start_date": "2026-03-16",
+                "end_date": "2026-04-10",
+            },
+        )
         assert r.status_code == 422
 
     def test_ip_iteration_flag(self, client):
         art_id = _create_art(client)
         pi_id = _create_pi(client, art_id)
-        r = client.post("/iterations", json={
-            "pi_id": pi_id, "number": 5, "start_date": "2026-03-16", "end_date": "2026-03-27", "is_ip": True,
-        })
+        r = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 5,
+                "start_date": "2026-03-16",
+                "end_date": "2026-03-27",
+                "is_ip": True,
+            },
+        )
         assert r.status_code == 201
         assert r.json()["is_ip"] is True
 

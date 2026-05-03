@@ -22,7 +22,11 @@ def list_capacity_plans(
     iteration_id: str | None = Query(default=None),
     repos: Repos = Depends(get_repos_dep),
 ):
-    filters = {k: v for k, v in {"pi_id": pi_id, "team_id": team_id, "iteration_id": iteration_id}.items() if v is not None}
+    filters = {
+        k: v
+        for k, v in {"pi_id": pi_id, "team_id": team_id, "iteration_id": iteration_id}.items()
+        if v is not None
+    }
     return repos.capacity_plans.find(**filters) if filters else repos.capacity_plans.get_all()
 
 
@@ -44,7 +48,9 @@ def get_capacity_plan(plan_id: str, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.patch("/{plan_id}", response_model=CapacityPlan)
-def update_capacity_plan(plan_id: str, body: CapacityPlanUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_capacity_plan(
+    plan_id: str, body: CapacityPlanUpdate, repos: Repos = Depends(get_repos_dep)
+):
     plan = _get_or_404(repos, plan_id)
     updated = plan.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.capacity_plans.save(updated)

@@ -1,10 +1,12 @@
 from datetime import date
-from enum import Enum
+from enum import StrEnum
+
 from pydantic import Field
+
 from safe.models.base import SAFeBaseModel
 
 
-class DependencyStatus(str, Enum):
+class DependencyStatus(StrEnum):
     IDENTIFIED = "identified"
     RESOLVED = "resolved"
     OWNED = "owned"

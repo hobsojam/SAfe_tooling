@@ -1,11 +1,12 @@
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
-import safe.cli.team as team_module
 import safe.cli.state as state
+import safe.cli.team as team_module
 from safe.cli.main import app
 from safe.store.db import get_db
 from safe.store.repos import get_repos
@@ -50,6 +51,7 @@ def _create_art(db_path: Path, name: str = "Platform ART"):
 # team create
 # ---------------------------------------------------------------------------
 
+
 class TestTeamCreate:
     def test_exit_code_success(self, db_path, patch_console):
         result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
@@ -68,7 +70,9 @@ class TestTeamCreate:
 
     def test_create_with_art_id(self, db_path, patch_console):
         art = _create_art(db_path)
-        result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", art.id)
+        result = invoke(
+            db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", art.id
+        )
         assert result.exit_code == 0
         team = repos_for(db_path).teams.get_all()[0]
         assert team.art_id == art.id
@@ -80,7 +84,9 @@ class TestTeamCreate:
         assert len(updated_art.team_ids) == 1
 
     def test_invalid_art_id_exits_1(self, db_path, patch_console):
-        result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", "bad-id")
+        result = invoke(
+            db_path, "team", "create", "--name", "Alpha", "--members", "6", "--art-id", "bad-id"
+        )
         assert result.exit_code == 1
 
     def test_missing_name_exits_nonzero(self, db_path, patch_console):
@@ -95,6 +101,7 @@ class TestTeamCreate:
 # ---------------------------------------------------------------------------
 # team show
 # ---------------------------------------------------------------------------
+
 
 class TestTeamShow:
     def _create_team(self, db_path):
@@ -124,6 +131,7 @@ class TestTeamShow:
 # ---------------------------------------------------------------------------
 # team list
 # ---------------------------------------------------------------------------
+
 
 class TestTeamList:
     def test_empty(self, db_path, patch_console):
@@ -155,6 +163,7 @@ class TestTeamList:
 # ---------------------------------------------------------------------------
 # team delete
 # ---------------------------------------------------------------------------
+
 
 class TestTeamDelete:
     def test_exit_code_success(self, db_path, patch_console):
