@@ -20,7 +20,7 @@ pip install -e ".[dev]"
 | ART / Team setup | Working | `safe art`, `safe team` |
 | PI / Iteration setup | Working | `safe pi`, `safe pi iteration` |
 | HTTP API (FastAPI) | Working | `safe-api` / `podman compose up` |
-| Program Backlog Manager | Planned | `safe feature`, `safe backlog` |
+| Program Backlog Manager | Working | `safe feature`, `safe story`, `safe backlog`, `safe wsjf rank` |
 | Capacity Planner (stateful) | Planned | `safe capacity set/show` |
 | PI Objectives Tracker | Planned | `safe objective` |
 | Risk Register | Planned | `safe risk` |
@@ -72,9 +72,55 @@ safe pi iteration list --pi-id <pi-id>
 safe pi iteration delete <id>
 ```
 
-### WSJF Score
+### Program Backlog Manager
 
-Calculate a Weighted Shortest Job First score for a Feature:
+```bash
+# Add a feature (WSJF fields required)
+safe feature add --name "Auth Service" \
+  --user-value 8 --time-crit 5 --risk-reduction 3 --job-size 4 \
+  --pi-id <pi-id>
+
+# List all features
+safe feature list
+safe feature list --pi-id <pi-id> --status implementing
+
+# WSJF-ranked backlog view
+safe feature rank
+safe wsjf rank            # alias for feature rank
+safe backlog show         # ranked view with story counts
+
+# Update a feature
+safe feature update <id> --status implementing
+safe feature assign <id> --team-id <team-id>
+
+# Delete (also removes child stories)
+safe feature delete <id>
+```
+
+### Stories
+
+```bash
+# Add a story to a feature
+safe story add --name "Login flow" --feature-id <fid> --team-id <tid> --points 3
+safe story add --name "Token refresh" --feature-id <fid> --team-id <tid> --points 2 \
+  --iteration-id <iter-id>
+
+# List stories
+safe story list
+safe story list --feature-id <fid>
+safe story list --team-id <tid>
+safe story list --iteration-id <iter-id>
+
+# Update
+safe story update <id> --status in_progress
+safe story update <id> --points 5 --iteration-id <iter-id>
+
+safe story delete <id>
+```
+
+### WSJF Score (stateless)
+
+Calculate a Weighted Shortest Job First score for a single feature:
 
 ```bash
 safe wsjf score --user-value 8 --time-crit 5 --risk-reduction 3 --job-size 4
@@ -179,11 +225,14 @@ safe/
   models/       Pydantic models (ART, Team, PI, Feature, Story, ...)
   logic/        Pure business logic (WSJF, capacity, predictability)
   cli/
-    main.py     Root Typer app; wsjf score, capacity calc; --db-path global option
+    main.py     Root Typer app; wsjf score/rank, capacity calc; --db-path global option
     state.py    Shared CLI state (db_path)
     art.py      safe art commands
     team.py     safe team commands
     pi.py       safe pi and safe pi iteration commands
+    feature.py  safe feature commands (add/show/list/rank/update/assign/delete)
+    story.py    safe story commands (add/list/update/delete)
+    backlog.py  safe backlog show
   api/
     main.py     FastAPI app; lifespan; router registration; run() entry point
     deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan
