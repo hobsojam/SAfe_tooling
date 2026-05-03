@@ -9,8 +9,8 @@ from safe.cli.backlog import backlog_app
 from safe.cli.capacity import capacity_app
 from safe.cli.feature import feature_app, feature_rank
 from safe.cli.objective import objective_app
-from safe.cli.risk import risk_app
 from safe.cli.pi import pi_app
+from safe.cli.risk import risk_app
 from safe.cli.story import story_app
 from safe.cli.team import team_app
 from safe.logic.wsjf import cost_of_delay, wsjf
