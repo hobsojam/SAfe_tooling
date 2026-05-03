@@ -10,14 +10,13 @@ from safe.cli.pi import pi_app
 from safe.cli.feature import feature_app, feature_rank
 from safe.cli.story import story_app
 from safe.cli.backlog import backlog_app
+from safe.cli.capacity import capacity_app
 from safe.logic.wsjf import wsjf, cost_of_delay
-from safe.logic.capacity import available_capacity
 
 app = typer.Typer(name="safe", help="SAFe PI Planning tools", no_args_is_help=True)
 console = Console()
 
 wsjf_app = typer.Typer(help="WSJF scoring and backlog prioritization")
-capacity_app = typer.Typer(help="Team capacity planning")
 
 app.add_typer(art_app, name="art")
 app.add_typer(team_app, name="team")
@@ -52,18 +51,6 @@ def wsjf_score(
     score = wsjf(user_value, time_criticality, risk_reduction, job_size)
     console.print(f"Cost of Delay : [bold]{cod}[/bold]")
     console.print(f"WSJF Score    : [bold green]{score}[/bold green]")
-
-
-@capacity_app.command("calc")
-def capacity_calc(
-    team_size: int = typer.Option(..., "--team-size", "-n", help="Number of team members"),
-    iteration_days: int = typer.Option(10, "--days", "-d", help="Working days per iteration"),
-    pto_days: float = typer.Option(0.0, "--pto", help="Total PTO days across team"),
-    overhead_pct: float = typer.Option(0.2, "--overhead", help="Overhead fraction (default 0.20)"),
-):
-    """Calculate available team capacity for an iteration."""
-    cap = available_capacity(team_size, iteration_days, pto_days, overhead_pct)
-    console.print(f"Available Capacity : [bold green]{cap}[/bold green] person-days")
 
 
 if __name__ == "__main__":

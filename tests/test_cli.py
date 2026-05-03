@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 
 import safe.cli.main as main_module
 import safe.cli.pi as pi_module
+import safe.cli.capacity as capacity_module
 from safe.cli.main import app
 
 runner = CliRunner()
@@ -24,6 +25,7 @@ def patch_console(monkeypatch):
     test_console = Console(file=buf, highlight=False, markup=False)
     monkeypatch.setattr(main_module, "console", test_console)
     monkeypatch.setattr(pi_module, "console", test_console)
+    monkeypatch.setattr(capacity_module, "console", test_console)
     yield buf
 
 
