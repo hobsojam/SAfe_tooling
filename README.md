@@ -184,8 +184,15 @@ safe/
     art.py      safe art commands
     team.py     safe team commands
     pi.py       safe pi and safe pi iteration commands
+  api/
+    main.py     FastAPI app; lifespan; router registration; run() entry point
+    deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan
+    schemas.py  Create/Update/action request body schemas
+    routers/    One file per resource (arts, teams, pi, iterations, features, ...)
   store/        TinyDB persistence (Repository[T], get_repos())
-tests/          pytest test suite
+tests/          pytest test suite (CLI + API)
+Dockerfile
+docker-compose.yml
 pyproject.toml
 ```
 
