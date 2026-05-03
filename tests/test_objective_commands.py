@@ -1,6 +1,7 @@
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
@@ -44,8 +45,19 @@ def repos_for(db_path: Path):
 def _setup(db_path):
     invoke(db_path, "art", "create", "--name", "ART")
     art_id = repos_for(db_path).arts.get_all()[0].id
-    invoke(db_path, "pi", "create", "--name", "PI 1", "--art-id", art_id,
-           "--start", "2026-01-05", "--end", "2026-03-27")
+    invoke(
+        db_path,
+        "pi",
+        "create",
+        "--name",
+        "PI 1",
+        "--art-id",
+        art_id,
+        "--start",
+        "2026-01-05",
+        "--end",
+        "2026-03-27",
+    )
     pi_id = repos_for(db_path).pis.get_all()[0].id
     invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
     team_id = repos_for(db_path).teams.get_all()[0].id
@@ -53,10 +65,18 @@ def _setup(db_path):
 
 
 def _add_objective(db_path, pi_id, team_id, planned_bv=8, stretch=False):
-    args = ["objective", "add",
-            "--description", "Deliver auth service",
-            "--team-id", team_id, "--pi-id", pi_id,
-            "--planned-bv", str(planned_bv)]
+    args = [
+        "objective",
+        "add",
+        "--description",
+        "Deliver auth service",
+        "--team-id",
+        team_id,
+        "--pi-id",
+        pi_id,
+        "--planned-bv",
+        str(planned_bv),
+    ]
     if stretch:
         args.append("--stretch")
     return invoke(db_path, *args)
@@ -90,16 +110,36 @@ class TestObjectiveAdd:
 
     def test_unknown_team_exits_1(self, db_path, patch_console):
         pi_id, _ = _setup(db_path)
-        result = invoke(db_path, "objective", "add",
-                        "--description", "X", "--team-id", "bad",
-                        "--pi-id", pi_id, "--planned-bv", "5")
+        result = invoke(
+            db_path,
+            "objective",
+            "add",
+            "--description",
+            "X",
+            "--team-id",
+            "bad",
+            "--pi-id",
+            pi_id,
+            "--planned-bv",
+            "5",
+        )
         assert result.exit_code == 1
 
     def test_unknown_pi_exits_1(self, db_path, patch_console):
         _, team_id = _setup(db_path)
-        result = invoke(db_path, "objective", "add",
-                        "--description", "X", "--team-id", team_id,
-                        "--pi-id", "bad", "--planned-bv", "5")
+        result = invoke(
+            db_path,
+            "objective",
+            "add",
+            "--description",
+            "X",
+            "--team-id",
+            team_id,
+            "--pi-id",
+            "bad",
+            "--planned-bv",
+            "5",
+        )
         assert result.exit_code == 1
 
 
