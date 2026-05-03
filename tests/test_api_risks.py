@@ -3,9 +3,15 @@ def _create_art(client):
 
 
 def _create_pi(client, art_id):
-    return client.post("/pi", json={
-        "name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27",
-    }).json()["id"]
+    return client.post(
+        "/pi",
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
+    ).json()["id"]
 
 
 def _create_risk(client, pi_id, **overrides):
@@ -25,9 +31,15 @@ def test_create_returns_201(client):
 def test_list_filter_by_pi(client):
     art_id = _create_art(client)
     pi1 = _create_pi(client, art_id)
-    pi2 = client.post("/pi", json={
-        "name": "PI 2", "art_id": art_id, "start_date": "2026-04-06", "end_date": "2026-06-26",
-    }).json()["id"]
+    pi2 = client.post(
+        "/pi",
+        json={
+            "name": "PI 2",
+            "art_id": art_id,
+            "start_date": "2026-04-06",
+            "end_date": "2026-06-26",
+        },
+    ).json()["id"]
     _create_risk(client, pi1)
     _create_risk(client, pi2)
     risks = client.get(f"/risks?pi_id={pi1}").json()

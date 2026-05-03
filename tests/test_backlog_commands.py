@@ -15,11 +15,16 @@ from safe.store.repos import get_repos
 runner = CliRunner()
 
 FEATURE_ARGS = [
-    "--name", "Auth Service",
-    "--user-value", "8",
-    "--time-crit", "5",
-    "--risk-reduction", "3",
-    "--job-size", "4",
+    "--name",
+    "Auth Service",
+    "--user-value",
+    "8",
+    "--time-crit",
+    "5",
+    "--risk-reduction",
+    "3",
+    "--job-size",
+    "4",
 ]
 
 
@@ -64,8 +69,21 @@ class TestBacklogShow:
         assert "Auth Service" in patch_console.getvalue()
 
     def test_ranked_by_wsjf(self, db_path, patch_console):
-        invoke(db_path, "feature", "add", "--name", "Low",
-               "--user-value", "1", "--time-crit", "1", "--risk-reduction", "1", "--job-size", "13")
+        invoke(
+            db_path,
+            "feature",
+            "add",
+            "--name",
+            "Low",
+            "--user-value",
+            "1",
+            "--time-crit",
+            "1",
+            "--risk-reduction",
+            "1",
+            "--job-size",
+            "13",
+        )
         invoke(db_path, "feature", "add", *FEATURE_ARGS)
         patch_console.truncate(0)
         patch_console.seek(0)
@@ -82,8 +100,9 @@ class TestWsjfRankAlias:
     @pytest.fixture
     def feature_buf(self, monkeypatch):
         buf = StringIO()
-        monkeypatch.setattr(feature_module, "console",
-                            Console(file=buf, highlight=False, markup=False, width=200))
+        monkeypatch.setattr(
+            feature_module, "console", Console(file=buf, highlight=False, markup=False, width=200)
+        )
         return buf
 
     def test_rank_alias_exit_code(self, db_path, patch_console, feature_buf):
@@ -111,15 +130,50 @@ class TestStoryClearIteration:
         tid = repos.teams.get_all()[0].id
         invoke(db_path, "art", "create", "--name", "ART")
         art_id = repos_for(db_path).arts.get_all()[0].id
-        invoke(db_path, "pi", "create", "--name", "PI 1", "--art-id", art_id,
-               "--start", "2026-01-05", "--end", "2026-03-27")
+        invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 1",
+            "--art-id",
+            art_id,
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
         pi_id = repos_for(db_path).pis.get_all()[0].id
-        invoke(db_path, "pi", "iteration", "add", "--pi-id", pi_id,
-               "--number", "1", "--start", "2026-01-05", "--end", "2026-01-16")
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+        )
         iter_id = repos_for(db_path).iterations.get_all()[0].id
-        invoke(db_path, "story", "add",
-               "--name", "S1", "--feature-id", fid, "--team-id", tid,
-               "--points", "3", "--iteration-id", iter_id)
+        invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S1",
+            "--feature-id",
+            fid,
+            "--team-id",
+            tid,
+            "--points",
+            "3",
+            "--iteration-id",
+            iter_id,
+        )
         story = repos_for(db_path).stories.get_all()[0]
         assert story.iteration_id == iter_id
         invoke(db_path, "story", "update", story.id, "--iteration-id", "")

@@ -46,6 +46,7 @@ def repos_for(db_path: Path):
 # art create
 # ---------------------------------------------------------------------------
 
+
 class TestArtCreate:
     def test_exit_code_success(self, db_path, patch_console):
         result = invoke(db_path, "art", "create", "--name", "Platform ART")
@@ -77,6 +78,7 @@ class TestArtCreate:
 # ---------------------------------------------------------------------------
 # art show
 # ---------------------------------------------------------------------------
+
 
 class TestArtShow:
     def _create_art(self, db_path):
@@ -110,6 +112,7 @@ class TestArtShow:
 # ---------------------------------------------------------------------------
 # art list
 # ---------------------------------------------------------------------------
+
 
 class TestArtList:
     def test_empty(self, db_path, patch_console):

@@ -1,5 +1,3 @@
-
-
 def _create_art(client, name="Platform ART"):
     return client.post("/art", json={"name": name}).json()["id"]
 

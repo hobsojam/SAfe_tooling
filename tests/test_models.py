@@ -15,6 +15,7 @@ from safe.models.risk import Risk, ROAMStatus
 # Team
 # ---------------------------------------------------------------------------
 
+
 class TestTeam:
     def test_basic(self):
         t = Team(name="Alpha", member_count=6)
@@ -47,6 +48,7 @@ class TestTeam:
 # ART
 # ---------------------------------------------------------------------------
 
+
 class TestART:
     def test_basic(self):
         art = ART(name="Platform ART")
@@ -62,11 +64,14 @@ class TestART:
 # Iteration
 # ---------------------------------------------------------------------------
 
+
 class TestIteration:
     def _make(self, **kwargs):
         defaults = {
-            "pi_id": "p-1", "number": 1,
-            "start_date": date(2026, 1, 5), "end_date": date(2026, 1, 16),
+            "pi_id": "p-1",
+            "number": 1,
+            "start_date": date(2026, 1, 5),
+            "end_date": date(2026, 1, 16),
         }
         return Iteration(**{**defaults, **kwargs})
 
@@ -92,11 +97,14 @@ class TestIteration:
 # PI
 # ---------------------------------------------------------------------------
 
+
 class TestPI:
     def _make(self, **kwargs):
         defaults = {
-            "name": "PI 2026.1", "art_id": "art-1",
-            "start_date": date(2026, 1, 5), "end_date": date(2026, 3, 27),
+            "name": "PI 2026.1",
+            "art_id": "art-1",
+            "start_date": date(2026, 1, 5),
+            "end_date": date(2026, 3, 27),
         }
         return PI(**{**defaults, **kwargs})
 
@@ -126,6 +134,7 @@ class TestPI:
 # Feature
 # ---------------------------------------------------------------------------
 
+
 class TestFeature:
     def _make(self, **kwargs):
         defaults = {
@@ -146,15 +155,19 @@ class TestFeature:
     def test_wsjf_rounding(self):
         # CoD = 10, size = 3 → 3.33
         f = self._make(
-            user_business_value=4, time_criticality=3,
-            risk_reduction_opportunity_enablement=3, job_size=3,
+            user_business_value=4,
+            time_criticality=3,
+            risk_reduction_opportunity_enablement=3,
+            job_size=3,
         )
         assert f.wsjf_score == round(10 / 3, 2)
 
     def test_maximum_wsjf(self):
         f = self._make(
-            user_business_value=10, time_criticality=10,
-            risk_reduction_opportunity_enablement=10, job_size=1,
+            user_business_value=10,
+            time_criticality=10,
+            risk_reduction_opportunity_enablement=10,
+            job_size=1,
         )
         assert f.cost_of_delay == 30
         assert f.wsjf_score == 30.0
@@ -212,11 +225,14 @@ class TestFeature:
 # Story
 # ---------------------------------------------------------------------------
 
+
 class TestStory:
     def _make(self, **kwargs):
         defaults = {
-            "name": "As a user I want to log in", "feature_id": "f-1",
-            "team_id": "t-1", "points": 3,
+            "name": "As a user I want to log in",
+            "feature_id": "f-1",
+            "team_id": "t-1",
+            "points": 3,
         }
         return Story(**{**defaults, **kwargs})
 
@@ -244,11 +260,14 @@ class TestStory:
 # PIObjective
 # ---------------------------------------------------------------------------
 
+
 class TestPIObjective:
     def _make(self, **kwargs):
         defaults = {
-            "description": "Ship feature X", "team_id": "t-1",
-            "pi_id": "p-1", "planned_business_value": 8,
+            "description": "Ship feature X",
+            "team_id": "t-1",
+            "pi_id": "p-1",
+            "planned_business_value": 8,
         }
         return PIObjective(**{**defaults, **kwargs})
 
@@ -290,6 +309,7 @@ class TestPIObjective:
 # Risk
 # ---------------------------------------------------------------------------
 
+
 class TestRisk:
     def _make(self, **kwargs):
         defaults = {"description": "Auth service unavailable", "pi_id": "p-1"}
@@ -325,11 +345,14 @@ class TestRisk:
 # Dependency
 # ---------------------------------------------------------------------------
 
+
 class TestDependency:
     def _make(self, **kwargs):
         defaults = {
-            "description": "Need API", "pi_id": "p-1",
-            "from_team_id": "t-a", "to_team_id": "t-b",
+            "description": "Need API",
+            "pi_id": "p-1",
+            "from_team_id": "t-a",
+            "to_team_id": "t-b",
         }
         return Dependency(**{**defaults, **kwargs})
 
@@ -359,6 +382,7 @@ class TestDependency:
 # ---------------------------------------------------------------------------
 # CapacityPlan
 # ---------------------------------------------------------------------------
+
 
 class TestCapacityPlan:
     def _make(self, **kwargs):
@@ -403,6 +427,7 @@ class TestCapacityPlan:
 # ---------------------------------------------------------------------------
 # models __init__ re-exports
 # ---------------------------------------------------------------------------
+
 
 def test_models_package_exports_all():
     # All public names must be importable from the package; the import itself is the assertion.

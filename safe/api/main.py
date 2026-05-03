@@ -38,6 +38,7 @@ app.include_router(compute.router)
 
 def run() -> None:
     import os
+
     host = os.environ.get("SAFE_API_HOST", "127.0.0.1")
     port = int(os.environ.get("SAFE_API_PORT", "8000"))
     uvicorn.run("safe.api.main:app", host=host, port=port, reload=False)

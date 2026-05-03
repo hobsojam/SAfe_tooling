@@ -50,10 +50,22 @@ class TestFeatureList:
         assert client.get("/features").json() == []
 
     def test_sort_wsjf_desc(self, client):
-        _create_feature(client, name="Low", user_business_value=1, time_criticality=1,
-                         risk_reduction_opportunity_enablement=1, job_size=10)
-        _create_feature(client, name="High", user_business_value=8, time_criticality=8,
-                         risk_reduction_opportunity_enablement=8, job_size=1)
+        _create_feature(
+            client,
+            name="Low",
+            user_business_value=1,
+            time_criticality=1,
+            risk_reduction_opportunity_enablement=1,
+            job_size=10,
+        )
+        _create_feature(
+            client,
+            name="High",
+            user_business_value=8,
+            time_criticality=8,
+            risk_reduction_opportunity_enablement=8,
+            job_size=1,
+        )
         features = client.get("/features?sort=wsjf_desc").json()
         assert features[0]["name"] == "High"
 

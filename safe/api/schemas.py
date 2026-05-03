@@ -8,6 +8,7 @@ from safe.models.risk import ROAMStatus
 
 # --- ART ---
 
+
 class ARTCreate(BaseModel):
     name: str
 
@@ -17,6 +18,7 @@ class ARTUpdate(BaseModel):
 
 
 # --- Team ---
+
 
 class TeamCreate(BaseModel):
     name: str
@@ -33,6 +35,7 @@ class TeamUpdate(BaseModel):
 
 # --- PI ---
 
+
 class PICreate(BaseModel):
     name: str
     art_id: str
@@ -47,6 +50,7 @@ class PIUpdate(BaseModel):
 
 
 # --- Iteration ---
+
 
 class IterationCreate(BaseModel):
     pi_id: str
@@ -66,6 +70,7 @@ class IterationUpdate(BaseModel):
 
 
 # --- Feature ---
+
 
 class FeatureCreate(BaseModel):
     name: str
@@ -99,6 +104,7 @@ class FeatureAssign(BaseModel):
 
 # --- Story ---
 
+
 class StoryCreate(BaseModel):
     name: str
     description: str = ""
@@ -121,6 +127,7 @@ class StoryUpdate(BaseModel):
 
 # --- PIObjective ---
 
+
 class PIObjectiveCreate(BaseModel):
     description: str
     team_id: str
@@ -140,6 +147,7 @@ class PIObjectiveUpdate(BaseModel):
 
 
 # --- Risk ---
+
 
 class RiskCreate(BaseModel):
     description: str
@@ -167,6 +175,7 @@ class RiskROAM(BaseModel):
 
 
 # --- Dependency ---
+
 
 class DependencyCreate(BaseModel):
     description: str
@@ -199,6 +208,7 @@ class DependencyROAM(BaseModel):
 
 # --- CapacityPlan ---
 
+
 class CapacityPlanCreate(BaseModel):
     team_id: str
     iteration_id: str
@@ -217,6 +227,7 @@ class CapacityPlanUpdate(BaseModel):
 
 
 # --- Compute ---
+
 
 class PredictabilityTeamInput(BaseModel):
     planned_business_value: int = Field(ge=1)

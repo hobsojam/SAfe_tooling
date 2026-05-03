@@ -14,11 +14,16 @@ from safe.store.repos import get_repos
 runner = CliRunner()
 
 FEATURE_ARGS = [
-    "--name", "Auth Service",
-    "--user-value", "8",
-    "--time-crit", "5",
-    "--risk-reduction", "3",
-    "--job-size", "4",
+    "--name",
+    "Auth Service",
+    "--user-value",
+    "8",
+    "--time-crit",
+    "5",
+    "--risk-reduction",
+    "3",
+    "--job-size",
+    "4",
 ]
 
 
@@ -60,9 +65,19 @@ def _setup(db_path):
 
 
 def _add_story(db_path, feature_id, team_id, name="Login flow", points="3"):
-    return invoke(db_path, "story", "add",
-                  "--name", name, "--feature-id", feature_id,
-                  "--team-id", team_id, "--points", points)
+    return invoke(
+        db_path,
+        "story",
+        "add",
+        "--name",
+        name,
+        "--feature-id",
+        feature_id,
+        "--team-id",
+        team_id,
+        "--points",
+        points,
+    )
 
 
 class TestStoryAdd:
@@ -88,14 +103,36 @@ class TestStoryAdd:
 
     def test_unknown_feature_exits_1(self, db_path, patch_console):
         _, tid = _setup(db_path)
-        result = invoke(db_path, "story", "add",
-                        "--name", "S", "--feature-id", "bad", "--team-id", tid, "--points", "3")
+        result = invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S",
+            "--feature-id",
+            "bad",
+            "--team-id",
+            tid,
+            "--points",
+            "3",
+        )
         assert result.exit_code == 1
 
     def test_unknown_team_exits_1(self, db_path, patch_console):
         fid, _ = _setup(db_path)
-        result = invoke(db_path, "story", "add",
-                        "--name", "S", "--feature-id", fid, "--team-id", "bad", "--points", "3")
+        result = invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S",
+            "--feature-id",
+            fid,
+            "--team-id",
+            "bad",
+            "--points",
+            "3",
+        )
         assert result.exit_code == 1
 
     def test_zero_points_exits_1(self, db_path, patch_console):

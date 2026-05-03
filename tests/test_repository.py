@@ -28,6 +28,7 @@ def repos(db: TinyDB) -> Repos:
 
 # --- Repository basics ---
 
+
 def test_save_and_get(db: TinyDB) -> None:
     repo: Repository[Team] = Repository(db, "teams", Team)
     team = Team(name="Alpha", member_count=6)
@@ -105,6 +106,7 @@ def test_find_multiple_conditions(db: TinyDB) -> None:
 
 # --- Computed fields not persisted ---
 
+
 def test_computed_fields_excluded_from_storage(db: TinyDB) -> None:
     repo: Repository[Feature] = Repository(db, "features", Feature)
     feature = Feature(
@@ -137,6 +139,7 @@ def test_computed_fields_available_after_load(db: TinyDB) -> None:
 
 # --- CapacityPlan computed field ---
 
+
 def test_capacity_plan_computed_excluded(db: TinyDB) -> None:
     repo: Repository[CapacityPlan] = Repository(db, "capacity_plans", CapacityPlan)
     plan = CapacityPlan(team_id="t1", iteration_id="i1", pi_id="p1", team_size=5)
@@ -155,6 +158,7 @@ def test_capacity_plan_computed_reloads(db: TinyDB) -> None:
 
 # --- Date serialisation round-trip ---
 
+
 def test_dependency_date_roundtrip(db: TinyDB) -> None:
     repo: Repository[Dependency] = Repository(db, "dependencies", Dependency)
     dep = Dependency(
@@ -171,6 +175,7 @@ def test_dependency_date_roundtrip(db: TinyDB) -> None:
 
 
 # --- Repos convenience wrapper ---
+
 
 def test_repos_all_tables_accessible(repos: Repos) -> None:
     assert repos.arts is not None
@@ -193,6 +198,7 @@ def test_repos_independent_tables(repos: Repos) -> None:
 
 
 # --- db singleton and close_db ---
+
 
 def test_get_db_with_path_returns_fresh_db(tmp_path: Path) -> None:
     db = get_db(path=tmp_path / "test.json")

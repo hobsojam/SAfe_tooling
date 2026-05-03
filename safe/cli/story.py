@@ -78,8 +78,13 @@ def story_list(
     table = Table("ID", "Name", "Points", "Status", "Feature", "Team", "Iteration")
     for s in stories:
         table.add_row(
-            s.id, s.name, str(s.points), s.status.value,
-            s.feature_id, s.team_id, s.iteration_id or "-",
+            s.id,
+            s.name,
+            str(s.points),
+            s.status.value,
+            s.feature_id,
+            s.team_id,
+            s.iteration_id or "-",
         )
     console.print(table)
 

@@ -3,9 +3,15 @@ def _create_art(client):
 
 
 def _create_pi(client, art_id):
-    return client.post("/pi", json={
-        "name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27",
-    }).json()["id"]
+    return client.post(
+        "/pi",
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
+    ).json()["id"]
 
 
 def _create_teams(client):
@@ -15,10 +21,16 @@ def _create_teams(client):
 
 
 def _create_dep(client, pi_id, t1, t2, **overrides):
-    return client.post("/dependencies", json={
-        "description": "Needs auth API", "pi_id": pi_id,
-        "from_team_id": t1, "to_team_id": t2, **overrides,
-    })
+    return client.post(
+        "/dependencies",
+        json={
+            "description": "Needs auth API",
+            "pi_id": pi_id,
+            "from_team_id": t1,
+            "to_team_id": t2,
+            **overrides,
+        },
+    )
 
 
 def test_create_returns_201(client):
@@ -33,9 +45,15 @@ def test_create_returns_201(client):
 def test_list_filter_by_pi(client):
     art_id = _create_art(client)
     pi1 = _create_pi(client, art_id)
-    pi2 = client.post("/pi", json={
-        "name": "PI 2", "art_id": art_id, "start_date": "2026-04-06", "end_date": "2026-06-26",
-    }).json()["id"]
+    pi2 = client.post(
+        "/pi",
+        json={
+            "name": "PI 2",
+            "art_id": art_id,
+            "start_date": "2026-04-06",
+            "end_date": "2026-06-26",
+        },
+    ).json()["id"]
     t1, t2 = _create_teams(client)
     _create_dep(client, pi1, t1, t2)
     _create_dep(client, pi2, t1, t2)

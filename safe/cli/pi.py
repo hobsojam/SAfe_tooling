@@ -191,8 +191,12 @@ def iteration_list(
     table = Table("ID", "Number", "Name", "Start", "End", "IP")
     for it in iterations:
         table.add_row(
-            it.id, str(it.number), it.name or "-",
-            str(it.start_date), str(it.end_date), "yes" if it.is_ip else "no",
+            it.id,
+            str(it.number),
+            it.name or "-",
+            str(it.start_date),
+            str(it.end_date),
+            "yes" if it.is_ip else "no",
         )
     console.print(table)
 

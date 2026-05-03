@@ -51,6 +51,7 @@ def _create_art(db_path: Path, name: str = "Platform ART"):
 # team create
 # ---------------------------------------------------------------------------
 
+
 class TestTeamCreate:
     def test_exit_code_success(self, db_path, patch_console):
         result = invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
@@ -101,6 +102,7 @@ class TestTeamCreate:
 # team show
 # ---------------------------------------------------------------------------
 
+
 class TestTeamShow:
     def _create_team(self, db_path):
         invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
@@ -129,6 +131,7 @@ class TestTeamShow:
 # ---------------------------------------------------------------------------
 # team list
 # ---------------------------------------------------------------------------
+
 
 class TestTeamList:
     def test_empty(self, db_path, patch_console):
@@ -160,6 +163,7 @@ class TestTeamList:
 # ---------------------------------------------------------------------------
 # team delete
 # ---------------------------------------------------------------------------
+
 
 class TestTeamDelete:
     def test_exit_code_success(self, db_path, patch_console):

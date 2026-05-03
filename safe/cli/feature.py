@@ -96,9 +96,14 @@ def feature_list(
     table = Table("ID", "Name", "Status", "CoD", "Size", "WSJF", "PI", "Team")
     for f in features:
         table.add_row(
-            f.id, f.name, f.status.value,
-            str(f.cost_of_delay), str(f.job_size), str(f.wsjf_score),
-            f.pi_id or "-", f.team_id or "-",
+            f.id,
+            f.name,
+            f.status.value,
+            str(f.cost_of_delay),
+            str(f.job_size),
+            str(f.wsjf_score),
+            f.pi_id or "-",
+            f.team_id or "-",
         )
     console.print(table)
 
@@ -117,8 +122,11 @@ def feature_rank(
     table = Table("#", "Name", "CoD", "Size", "WSJF", "Status")
     for rank, f in enumerate(features, 1):
         table.add_row(
-            str(rank), f.name,
-            str(f.cost_of_delay), str(f.job_size), str(f.wsjf_score),
+            str(rank),
+            f.name,
+            str(f.cost_of_delay),
+            str(f.job_size),
+            str(f.wsjf_score),
             f.status.value,
         )
     console.print(table)
