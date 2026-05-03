@@ -229,6 +229,13 @@ safe [--db-path PATH]
   └── board     show / export
 ```
 
+## Git Workflow
+
+- Each new feature or phase must be developed on its own branch, branched from `main`.
+- Branch naming: `feat/<short-description>` (e.g. `feat/phase-3-backlog-manager`).
+- Every feature branch must have its own PR targeting `main` before being merged.
+- Never commit feature work directly to `main`.
+
 ## Out of Scope
 
 - Full ALM/project management system replacement (not Jira/Rally)
