@@ -22,7 +22,7 @@ pip install -e ".[dev]"
 | HTTP API (FastAPI) | Working | `safe-api` / `podman compose up` |
 | Program Backlog Manager | Working | `safe feature`, `safe story`, `safe backlog`, `safe wsjf rank` |
 | PI Objectives Tracker | Working | `safe objective` |
-| Risk Register | Planned | `safe risk` |
+| Risk Register | Working | `safe risk add/list/show/roam/delete` |
 | Dependency Mapper | Planned | `safe dependency` |
 | PI Board | Planned | `safe board` |
 | Web Frontend | Planned | React SPA |
@@ -172,6 +172,32 @@ safe objective update <id> --planned-bv 9
 safe objective delete <id>
 ```
 
+### Risk Register
+
+```bash
+# Add a risk (unroamed by default)
+safe risk add --description "Auth service unavailable" --pi-id <pi-id>
+safe risk add --description "Infra dependency missing" --pi-id <pi-id> \
+  --team-id <tid> --owner "Alice"
+
+# List all risks for a PI
+safe risk list
+safe risk list --pi-id <pi-id>
+safe risk list --status unroamed      # highlight risks not yet dispositioned
+safe risk list --team-id <tid>
+
+# Show full detail for one risk
+safe risk show <id>
+
+# ROAM the risk (Resolved / Owned / Accepted / Mitigated)
+safe risk roam <id> --status owned --owner "Bob"
+safe risk roam <id> --status mitigated --notes "Added circuit breaker"
+safe risk roam <id> --status resolved
+
+# Delete
+safe risk delete <id>
+```
+
 ### PI Predictability
 
 Calculate ART predictability at end of PI. Repeat `--planned` and `--actual` once per team:
@@ -268,6 +294,8 @@ safe/
     feature.py  safe feature commands (add/show/list/rank/update/assign/delete)
     story.py    safe story commands (add/list/update/delete)
     backlog.py  safe backlog show
+    objective.py safe objective commands
+    risk.py     safe risk commands (add/list/show/roam/delete)
   api/
     main.py     FastAPI app; lifespan; router registration; run() entry point
     deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan

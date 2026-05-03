@@ -10,6 +10,7 @@ from safe.cli.capacity import capacity_app
 from safe.cli.feature import feature_app, feature_rank
 from safe.cli.objective import objective_app
 from safe.cli.pi import pi_app
+from safe.cli.risk import risk_app
 from safe.cli.story import story_app
 from safe.cli.team import team_app
 from safe.logic.wsjf import cost_of_delay, wsjf
@@ -28,6 +29,7 @@ app.add_typer(backlog_app, name="backlog")
 app.add_typer(wsjf_app, name="wsjf")
 app.add_typer(capacity_app, name="capacity")
 app.add_typer(objective_app, name="objective")
+app.add_typer(risk_app, name="risk")
 
 
 @app.callback()
