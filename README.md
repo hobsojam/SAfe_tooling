@@ -23,7 +23,7 @@ pip install -e ".[dev]"
 | Program Backlog Manager | Working | `safe feature`, `safe story`, `safe backlog`, `safe wsjf rank` |
 | PI Objectives Tracker | Working | `safe objective` |
 | Risk Register | Working | `safe risk add/list/show/roam/delete` |
-| Dependency Mapper | Planned | `safe dependency` |
+| Dependency Mapper | Working | `safe dependency add/list/show/roam/delete` |
 | PI Board | Planned | `safe board` |
 | Web Frontend | Planned | React SPA |
 
@@ -198,6 +198,35 @@ safe risk roam <id> --status resolved
 safe risk delete <id>
 ```
 
+### Dependency Mapper
+
+```bash
+# Add a cross-team dependency (identified by default)
+safe dependency add --description "Auth service API contract" \
+  --pi-id <pi-id> --from-team-id <from-tid> --to-team-id <to-tid>
+safe dependency add --description "Platform library v2" \
+  --pi-id <pi-id> --from-team-id <from-tid> --to-team-id <to-tid> \
+  --owner "Alice" --needed-by 2026-02-14
+
+# List dependencies
+safe dependency list
+safe dependency list --pi-id <pi-id>
+safe dependency list --from-team-id <tid>
+safe dependency list --to-team-id <tid>
+safe dependency list --status identified    # highlight unresolved dependencies
+
+# Show full detail for one dependency
+safe dependency show <id>
+
+# Update status (identified / owned / accepted / mitigated / resolved)
+safe dependency roam <id> --status owned --owner "Bob"
+safe dependency roam <id> --status mitigated --notes "Interface agreed in Iteration 2"
+safe dependency roam <id> --status resolved
+
+# Delete
+safe dependency delete <id>
+```
+
 ### PI Predictability
 
 Calculate ART predictability at end of PI. Repeat `--planned` and `--actual` once per team:
@@ -296,6 +325,7 @@ safe/
     backlog.py  safe backlog show
     objective.py safe objective commands
     risk.py     safe risk commands (add/list/show/roam/delete)
+    dependency.py safe dependency commands (add/list/show/roam/delete)
   api/
     main.py     FastAPI app; lifespan; router registration; run() entry point
     deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan
