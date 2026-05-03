@@ -15,13 +15,13 @@ pip install -e ".[dev]"
 | Tool | Status | Commands |
 |------|--------|---------|
 | WSJF Calculator (stateless) | Working | `safe wsjf score` |
-| Capacity Planner (stateless) | Working | `safe capacity calc` |
+| Capacity Planner | Working | `safe capacity calc/set/show/export` |
 | PI Predictability (stateless) | Working | `safe pi predictability` |
 | ART / Team setup | Working | `safe art`, `safe team` |
 | PI / Iteration setup | Working | `safe pi`, `safe pi iteration` |
 | HTTP API (FastAPI) | Working | `safe-api` / `podman compose up` |
 | Program Backlog Manager | Working | `safe feature`, `safe story`, `safe backlog`, `safe wsjf rank` |
-| Capacity Planner (stateful) | Planned | `safe capacity set/show` |
+| Capacity Planner (stateful) | Working | `safe capacity set/show/export` |
 | PI Objectives Tracker | Planned | `safe objective` |
 | Risk Register | Planned | `safe risk` |
 | Dependency Mapper | Planned | `safe dependency` |
@@ -130,11 +130,22 @@ safe wsjf score --user-value 8 --time-crit 5 --risk-reduction 3 --job-size 4
 
 ### Capacity Planning
 
-Calculate available team capacity for an iteration:
-
 ```bash
+# Stateless calculation
 safe capacity calc --team-size 7 --days 10 --pto 3 --overhead 0.2
 # Available Capacity : 41.6 person-days
+
+# Save a capacity plan for a team/iteration (upserts if one already exists)
+safe capacity set --pi-id <pi-id> --team-id <tid> --iteration-id <iter-id> \
+  --team-size 7 --pto 2 --overhead 0.2
+
+# Show plans (with load % when stories are assigned to the iteration)
+safe capacity show
+safe capacity show --pi-id <pi-id>
+safe capacity show --team-id <tid>
+
+# Export to CSV for sharing
+safe capacity export --pi-id <pi-id> --output capacity.csv
 ```
 
 ### PI Predictability
