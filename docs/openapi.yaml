@@ -1,69 +1,67 @@
-openapi: "3.1.0"
-
+openapi: 3.1.0
 info:
   title: SAFe Tooling API
-  version: "1.0.0"
-  description: |
-    REST API for the SAFe Tooling platform. Manages ARTs, Teams, Program
+  version: 1.0.0
+  description: 'REST API for the SAFe Tooling platform. Manages ARTs, Teams, Program
+
     Increments, Features, Stories, PI Objectives, Risks, Dependencies, and
+
     Capacity Plans.
+
 
     All entity IDs are UUID strings. Dates are ISO 8601 strings (YYYY-MM-DD).
 
+
     Computed fields (wsjf_score, cost_of_delay, available_capacity) are
+
     returned in responses but must not be sent in request bodies.
 
+    '
 servers:
-  - url: http://localhost:8000
-    description: Local development server
-
+- url: http://localhost:8000
+  description: Local development server
 tags:
-  - name: arts
-    description: Agile Release Trains
-  - name: teams
-    description: ART Teams
-  - name: pi
-    description: Program Increments
-  - name: iterations
-    description: PI Iterations
-  - name: features
-    description: Program Backlog Features
-  - name: stories
-    description: User Stories
-  - name: objectives
-    description: PI Objectives
-  - name: risks
-    description: ROAM Risk Register
-  - name: dependencies
-    description: Cross-team Dependencies
-  - name: capacity-plans
-    description: Team Capacity Plans
-  - name: compute
-    description: Stateless calculations (no persistence)
-
+- name: arts
+  description: Agile Release Trains
+- name: teams
+  description: ART Teams
+- name: pi
+  description: Program Increments
+- name: iterations
+  description: PI Iterations
+- name: features
+  description: Program Backlog Features
+- name: stories
+  description: User Stories
+- name: objectives
+  description: PI Objectives
+- name: risks
+  description: ROAM Risk Register
+- name: dependencies
+  description: Cross-team Dependencies
+- name: capacity-plans
+  description: Team Capacity Plans
+- name: compute
+  description: Stateless calculations (no persistence)
 paths:
-
-  # ---------------------------------------------------------------------------
-  # ARTs
-  # ---------------------------------------------------------------------------
-
-  /arts:
+  /art:
     get:
-      tags: [arts]
+      tags:
+      - arts
       summary: List all ARTs
       operationId: list_arts
       responses:
-        "200":
+        '200':
           description: List of ARTs
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ART"
-
+                  $ref: '#/components/schemas/ART'
     post:
-      tags: [arts]
+      tags:
+      - arts
       summary: Create an ART
       operationId: create_art
       requestBody:
@@ -71,35 +69,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ARTCreate"
+              $ref: '#/components/schemas/ARTCreate'
       responses:
-        "201":
+        '201':
           description: Created ART
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ART"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  /arts/{art_id}:
+                $ref: '#/components/schemas/ART'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /art/{art_id}:
     parameters:
-      - $ref: "#/components/parameters/art_id"
+    - $ref: '#/components/parameters/art_id'
     get:
-      tags: [arts]
+      tags:
+      - arts
       summary: Get an ART
       operationId: get_art
       responses:
-        "200":
+        '200':
           description: ART details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ART"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/ART'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [arts]
+      tags:
+      - arts
       summary: Update an ART
       operationId: update_art
       requestBody:
@@ -107,101 +106,101 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ARTUpdate"
+              $ref: '#/components/schemas/ARTUpdate'
       responses:
-        "200":
+        '200':
           description: Updated ART
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ART"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/ART'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [arts]
+      tags:
+      - arts
       summary: Delete an ART
       operationId: delete_art
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Teams
-  # ---------------------------------------------------------------------------
-
-  /teams:
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /team:
     get:
-      tags: [teams]
+      tags:
+      - teams
       summary: List teams
       operationId: list_teams
       parameters:
-        - name: art_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by ART
+      - name: art_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by ART
       responses:
-        "200":
+        '200':
           description: List of teams
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Team"
-
+                  $ref: '#/components/schemas/Team'
     post:
-      tags: [teams]
+      tags:
+      - teams
       summary: Create a team
       operationId: create_team
-      description: |
-        If art_id is supplied the team is linked to that ART and the ART's
+      description: 'If art_id is supplied the team is linked to that ART and the ART''s
+
         team_ids list is updated atomically.
+
+        '
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TeamCreate"
+              $ref: '#/components/schemas/TeamCreate'
       responses:
-        "201":
+        '201':
           description: Created team
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Team"
-        "404":
+                $ref: '#/components/schemas/Team'
+        '404':
           description: ART not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  /teams/{team_id}:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /team/{team_id}:
     parameters:
-      - $ref: "#/components/parameters/team_id"
+    - $ref: '#/components/parameters/team_id'
     get:
-      tags: [teams]
+      tags:
+      - teams
       summary: Get a team
       operationId: get_team
       responses:
-        "200":
+        '200':
           description: Team details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Team"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Team'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [teams]
+      tags:
+      - teams
       summary: Update a team
       operationId: update_team
       requestBody:
@@ -209,62 +208,59 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TeamUpdate"
+              $ref: '#/components/schemas/TeamUpdate'
       responses:
-        "200":
+        '200':
           description: Updated team
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Team"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/Team'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [teams]
+      tags:
+      - teams
       summary: Delete a team
       operationId: delete_team
       description: Also removes the team from its ART's team_ids list.
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Program Increments
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /pi:
     get:
-      tags: [pi]
+      tags:
+      - pi
       summary: List PIs
       operationId: list_pis
       parameters:
-        - name: art_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by ART
-        - name: status
-          in: query
-          schema:
-            $ref: "#/components/schemas/PIStatus"
-          description: Filter by status
+      - name: art_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by ART
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/PIStatus'
+        description: Filter by status
       responses:
-        "200":
+        '200':
           description: List of PIs
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PI"
-
+                  $ref: '#/components/schemas/PI'
     post:
-      tags: [pi]
+      tags:
+      - pi
       summary: Create a PI
       operationId: create_pi
       requestBody:
@@ -272,41 +268,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PICreate"
+              $ref: '#/components/schemas/PICreate'
       responses:
-        "201":
+        '201':
           description: Created PI
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PI"
-        "404":
+                $ref: '#/components/schemas/PI'
+        '404':
           description: ART not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /pi/{pi_id}:
     parameters:
-      - $ref: "#/components/parameters/pi_id"
+    - $ref: '#/components/parameters/pi_id'
     get:
-      tags: [pi]
+      tags:
+      - pi
       summary: Get a PI
       operationId: get_pi
       responses:
-        "200":
+        '200':
           description: PI details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PI"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/PI'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [pi]
+      tags:
+      - pi
       summary: Update PI metadata (name, dates)
       operationId: update_pi
       description: Status transitions must use /activate or /close.
@@ -315,152 +312,154 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PIUpdate"
+              $ref: '#/components/schemas/PIUpdate'
       responses:
-        "200":
+        '200':
           description: Updated PI
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PI"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/PI'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [pi]
+      tags:
+      - pi
       summary: Delete a PI
       operationId: delete_pi
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /pi/{pi_id}/activate:
     parameters:
-      - $ref: "#/components/parameters/pi_id"
+    - $ref: '#/components/parameters/pi_id'
     post:
-      tags: [pi]
+      tags:
+      - pi
       summary: Activate a PI (planning -> active)
       operationId: activate_pi
-      description: |
-        Fails with 409 if the PI is not in planning status, or if another
+      description: 'Fails with 409 if the PI is not in planning status, or if another
+
         PI for the same ART is already active.
+
+        '
       responses:
-        "200":
+        '200':
           description: Activated PI
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PI"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
+                $ref: '#/components/schemas/PI'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
           description: PI is not in planning status, or another PI is already active
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-
+                $ref: '#/components/schemas/Error'
   /pi/{pi_id}/close:
     parameters:
-      - $ref: "#/components/parameters/pi_id"
+    - $ref: '#/components/parameters/pi_id'
     post:
-      tags: [pi]
+      tags:
+      - pi
       summary: Close a PI (active -> closed)
       operationId: close_pi
       description: Fails with 409 if the PI is not in active status.
       responses:
-        "200":
+        '200':
           description: Closed PI
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PI"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
+                $ref: '#/components/schemas/PI'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
           description: PI is not active
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-
-  # ---------------------------------------------------------------------------
-  # Iterations (top-level; pi_id is a field and filter param)
-  # ---------------------------------------------------------------------------
-
+                $ref: '#/components/schemas/Error'
   /iterations:
     get:
-      tags: [iterations]
+      tags:
+      - iterations
       summary: List iterations
       operationId: list_iterations
       parameters:
-        - name: pi_id
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: PI to list iterations for
+      - name: pi_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: PI to list iterations for
       responses:
-        "200":
+        '200':
           description: Iterations sorted by number
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Iteration"
-
+                  $ref: '#/components/schemas/Iteration'
     post:
-      tags: [iterations]
+      tags:
+      - iterations
       summary: Add an iteration to a PI
       operationId: create_iteration
-      description: |
-        Iteration dates must fall within the PI's date range.
+      description: 'Iteration dates must fall within the PI''s date range.
+
         Also appends the iteration id to PI.iteration_ids.
+
+        '
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/IterationCreate"
+              $ref: '#/components/schemas/IterationCreate'
       responses:
-        "201":
+        '201':
           description: Created iteration
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Iteration"
-        "404":
+                $ref: '#/components/schemas/Iteration'
+        '404':
           description: PI not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /iterations/{iteration_id}:
     parameters:
-      - $ref: "#/components/parameters/iteration_id"
+    - $ref: '#/components/parameters/iteration_id'
     get:
-      tags: [iterations]
+      tags:
+      - iterations
       summary: Get an iteration
       operationId: get_iteration
       responses:
-        "200":
+        '200':
           description: Iteration details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Iteration"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Iteration'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [iterations]
+      tags:
+      - iterations
       summary: Update an iteration
       operationId: update_iteration
       requestBody:
@@ -468,75 +467,74 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/IterationUpdate"
+              $ref: '#/components/schemas/IterationUpdate'
       responses:
-        "200":
+        '200':
           description: Updated iteration
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Iteration"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/Iteration'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [iterations]
+      tags:
+      - iterations
       summary: Delete an iteration
       operationId: delete_iteration
       description: Also removes the iteration id from PI.iteration_ids.
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Features
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /features:
     get:
-      tags: [features]
+      tags:
+      - features
       summary: List features
       operationId: list_features
       parameters:
-        - name: pi_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by PI
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by team
-        - name: status
-          in: query
-          schema:
-            $ref: "#/components/schemas/FeatureStatus"
-          description: Filter by status
-        - name: sort
-          in: query
-          schema:
-            type: string
-            enum: [wsjf_desc, name_asc]
-            default: wsjf_desc
-          description: "wsjf_desc = ranked by WSJF score (default), name_asc = alphabetical"
+      - name: pi_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by PI
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by team
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/FeatureStatus'
+        description: Filter by status
+      - name: sort
+        in: query
+        schema:
+          type: string
+          enum:
+          - wsjf_desc
+          - name_asc
+          default: wsjf_desc
+        description: wsjf_desc = ranked by WSJF score (default), name_asc = alphabetical
       responses:
-        "200":
+        '200':
           description: List of features
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Feature"
-
+                  $ref: '#/components/schemas/Feature'
     post:
-      tags: [features]
+      tags:
+      - features
       summary: Add a feature to the backlog
       operationId: create_feature
       requestBody:
@@ -544,35 +542,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FeatureCreate"
+              $ref: '#/components/schemas/FeatureCreate'
       responses:
-        "201":
+        '201':
           description: Created feature (includes computed cost_of_delay and wsjf_score)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Feature"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/Feature'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /features/{feature_id}:
     parameters:
-      - $ref: "#/components/parameters/feature_id"
+    - $ref: '#/components/parameters/feature_id'
     get:
-      tags: [features]
+      tags:
+      - features
       summary: Get a feature
       operationId: get_feature
       responses:
-        "200":
+        '200':
           description: Feature details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Feature"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Feature'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [features]
+      tags:
+      - features
       summary: Update a feature
       operationId: update_feature
       requestBody:
@@ -580,73 +579,70 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FeatureUpdate"
+              $ref: '#/components/schemas/FeatureUpdate'
       responses:
-        "200":
+        '200':
           description: Updated feature
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Feature"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/Feature'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [features]
+      tags:
+      - features
       summary: Delete a feature
       operationId: delete_feature
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Stories
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /stories:
     get:
-      tags: [stories]
+      tags:
+      - stories
       summary: List stories
       operationId: list_stories
       parameters:
-        - name: feature_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by feature
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by team
-        - name: iteration_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by iteration
-        - name: status
-          in: query
-          schema:
-            $ref: "#/components/schemas/StoryStatus"
-          description: Filter by status
+      - name: feature_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by feature
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by team
+      - name: iteration_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by iteration
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/StoryStatus'
+        description: Filter by status
       responses:
-        "200":
+        '200':
           description: List of stories
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Story"
-
+                  $ref: '#/components/schemas/Story'
     post:
-      tags: [stories]
+      tags:
+      - stories
       summary: Create a story
       operationId: create_story
       requestBody:
@@ -654,35 +650,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StoryCreate"
+              $ref: '#/components/schemas/StoryCreate'
       responses:
-        "201":
+        '201':
           description: Created story
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Story"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/Story'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /stories/{story_id}:
     parameters:
-      - $ref: "#/components/parameters/story_id"
+    - $ref: '#/components/parameters/story_id'
     get:
-      tags: [stories]
+      tags:
+      - stories
       summary: Get a story
       operationId: get_story
       responses:
-        "200":
+        '200':
           description: Story details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Story"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Story'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [stories]
+      tags:
+      - stories
       summary: Update a story
       operationId: update_story
       requestBody:
@@ -690,67 +687,64 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StoryUpdate"
+              $ref: '#/components/schemas/StoryUpdate'
       responses:
-        "200":
+        '200':
           description: Updated story
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Story"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/Story'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [stories]
+      tags:
+      - stories
       summary: Delete a story
       operationId: delete_story
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # PI Objectives
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /objectives:
     get:
-      tags: [objectives]
+      tags:
+      - objectives
       summary: List PI objectives
       operationId: list_objectives
       parameters:
-        - name: pi_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by PI
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by team
-        - name: is_stretch
-          in: query
-          schema:
-            type: boolean
-          description: "true = stretch only, false = committed only"
+      - name: pi_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by PI
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by team
+      - name: is_stretch
+        in: query
+        schema:
+          type: boolean
+        description: true = stretch only, false = committed only
       responses:
-        "200":
+        '200':
           description: List of PI objectives
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PIObjective"
-
+                  $ref: '#/components/schemas/PIObjective'
     post:
-      tags: [objectives]
+      tags:
+      - objectives
       summary: Create a PI objective
       operationId: create_objective
       requestBody:
@@ -758,35 +752,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PIObjectiveCreate"
+              $ref: '#/components/schemas/PIObjectiveCreate'
       responses:
-        "201":
+        '201':
           description: Created PI objective
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PIObjective"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/PIObjective'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /objectives/{objective_id}:
     parameters:
-      - $ref: "#/components/parameters/objective_id"
+    - $ref: '#/components/parameters/objective_id'
     get:
-      tags: [objectives]
+      tags:
+      - objectives
       summary: Get a PI objective
       operationId: get_objective
       responses:
-        "200":
+        '200':
           description: PI objective details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PIObjective"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/PIObjective'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [objectives]
+      tags:
+      - objectives
       summary: Update a PI objective (includes scoring actual business value)
       operationId: update_objective
       requestBody:
@@ -794,67 +789,64 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PIObjectiveUpdate"
+              $ref: '#/components/schemas/PIObjectiveUpdate'
       responses:
-        "200":
+        '200':
           description: Updated PI objective
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PIObjective"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/PIObjective'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [objectives]
+      tags:
+      - objectives
       summary: Delete a PI objective
       operationId: delete_objective
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Risks
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /risks:
     get:
-      tags: [risks]
+      tags:
+      - risks
       summary: List risks
       operationId: list_risks
       parameters:
-        - name: pi_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by PI
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by team
-        - name: roam_status
-          in: query
-          schema:
-            $ref: "#/components/schemas/ROAMStatus"
-          description: Filter by ROAM status
+      - name: pi_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by PI
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by team
+      - name: roam_status
+        in: query
+        schema:
+          $ref: '#/components/schemas/ROAMStatus'
+        description: Filter by ROAM status
       responses:
-        "200":
+        '200':
           description: List of risks
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Risk"
-
+                  $ref: '#/components/schemas/Risk'
     post:
-      tags: [risks]
+      tags:
+      - risks
       summary: Raise a risk
       operationId: create_risk
       requestBody:
@@ -862,35 +854,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RiskCreate"
+              $ref: '#/components/schemas/RiskCreate'
       responses:
-        "201":
+        '201':
           description: Created risk
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Risk"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/Risk'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /risks/{risk_id}:
     parameters:
-      - $ref: "#/components/parameters/risk_id"
+    - $ref: '#/components/parameters/risk_id'
     get:
-      tags: [risks]
+      tags:
+      - risks
       summary: Get a risk
       operationId: get_risk
       responses:
-        "200":
+        '200':
           description: Risk details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Risk"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Risk'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [risks]
+      tags:
+      - risks
       summary: Update a risk (includes ROAM disposition)
       operationId: update_risk
       requestBody:
@@ -898,73 +891,70 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RiskUpdate"
+              $ref: '#/components/schemas/RiskUpdate'
       responses:
-        "200":
+        '200':
           description: Updated risk
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Risk"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/Risk'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [risks]
+      tags:
+      - risks
       summary: Delete a risk
       operationId: delete_risk
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Dependencies
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /dependencies:
     get:
-      tags: [dependencies]
+      tags:
+      - dependencies
       summary: List dependencies
       operationId: list_dependencies
       parameters:
-        - name: pi_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by PI
-        - name: from_team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by requesting team
-        - name: to_team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by providing team
-        - name: status
-          in: query
-          schema:
-            $ref: "#/components/schemas/DependencyStatus"
-          description: Filter by status
+      - name: pi_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by PI
+      - name: from_team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by requesting team
+      - name: to_team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by providing team
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/DependencyStatus'
+        description: Filter by status
       responses:
-        "200":
+        '200':
           description: List of dependencies
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Dependency"
-
+                  $ref: '#/components/schemas/Dependency'
     post:
-      tags: [dependencies]
+      tags:
+      - dependencies
       summary: Create a dependency
       operationId: create_dependency
       requestBody:
@@ -972,35 +962,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DependencyCreate"
+              $ref: '#/components/schemas/DependencyCreate'
       responses:
-        "201":
+        '201':
           description: Created dependency
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Dependency"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/Dependency'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /dependencies/{dependency_id}:
     parameters:
-      - $ref: "#/components/parameters/dependency_id"
+    - $ref: '#/components/parameters/dependency_id'
     get:
-      tags: [dependencies]
+      tags:
+      - dependencies
       summary: Get a dependency
       operationId: get_dependency
       responses:
-        "200":
+        '200':
           description: Dependency details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Dependency"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Dependency'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [dependencies]
+      tags:
+      - dependencies
       summary: Update a dependency
       operationId: update_dependency
       requestBody:
@@ -1008,68 +999,65 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DependencyUpdate"
+              $ref: '#/components/schemas/DependencyUpdate'
       responses:
-        "200":
+        '200':
           description: Updated dependency
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Dependency"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/Dependency'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [dependencies]
+      tags:
+      - dependencies
       summary: Delete a dependency
       operationId: delete_dependency
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Capacity Plans
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /capacity-plans:
     get:
-      tags: [capacity-plans]
+      tags:
+      - capacity-plans
       summary: List capacity plans
       operationId: list_capacity_plans
       parameters:
-        - name: pi_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by PI
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by team
-        - name: iteration_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-          description: Filter by iteration
+      - name: pi_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by PI
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by team
+      - name: iteration_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by iteration
       responses:
-        "200":
+        '200':
           description: List of capacity plans
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CapacityPlan"
-
+                  $ref: '#/components/schemas/CapacityPlan'
     post:
-      tags: [capacity-plans]
+      tags:
+      - capacity-plans
       summary: Create a capacity plan
       operationId: create_capacity_plan
       requestBody:
@@ -1077,35 +1065,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CapacityPlanCreate"
+              $ref: '#/components/schemas/CapacityPlanCreate'
       responses:
-        "201":
+        '201':
           description: Created capacity plan (includes computed available_capacity)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CapacityPlan"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/CapacityPlan'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /capacity-plans/{plan_id}:
     parameters:
-      - $ref: "#/components/parameters/plan_id"
+    - $ref: '#/components/parameters/plan_id'
     get:
-      tags: [capacity-plans]
+      tags:
+      - capacity-plans
       summary: Get a capacity plan
       operationId: get_capacity_plan
       responses:
-        "200":
+        '200':
           description: Capacity plan details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CapacityPlan"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/CapacityPlan'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [capacity-plans]
+      tags:
+      - capacity-plans
       summary: Update a capacity plan
       operationId: update_capacity_plan
       requestBody:
@@ -1113,67 +1102,137 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CapacityPlanUpdate"
+              $ref: '#/components/schemas/CapacityPlanUpdate'
       responses:
-        "200":
+        '200':
           description: Updated capacity plan
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CapacityPlan"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                $ref: '#/components/schemas/CapacityPlan'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
-      tags: [capacity-plans]
+      tags:
+      - capacity-plans
       summary: Delete a capacity plan
       operationId: delete_capacity_plan
       responses:
-        "204":
+        '204':
           description: Deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ---------------------------------------------------------------------------
-  # Stateless Compute
-  # ---------------------------------------------------------------------------
-
+        '404':
+          $ref: '#/components/responses/NotFound'
   /compute/predictability:
     post:
-      tags: [compute]
+      tags:
+      - compute
       summary: Calculate ART PI predictability (stateless)
       operationId: compute_predictability
-      description: |
-        Calculates predictability from planned vs actual business value across
+      description: 'Calculates predictability from planned vs actual business value
+        across
+
         all teams. Use this during Inspect & Adapt before closing a PI.
+
+        '
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PredictabilityRequest"
+              $ref: '#/components/schemas/PredictabilityRequest'
       responses:
-        "200":
+        '200':
           description: Predictability result
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PredictabilityResponse"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-
-# =============================================================================
-# Components
-# =============================================================================
-
+                $ref: '#/components/schemas/PredictabilityResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /risks/{risk_id}/roam:
+    post:
+      summary: ROAM a risk
+      operationId: roam_risk
+      tags:
+      - risks
+      parameters:
+      - name: risk_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskROAM'
+      responses:
+        '200':
+          description: Updated risk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Risk'
+        '404':
+          description: Risk not found
+  /dependencies/{dependency_id}/roam:
+    post:
+      summary: Set dependency status
+      operationId: roam_dependency
+      tags:
+      - dependencies
+      parameters:
+      - name: dependency_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DependencyROAM'
+      responses:
+        '200':
+          description: Updated dependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dependency'
+        '404':
+          description: Dependency not found
+  /features/{feature_id}/assign:
+    post:
+      summary: Assign a feature to a team
+      operationId: assign_feature
+      tags:
+      - features
+      parameters:
+      - name: feature_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureAssign'
+      responses:
+        '200':
+          description: Updated feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+        '404':
+          description: Feature or team not found
 components:
-
-  # ---------------------------------------------------------------------------
-  # Reusable parameters
-  # ---------------------------------------------------------------------------
-
   parameters:
     art_id:
       name: art_id
@@ -1245,68 +1304,71 @@ components:
       schema:
         type: string
         format: uuid
-
-  # ---------------------------------------------------------------------------
-  # Reusable responses
-  # ---------------------------------------------------------------------------
-
   responses:
     NotFound:
       description: Resource not found
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            $ref: '#/components/schemas/Error'
     ValidationError:
       description: Request body failed validation
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
-
-  # ---------------------------------------------------------------------------
-  # Schemas
-  # ---------------------------------------------------------------------------
-
+            $ref: '#/components/schemas/Error'
   schemas:
-
-    # --- Shared ---
-
     Error:
       type: object
-      required: [detail]
+      required:
+      - detail
       properties:
         detail:
           type: string
-          example: "PI 'abc-123' not found"
-
-    # --- Enums ---
-
+          example: PI 'abc-123' not found
     PIStatus:
       type: string
-      enum: [planning, active, closed]
-
+      enum:
+      - planning
+      - active
+      - closed
     FeatureStatus:
       type: string
-      enum: [funnel, analyzing, backlog, implementing, done]
-
+      enum:
+      - funnel
+      - analyzing
+      - backlog
+      - implementing
+      - done
     StoryStatus:
       type: string
-      enum: [not_started, in_progress, done, accepted]
-
+      enum:
+      - not_started
+      - in_progress
+      - done
+      - accepted
     ROAMStatus:
       type: string
-      enum: [unroamed, resolved, owned, accepted, mitigated]
-
+      enum:
+      - unroamed
+      - resolved
+      - owned
+      - accepted
+      - mitigated
     DependencyStatus:
       type: string
-      enum: [identified, resolved, owned, accepted, mitigated]
-
-    # --- ART ---
-
+      enum:
+      - identified
+      - resolved
+      - owned
+      - accepted
+      - mitigated
     ART:
       type: object
-      required: [id, name, team_ids]
+      required:
+      - id
+      - name
+      - team_ids
       properties:
         id:
           type: string
@@ -1319,26 +1381,26 @@ components:
           items:
             type: string
             format: uuid
-
     ARTCreate:
       type: object
-      required: [name]
+      required:
+      - name
       properties:
         name:
           type: string
           example: Platform ART
-
     ARTUpdate:
       type: object
       properties:
         name:
           type: string
-
-    # --- Team ---
-
     Team:
       type: object
-      required: [id, name, member_count, velocity_history]
+      required:
+      - id
+      - name
+      - member_count
+      - velocity_history
       properties:
         id:
           type: string
@@ -1357,11 +1419,15 @@ components:
           type: array
           items:
             type: integer
-          example: [42, 38, 40]
-
+          example:
+          - 42
+          - 38
+          - 40
     TeamCreate:
       type: object
-      required: [name, member_count]
+      required:
+      - name
+      - member_count
       properties:
         name:
           type: string
@@ -1377,7 +1443,6 @@ components:
           items:
             type: integer
           default: []
-
     TeamUpdate:
       type: object
       properties:
@@ -1394,12 +1459,16 @@ components:
           type: array
           items:
             type: integer
-
-    # --- PI ---
-
     PI:
       type: object
-      required: [id, name, art_id, start_date, end_date, status, iteration_ids]
+      required:
+      - id
+      - name
+      - art_id
+      - start_date
+      - end_date
+      - status
+      - iteration_ids
       properties:
         id:
           type: string
@@ -1413,22 +1482,25 @@ components:
         start_date:
           type: string
           format: date
-          example: "2026-01-05"
+          example: '2026-01-05'
         end_date:
           type: string
           format: date
-          example: "2026-03-27"
+          example: '2026-03-27'
         status:
-          $ref: "#/components/schemas/PIStatus"
+          $ref: '#/components/schemas/PIStatus'
         iteration_ids:
           type: array
           items:
             type: string
             format: uuid
-
     PICreate:
       type: object
-      required: [name, art_id, start_date, end_date]
+      required:
+      - name
+      - art_id
+      - start_date
+      - end_date
       properties:
         name:
           type: string
@@ -1441,7 +1513,6 @@ components:
         end_date:
           type: string
           format: date
-
     PIUpdate:
       type: object
       description: Status transitions use /activate and /close, not this endpoint.
@@ -1454,12 +1525,15 @@ components:
         end_date:
           type: string
           format: date
-
-    # --- Iteration ---
-
     Iteration:
       type: object
-      required: [id, pi_id, number, start_date, end_date, is_ip]
+      required:
+      - id
+      - pi_id
+      - number
+      - start_date
+      - end_date
+      - is_ip
       properties:
         id:
           type: string
@@ -1472,7 +1546,7 @@ components:
           minimum: 1
         name:
           type: string
-          default: ""
+          default: ''
         start_date:
           type: string
           format: date
@@ -1483,10 +1557,13 @@ components:
           type: boolean
           default: false
           description: True for the Innovation & Planning iteration
-
     IterationCreate:
       type: object
-      required: [pi_id, number, start_date, end_date]
+      required:
+      - pi_id
+      - number
+      - start_date
+      - end_date
       properties:
         pi_id:
           type: string
@@ -1496,7 +1573,7 @@ components:
           minimum: 1
         name:
           type: string
-          default: ""
+          default: ''
         start_date:
           type: string
           format: date
@@ -1506,7 +1583,6 @@ components:
         is_ip:
           type: boolean
           default: false
-
     IterationUpdate:
       type: object
       properties:
@@ -1523,23 +1599,20 @@ components:
           format: date
         is_ip:
           type: boolean
-
-    # --- Feature ---
-
     Feature:
       type: object
       required:
-        - id
-        - name
-        - status
-        - user_business_value
-        - time_criticality
-        - risk_reduction_opportunity_enablement
-        - job_size
-        - cost_of_delay
-        - wsjf_score
-        - story_ids
-        - dependency_ids
+      - id
+      - name
+      - status
+      - user_business_value
+      - time_criticality
+      - risk_reduction_opportunity_enablement
+      - job_size
+      - cost_of_delay
+      - wsjf_score
+      - story_ids
+      - dependency_ids
       properties:
         id:
           type: string
@@ -1549,7 +1622,7 @@ components:
           example: Single Sign-On
         description:
           type: string
-          default: ""
+          default: ''
         pi_id:
           type: string
           format: uuid
@@ -1559,10 +1632,10 @@ components:
           format: uuid
           nullable: true
         status:
-          $ref: "#/components/schemas/FeatureStatus"
+          $ref: '#/components/schemas/FeatureStatus'
         acceptance_criteria:
           type: string
-          default: ""
+          default: ''
         user_business_value:
           type: integer
           minimum: 1
@@ -1582,12 +1655,12 @@ components:
         cost_of_delay:
           type: integer
           readOnly: true
-          description: "Computed: user_business_value + time_criticality + risk_reduction_opportunity_enablement"
+          description: 'Computed: user_business_value + time_criticality + risk_reduction_opportunity_enablement'
         wsjf_score:
           type: number
           format: float
           readOnly: true
-          description: "Computed: cost_of_delay / job_size (rounded to 2 dp)"
+          description: 'Computed: cost_of_delay / job_size (rounded to 2 dp)'
         story_ids:
           type: array
           items:
@@ -1598,21 +1671,20 @@ components:
           items:
             type: string
             format: uuid
-
     FeatureCreate:
       type: object
       required:
-        - name
-        - user_business_value
-        - time_criticality
-        - risk_reduction_opportunity_enablement
-        - job_size
+      - name
+      - user_business_value
+      - time_criticality
+      - risk_reduction_opportunity_enablement
+      - job_size
       properties:
         name:
           type: string
         description:
           type: string
-          default: ""
+          default: ''
         pi_id:
           type: string
           format: uuid
@@ -1622,11 +1694,11 @@ components:
           format: uuid
           nullable: true
         status:
-          $ref: "#/components/schemas/FeatureStatus"
+          $ref: '#/components/schemas/FeatureStatus'
           default: backlog
         acceptance_criteria:
           type: string
-          default: ""
+          default: ''
         user_business_value:
           type: integer
           minimum: 1
@@ -1643,7 +1715,6 @@ components:
           type: integer
           minimum: 1
           maximum: 13
-
     FeatureUpdate:
       type: object
       properties:
@@ -1660,7 +1731,7 @@ components:
           format: uuid
           nullable: true
         status:
-          $ref: "#/components/schemas/FeatureStatus"
+          $ref: '#/components/schemas/FeatureStatus'
         acceptance_criteria:
           type: string
         user_business_value:
@@ -1679,12 +1750,15 @@ components:
           type: integer
           minimum: 1
           maximum: 13
-
-    # --- Story ---
-
     Story:
       type: object
-      required: [id, name, feature_id, team_id, points, status]
+      required:
+      - id
+      - name
+      - feature_id
+      - team_id
+      - points
+      - status
       properties:
         id:
           type: string
@@ -1694,7 +1768,7 @@ components:
           example: As a user I can reset my password
         description:
           type: string
-          default: ""
+          default: ''
         feature_id:
           type: string
           format: uuid
@@ -1709,20 +1783,23 @@ components:
           type: integer
           minimum: 1
         status:
-          $ref: "#/components/schemas/StoryStatus"
+          $ref: '#/components/schemas/StoryStatus'
         acceptance_criteria:
           type: string
-          default: ""
-
+          default: ''
     StoryCreate:
       type: object
-      required: [name, feature_id, team_id, points]
+      required:
+      - name
+      - feature_id
+      - team_id
+      - points
       properties:
         name:
           type: string
         description:
           type: string
-          default: ""
+          default: ''
         feature_id:
           type: string
           format: uuid
@@ -1737,12 +1814,11 @@ components:
           type: integer
           minimum: 1
         status:
-          $ref: "#/components/schemas/StoryStatus"
+          $ref: '#/components/schemas/StoryStatus'
           default: not_started
         acceptance_criteria:
           type: string
-          default: ""
-
+          default: ''
     StoryUpdate:
       type: object
       properties:
@@ -1758,22 +1834,19 @@ components:
           type: integer
           minimum: 1
         status:
-          $ref: "#/components/schemas/StoryStatus"
+          $ref: '#/components/schemas/StoryStatus'
         acceptance_criteria:
           type: string
-
-    # --- PIObjective ---
-
     PIObjective:
       type: object
       required:
-        - id
-        - description
-        - team_id
-        - pi_id
-        - planned_business_value
-        - is_stretch
-        - feature_ids
+      - id
+      - description
+      - team_id
+      - pi_id
+      - planned_business_value
+      - is_stretch
+      - feature_ids
       properties:
         id:
           type: string
@@ -1799,16 +1872,19 @@ components:
         is_stretch:
           type: boolean
           default: false
-          description: "Committed when false, stretch when true"
+          description: Committed when false, stretch when true
         feature_ids:
           type: array
           items:
             type: string
             format: uuid
-
     PIObjectiveCreate:
       type: object
-      required: [description, team_id, pi_id, planned_business_value]
+      required:
+      - description
+      - team_id
+      - pi_id
+      - planned_business_value
       properties:
         description:
           type: string
@@ -1836,7 +1912,6 @@ components:
             type: string
             format: uuid
           default: []
-
     PIObjectiveUpdate:
       type: object
       properties:
@@ -1858,12 +1933,14 @@ components:
           items:
             type: string
             format: uuid
-
-    # --- Risk ---
-
     Risk:
       type: object
-      required: [id, description, pi_id, roam_status, raised_date]
+      required:
+      - id
+      - description
+      - pi_id
+      - roam_status
+      - raised_date
       properties:
         id:
           type: string
@@ -1883,21 +1960,22 @@ components:
           format: uuid
           nullable: true
         roam_status:
-          $ref: "#/components/schemas/ROAMStatus"
+          $ref: '#/components/schemas/ROAMStatus'
         owner:
           type: string
           nullable: true
           example: Jane Smith
         mitigation_notes:
           type: string
-          default: ""
+          default: ''
         raised_date:
           type: string
           format: date
-
     RiskCreate:
       type: object
-      required: [description, pi_id]
+      required:
+      - description
+      - pi_id
       properties:
         description:
           type: string
@@ -1913,15 +1991,14 @@ components:
           format: uuid
           nullable: true
         roam_status:
-          $ref: "#/components/schemas/ROAMStatus"
+          $ref: '#/components/schemas/ROAMStatus'
           default: unroamed
         owner:
           type: string
           nullable: true
         mitigation_notes:
           type: string
-          default: ""
-
+          default: ''
     RiskUpdate:
       type: object
       properties:
@@ -1936,25 +2013,22 @@ components:
           format: uuid
           nullable: true
         roam_status:
-          $ref: "#/components/schemas/ROAMStatus"
+          $ref: '#/components/schemas/ROAMStatus'
         owner:
           type: string
           nullable: true
         mitigation_notes:
           type: string
-
-    # --- Dependency ---
-
     Dependency:
       type: object
       required:
-        - id
-        - description
-        - pi_id
-        - from_team_id
-        - to_team_id
-        - status
-        - raised_date
+      - id
+      - description
+      - pi_id
+      - from_team_id
+      - to_team_id
+      - status
+      - raised_date
       properties:
         id:
           type: string
@@ -1983,13 +2057,13 @@ components:
           nullable: true
           description: Iteration by which the dependency must be delivered
         status:
-          $ref: "#/components/schemas/DependencyStatus"
+          $ref: '#/components/schemas/DependencyStatus'
         owner:
           type: string
           nullable: true
         resolution_notes:
           type: string
-          default: ""
+          default: ''
         raised_date:
           type: string
           format: date
@@ -1997,10 +2071,13 @@ components:
           type: string
           format: date
           nullable: true
-
     DependencyCreate:
       type: object
-      required: [description, pi_id, from_team_id, to_team_id]
+      required:
+      - description
+      - pi_id
+      - from_team_id
+      - to_team_id
       properties:
         description:
           type: string
@@ -2028,7 +2105,6 @@ components:
         owner:
           type: string
           nullable: true
-
     DependencyUpdate:
       type: object
       properties:
@@ -2043,7 +2119,7 @@ components:
           format: uuid
           nullable: true
         status:
-          $ref: "#/components/schemas/DependencyStatus"
+          $ref: '#/components/schemas/DependencyStatus'
         owner:
           type: string
           nullable: true
@@ -2053,21 +2129,18 @@ components:
           type: string
           format: date
           nullable: true
-
-    # --- CapacityPlan ---
-
     CapacityPlan:
       type: object
       required:
-        - id
-        - team_id
-        - iteration_id
-        - pi_id
-        - team_size
-        - iteration_days
-        - pto_days
-        - overhead_pct
-        - available_capacity
+      - id
+      - team_id
+      - iteration_id
+      - pi_id
+      - team_size
+      - iteration_days
+      - pto_days
+      - overhead_pct
+      - available_capacity
       properties:
         id:
           type: string
@@ -2103,11 +2176,14 @@ components:
           type: number
           format: float
           readOnly: true
-          description: "Computed: (team_size x iteration_days - pto_days) x (1 - overhead_pct)"
-
+          description: 'Computed: (team_size x iteration_days - pto_days) x (1 - overhead_pct)'
     CapacityPlanCreate:
       type: object
-      required: [team_id, iteration_id, pi_id, team_size]
+      required:
+      - team_id
+      - iteration_id
+      - pi_id
+      - team_size
       properties:
         team_id:
           type: string
@@ -2136,7 +2212,6 @@ components:
           minimum: 0.0
           maximum: 1.0
           default: 0.2
-
     CapacityPlanUpdate:
       type: object
       properties:
@@ -2155,12 +2230,11 @@ components:
           format: float
           minimum: 0.0
           maximum: 1.0
-
-    # --- Stateless compute ---
-
     PredictabilityTeamResult:
       type: object
-      required: [planned_business_value, actual_business_value]
+      required:
+      - planned_business_value
+      - actual_business_value
       properties:
         planned_business_value:
           type: integer
@@ -2168,20 +2242,21 @@ components:
         actual_business_value:
           type: integer
           minimum: 0
-
     PredictabilityRequest:
       type: object
-      required: [teams]
+      required:
+      - teams
       properties:
         teams:
           type: array
           minItems: 1
           items:
-            $ref: "#/components/schemas/PredictabilityTeamResult"
-
+            $ref: '#/components/schemas/PredictabilityTeamResult'
     PredictabilityResponse:
       type: object
-      required: [score_pct, rating]
+      required:
+      - score_pct
+      - rating
       properties:
         score_pct:
           type: number
@@ -2190,5 +2265,41 @@ components:
           example: 85.0
         rating:
           type: string
-          enum: [green, yellow, red]
-          description: "green >= 80%, yellow 60-79%, red < 60%"
+          enum:
+          - green
+          - yellow
+          - red
+          description: green >= 80%, yellow 60-79%, red < 60%
+    RiskROAM:
+      type: object
+      required:
+      - roam_status
+      properties:
+        roam_status:
+          $ref: '#/components/schemas/ROAMStatus'
+        owner:
+          type: string
+          nullable: true
+        mitigation_notes:
+          type: string
+          nullable: true
+    DependencyROAM:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/DependencyStatus'
+        owner:
+          type: string
+          nullable: true
+        resolution_notes:
+          type: string
+          nullable: true
+    FeatureAssign:
+      type: object
+      required:
+      - team_id
+      properties:
+        team_id:
+          type: string
