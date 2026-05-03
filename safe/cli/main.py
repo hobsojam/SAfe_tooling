@@ -7,6 +7,9 @@ import safe.cli.state as state
 from safe.cli.art import art_app
 from safe.cli.team import team_app
 from safe.cli.pi import pi_app
+from safe.cli.feature import feature_app, feature_rank
+from safe.cli.story import story_app
+from safe.cli.backlog import backlog_app
 from safe.logic.wsjf import wsjf, cost_of_delay
 from safe.logic.capacity import available_capacity
 
@@ -19,6 +22,9 @@ capacity_app = typer.Typer(help="Team capacity planning")
 app.add_typer(art_app, name="art")
 app.add_typer(team_app, name="team")
 app.add_typer(pi_app, name="pi")
+app.add_typer(feature_app, name="feature")
+app.add_typer(story_app, name="story")
+app.add_typer(backlog_app, name="backlog")
 app.add_typer(wsjf_app, name="wsjf")
 app.add_typer(capacity_app, name="capacity")
 
@@ -29,6 +35,9 @@ def main_callback(
 ):
     if db_path is not None:
         state.db_path = db_path
+
+
+wsjf_app.command("rank")(feature_rank)
 
 
 @wsjf_app.command("score")

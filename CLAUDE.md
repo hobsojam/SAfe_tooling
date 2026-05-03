@@ -202,7 +202,7 @@ pyproject.toml
 |-------|-------|--------|
 | 1 | Persistence foundation — `Repository[T]`, model extensions, new models | **Done** |
 | 2 | ART / Team / PI setup commands (CLI) | **Done** |
-| 3 | Program Backlog Manager + stateful WSJF (CLI) | Not started |
+| 3 | Program Backlog Manager + stateful WSJF (CLI) | **Done** |
 | 4 | Capacity Planner (stateful CLI) | Not started |
 | 5 | PI Objectives Tracker (CLI) | Not started |
 | 6 | Risk Register (CLI) | Not started |
@@ -235,6 +235,15 @@ safe [--db-path PATH]
 - Branch naming: `feat/<short-description>` (e.g. `feat/phase-3-backlog-manager`).
 - Every feature branch must have its own PR targeting `main` before being merged.
 - Never commit feature work directly to `main`.
+
+## Documentation
+
+- **Always update `README.md` when completing a phase or adding new commands.** This means:
+  - Marking the feature as "Working" (not "Planned") in the What's implemented table.
+  - Adding usage examples for every new command group.
+  - Updating the Project Layout section if new files were added.
+- **Always update `CLAUDE.md` build phase status** to **Done** when a phase is complete.
+- Documentation updates must be committed on the same branch as the feature work, before the PR is created.
 
 ## Out of Scope
 
