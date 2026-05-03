@@ -74,14 +74,16 @@ All relationships use ID references (never embedded objects). `PI.iteration_ids`
 |-------|---------|---------|
 | Language | Python 3.14 | |
 | CLI | Typer (`typer[all]`) | Subcommand structure, `--help` generation |
+| HTTP API | FastAPI + uvicorn | REST API matching `docs/openapi.yaml` |
 | Data models | Pydantic v2 | Validated models with `computed_field` for derived values |
 | Persistence | TinyDB | JSON-backed local store at `~/.safe_tooling/db.json` |
 | Terminal output | Rich (bundled with Typer) | Colored tables, status indicators |
 | Spreadsheet I/O | openpyxl | Import/export for PI Planning Excel artifacts |
-| Testing | pytest + pytest-cov | |
+| Testing | pytest + pytest-cov + httpx | |
 
 Install: `pip install -e ".[dev]"`
 Run CLI: `safe --help`
+Run API: `safe-api` (or `podman compose up -d --build`)
 
 ## Project Structure
 
@@ -108,11 +110,30 @@ safe/
     team.py              # safe team create / show / list / delete
     pi.py                # safe pi create / show / list / activate / close / predictability
                          # safe pi iteration add / list / delete
+  api/
+    main.py              # FastAPI app; lifespan; router registration; run() entry point
+    deps.py              # get_repos_dep() Depends factory; DB lifecycle via lifespan
+    schemas.py           # Create/Update/action request body schemas (never expose id/computed fields)
+    routers/             # One file per resource; mirrors safe/cli/ structure
+      arts.py            # GET/POST /art, GET/PATCH/DELETE /art/{id}
+      teams.py           # GET/POST /team, GET/PATCH/DELETE /team/{id}
+      pi.py              # GET/POST /pi, GET/PATCH/DELETE /pi/{id}, POST activate/close
+      iterations.py      # GET/POST /iterations (?pi_id required), GET/PATCH/DELETE /{id}
+      features.py        # GET/POST /features (?sort=wsjf_desc), GET/PATCH/DELETE /{id}, POST /assign
+      stories.py         # GET/POST /stories, GET/PATCH/DELETE /{id}
+      objectives.py      # GET/POST /objectives, GET/PATCH/DELETE /{id}
+      risks.py           # GET/POST /risks, GET/PATCH/DELETE /{id}, POST /roam
+      dependencies.py    # GET/POST /dependencies, GET/PATCH/DELETE /{id}, POST /roam
+      capacity_plans.py  # GET/POST /capacity-plans (upsert), GET/PATCH/DELETE /{id}
+      compute.py         # POST /compute/predictability (stateless)
   store/
     db.py                # get_db(path?), close_db() — singleton TinyDB
     repository.py        # Repository[T] — generic save/get/find/delete
     repos.py             # Repos dataclass; get_repos() entry point
+docs/
+  openapi.yaml           # OpenAPI 3.1 spec — authoritative API contract
 tests/
+  conftest.py            # shared db (tmp_path TinyDB) and client (TestClient) fixtures
   test_wsjf.py
   test_capacity.py
   test_predictability.py
@@ -121,6 +142,19 @@ tests/
   test_art_commands.py
   test_team_commands.py
   test_pi_commands.py
+  test_api_arts.py       # one test file per API router
+  test_api_teams.py
+  test_api_pi.py
+  test_api_iterations.py
+  test_api_features.py
+  test_api_stories.py
+  test_api_objectives.py
+  test_api_risks.py
+  test_api_dependencies.py
+  test_api_capacity_plans.py
+  test_api_compute.py
+Dockerfile
+docker-compose.yml       # podman compose up -d --build
 pyproject.toml
 ```
 
@@ -148,23 +182,33 @@ pyproject.toml
 - The root callback in `main.py` sets `state.db_path` when `--db-path` is passed; all sub-apps pick it up via `safe.cli.state`.
 - Tests that patch Rich output must monkeypatch the specific module's `console`, not just `main.console`.
 
+**API structure**
+- All API route prefixes use **singular resource names**: `/art`, `/team`, `/pi`, `/iterations`, `/features`, `/stories`, `/objectives`, `/risks`, `/dependencies`, `/capacity-plans`. Never use plurals like `/arts` or `/teams`.
+- Domain models are used directly as `response_model`. Request bodies always use separate `*Create` / `*Update` schemas from `schemas.py` — never expose `id`, computed fields, or relationship ID lists (`team_ids`, `story_ids`, etc.) in request bodies.
+- PATCH handlers use `model_copy(update=body.model_dump(exclude_unset=True))` — `exclude_unset=True` is required so omitted fields are not overwritten with `None`.
+- 404 → `HTTPException(404)`, state machine violations → `HTTPException(409)`, validation → FastAPI raises 422 automatically.
+- API tests use the `client` fixture from `tests/conftest.py` which injects a fresh `tmp_path` TinyDB via `app.dependency_overrides[get_repos_dep]`.
+- The API DB lifecycle is independent of the CLI's `state.db_path` singleton — configured via `SAFE_DB_PATH` env var.
+
 **Testing**
 - Repository tests use `tmp_path` fixture to get a fresh TinyDB per test.
 - Logic tests are pure unit tests with no I/O.
 - CLI tests use `typer.testing.CliRunner` with `--db-path` pointing to a tmp file. Each test module includes an `autouse` `reset_state` fixture that sets `state.db_path = None` before and after each test to prevent state leaking between invocations.
+- API tests use `fastapi.testclient.TestClient` with `app.dependency_overrides` to inject a `tmp_path` TinyDB — see `tests/conftest.py`.
 
 ## Build Phases
 
 | Phase | Scope | Status |
 |-------|-------|--------|
 | 1 | Persistence foundation — `Repository[T]`, model extensions, new models | **Done** |
-| 2 | ART / Team / PI setup commands | **Done** |
-| 3 | Program Backlog Manager + stateful WSJF | Not started |
-| 4 | Capacity Planner (stateful) | Not started |
-| 5 | PI Objectives Tracker | Not started |
-| 6 | Risk Register | Not started |
-| 7 | Dependency Mapper | Not started |
-| 8 | PI Board (integrating view) | Not started |
+| 2 | ART / Team / PI setup commands (CLI) | **Done** |
+| 3 | Program Backlog Manager + stateful WSJF (CLI) | Not started |
+| 4 | Capacity Planner (stateful CLI) | Not started |
+| 5 | PI Objectives Tracker (CLI) | Not started |
+| 6 | Risk Register (CLI) | Not started |
+| 7 | Dependency Mapper (CLI) | Not started |
+| 8 | FastAPI HTTP layer — full OpenAPI implementation | **Done** |
+| 9 | PI Board (integrating view) | Not started |
 
 ## Planned CLI Command Tree
 
