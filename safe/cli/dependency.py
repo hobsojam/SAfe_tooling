@@ -30,7 +30,9 @@ def dependency_add(
     description: str = typer.Option(..., "--description", "-d", help="Dependency description"),
     pi_id: str = typer.Option(..., "--pi-id", help="PI id"),
     from_team_id: str = typer.Option(..., "--from-team-id", help="Team that has the dependency"),
-    to_team_id: str = typer.Option(..., "--to-team-id", help="Team that must fulfil the dependency"),
+    to_team_id: str = typer.Option(
+        ..., "--to-team-id", help="Team that must fulfil the dependency"
+    ),
     feature_id: str | None = typer.Option(None, "--feature-id", help="Related feature id"),
     iteration_id: str | None = typer.Option(None, "--iteration-id", help="Iteration needed by"),
     owner: str | None = typer.Option(None, "--owner", help="Dependency owner name"),
@@ -53,7 +55,7 @@ def dependency_add(
             parsed_needed_by = date.fromisoformat(needed_by_date)
         except ValueError:
             console.print(f"[red]Error: Invalid date '{needed_by_date}' — use YYYY-MM-DD[/red]")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
     dep = Dependency(
         description=description,
         pi_id=pi_id,
