@@ -1,9 +1,10 @@
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel
 from tinydb import Query, TinyDB
 
-T = TypeVar("T", bound=BaseModel)
+from safe.models.base import SAFeBaseModel
+
+T = TypeVar("T", bound=SAFeBaseModel)
 
 # Module-level singleton avoids rebuilding Query() on every method call — TinyDB
 # Query objects are stateless field-accessor proxies, so sharing one is safe.
@@ -44,6 +45,7 @@ class Repository(Generic[T]):
         for k, v in kwargs.items():
             clause = getattr(_Q, k) == v
             cond = clause if cond is None else (cond & clause)
+        assert cond is not None
         return [self._model.model_validate(r) for r in self._table.search(cond)]
 
     def delete(self, entity_id: str) -> bool:
