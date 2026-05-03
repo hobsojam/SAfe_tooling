@@ -204,11 +204,12 @@ pyproject.toml
 | 2 | ART / Team / PI setup commands (CLI) | **Done** |
 | 3 | Program Backlog Manager + stateful WSJF (CLI) | **Done** |
 | 4 | Capacity Planner (stateful CLI) | **Done** |
-| 5 | PI Objectives Tracker (CLI) | Not started |
+| 5 | PI Objectives Tracker (CLI) | **Done** |
 | 6 | Risk Register (CLI) | Not started |
 | 7 | Dependency Mapper (CLI) | Not started |
 | 8 | FastAPI HTTP layer — full OpenAPI implementation | **Done** |
 | 9 | PI Board (integrating view) | Not started |
+| 10 | Web frontend — React SPA consuming the FastAPI layer | Not started |
 
 ## Planned CLI Command Tree
 

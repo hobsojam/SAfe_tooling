@@ -21,11 +21,11 @@ pip install -e ".[dev]"
 | PI / Iteration setup | Working | `safe pi`, `safe pi iteration` |
 | HTTP API (FastAPI) | Working | `safe-api` / `podman compose up` |
 | Program Backlog Manager | Working | `safe feature`, `safe story`, `safe backlog`, `safe wsjf rank` |
-| Capacity Planner (stateful) | Working | `safe capacity set/show/export` |
-| PI Objectives Tracker | Planned | `safe objective` |
+| PI Objectives Tracker | Working | `safe objective` |
 | Risk Register | Planned | `safe risk` |
 | Dependency Mapper | Planned | `safe dependency` |
 | PI Board | Planned | `safe board` |
+| Web Frontend | Planned | React SPA |
 
 ## Usage
 
@@ -146,6 +146,30 @@ safe capacity show --team-id <tid>
 
 # Export to CSV for sharing
 safe capacity export --pi-id <pi-id> --output capacity.csv
+```
+
+### PI Objectives
+
+```bash
+# Add a committed objective
+safe objective add --description "Deliver auth service" \
+  --team-id <tid> --pi-id <pi-id> --planned-bv 8
+
+# Add a stretch objective
+safe objective add --description "Add SSO support" \
+  --team-id <tid> --pi-id <pi-id> --planned-bv 5 --stretch
+
+# List objectives
+safe objective list
+safe objective list --pi-id <pi-id>
+safe objective list --team-id <tid>
+
+# Record actual business value at end of PI (for predictability)
+safe objective score <id> --actual-bv 7
+
+# Update or delete
+safe objective update <id> --planned-bv 9
+safe objective delete <id>
 ```
 
 ### PI Predictability
