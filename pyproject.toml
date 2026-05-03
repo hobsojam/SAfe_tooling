@@ -27,6 +27,7 @@ dev = [
     "httpx>=0.27",
     "ruff>=0.4",
     "mypy>=1.10",
+    "mutmut>=2",
 ]
 
 [tool.pytest.ini_options]
@@ -48,6 +49,11 @@ select = [
 ignore = [
     "B008",  # do not perform function calls in default arguments (common in FastAPI/Typer)
 ]
+
+[tool.mutmut]
+paths_to_mutate = "safe/logic/"
+tests_dir = "tests/"
+runner = "python -m pytest tests/test_wsjf.py tests/test_capacity.py tests/test_predictability.py -x -q"
 
 [tool.mypy]
 python_version = "3.11"

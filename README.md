@@ -21,11 +21,11 @@ pip install -e ".[dev]"
 | PI / Iteration setup | Working | `safe pi`, `safe pi iteration` |
 | HTTP API (FastAPI) | Working | `safe-api` / `podman compose up` |
 | Program Backlog Manager | Working | `safe feature`, `safe story`, `safe backlog`, `safe wsjf rank` |
-| Capacity Planner (stateful) | Working | `safe capacity set/show/export` |
-| PI Objectives Tracker | Planned | `safe objective` |
-| Risk Register | Planned | `safe risk` |
-| Dependency Mapper | Planned | `safe dependency` |
-| PI Board | Planned | `safe board` |
+| PI Objectives Tracker | Working | `safe objective` |
+| Risk Register | Working | `safe risk add/list/show/roam/delete` |
+| Dependency Mapper | Working | `safe dependency add/list/show/roam/delete` |
+| PI Board | Working | `safe board show/export` |
+| Web Frontend | Planned | React SPA |
 
 ## Usage
 
@@ -148,6 +148,97 @@ safe capacity show --team-id <tid>
 safe capacity export --pi-id <pi-id> --output capacity.csv
 ```
 
+### PI Objectives
+
+```bash
+# Add a committed objective
+safe objective add --description "Deliver auth service" \
+  --team-id <tid> --pi-id <pi-id> --planned-bv 8
+
+# Add a stretch objective
+safe objective add --description "Add SSO support" \
+  --team-id <tid> --pi-id <pi-id> --planned-bv 5 --stretch
+
+# List objectives
+safe objective list
+safe objective list --pi-id <pi-id>
+safe objective list --team-id <tid>
+
+# Record actual business value at end of PI (for predictability)
+safe objective score <id> --actual-bv 7
+
+# Update or delete
+safe objective update <id> --planned-bv 9
+safe objective delete <id>
+```
+
+### Risk Register
+
+```bash
+# Add a risk (unroamed by default)
+safe risk add --description "Auth service unavailable" --pi-id <pi-id>
+safe risk add --description "Infra dependency missing" --pi-id <pi-id> \
+  --team-id <tid> --owner "Alice"
+
+# List all risks for a PI
+safe risk list
+safe risk list --pi-id <pi-id>
+safe risk list --status unroamed      # highlight risks not yet dispositioned
+safe risk list --team-id <tid>
+
+# Show full detail for one risk
+safe risk show <id>
+
+# ROAM the risk (Resolved / Owned / Accepted / Mitigated)
+safe risk roam <id> --status owned --owner "Bob"
+safe risk roam <id> --status mitigated --notes "Added circuit breaker"
+safe risk roam <id> --status resolved
+
+# Delete
+safe risk delete <id>
+```
+
+### Dependency Mapper
+
+```bash
+# Add a cross-team dependency (identified by default)
+safe dependency add --description "Auth service API contract" \
+  --pi-id <pi-id> --from-team-id <from-tid> --to-team-id <to-tid>
+safe dependency add --description "Platform library v2" \
+  --pi-id <pi-id> --from-team-id <from-tid> --to-team-id <to-tid> \
+  --owner "Alice" --needed-by 2026-02-14
+
+# List dependencies
+safe dependency list
+safe dependency list --pi-id <pi-id>
+safe dependency list --from-team-id <tid>
+safe dependency list --to-team-id <tid>
+safe dependency list --status identified    # highlight unresolved dependencies
+
+# Show full detail for one dependency
+safe dependency show <id>
+
+# Update status (identified / owned / accepted / mitigated / resolved)
+safe dependency roam <id> --status owned --owner "Bob"
+safe dependency roam <id> --status mitigated --notes "Interface agreed in Iteration 2"
+safe dependency roam <id> --status resolved
+
+# Delete
+safe dependency delete <id>
+```
+
+### PI Board
+
+```bash
+# Show the program board for a PI
+# Columns: teams × iterations (features placed by story point majority)
+# Unplanned column for features with no iteration-assigned stories
+safe board show --pi-id <pi-id>
+
+# Export to Excel (.xlsx) — board sheet + optional Dependencies sheet
+safe board export --pi-id <pi-id> --output board.xlsx
+```
+
 ### PI Predictability
 
 Calculate ART predictability at end of PI. Repeat `--planned` and `--actual` once per team:
@@ -244,6 +335,12 @@ safe/
     feature.py  safe feature commands (add/show/list/rank/update/assign/delete)
     story.py    safe story commands (add/list/update/delete)
     backlog.py  safe backlog show
+    objective.py safe objective commands
+    risk.py     safe risk commands (add/list/show/roam/delete)
+    dependency.py safe dependency commands (add/list/show/roam/delete)
+    board.py    safe board commands (show/export)
+  logic/
+    board.py    build_board() — feature-to-iteration grid logic
   api/
     main.py     FastAPI app; lifespan; router registration; run() entry point
     deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan
