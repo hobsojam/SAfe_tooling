@@ -24,7 +24,7 @@ pip install -e ".[dev]"
 | PI Objectives Tracker | Working | `safe objective` |
 | Risk Register | Working | `safe risk add/list/show/roam/delete` |
 | Dependency Mapper | Working | `safe dependency add/list/show/roam/delete` |
-| PI Board | Planned | `safe board` |
+| PI Board | Working | `safe board show/export` |
 | Web Frontend | Planned | React SPA |
 
 ## Usage
@@ -227,6 +227,18 @@ safe dependency roam <id> --status resolved
 safe dependency delete <id>
 ```
 
+### PI Board
+
+```bash
+# Show the program board for a PI
+# Columns: teams × iterations (features placed by story point majority)
+# Unplanned column for features with no iteration-assigned stories
+safe board show --pi-id <pi-id>
+
+# Export to Excel (.xlsx) — board sheet + optional Dependencies sheet
+safe board export --pi-id <pi-id> --output board.xlsx
+```
+
 ### PI Predictability
 
 Calculate ART predictability at end of PI. Repeat `--planned` and `--actual` once per team:
@@ -326,6 +338,9 @@ safe/
     objective.py safe objective commands
     risk.py     safe risk commands (add/list/show/roam/delete)
     dependency.py safe dependency commands (add/list/show/roam/delete)
+    board.py    safe board commands (show/export)
+  logic/
+    board.py    build_board() — feature-to-iteration grid logic
   api/
     main.py     FastAPI app; lifespan; router registration; run() entry point
     deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan

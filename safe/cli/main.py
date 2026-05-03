@@ -6,6 +6,7 @@ from rich.console import Console
 import safe.cli.state as state
 from safe.cli.art import art_app
 from safe.cli.backlog import backlog_app
+from safe.cli.board import board_app
 from safe.cli.capacity import capacity_app
 from safe.cli.dependency import dependency_app
 from safe.cli.feature import feature_app, feature_rank
@@ -32,6 +33,7 @@ app.add_typer(capacity_app, name="capacity")
 app.add_typer(objective_app, name="objective")
 app.add_typer(risk_app, name="risk")
 app.add_typer(dependency_app, name="dependency")
+app.add_typer(board_app, name="board")
 
 
 @app.callback()
