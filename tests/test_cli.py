@@ -5,14 +5,16 @@ Rich's Console is created at module level pointing to the real stdout, which
 the CliRunner's buffer does not capture. We monkeypatch each module's console
 with a Console backed by a StringIO so assertions on output are reliable.
 """
-import pytest
+
 from io import StringIO
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
+import safe.cli.capacity as capacity_module
 import safe.cli.main as main_module
 import safe.cli.pi as pi_module
-import safe.cli.capacity as capacity_module
 from safe.cli.main import app
 
 runner = CliRunner()
@@ -33,6 +35,7 @@ def patch_console(monkeypatch):
 # safe wsjf score
 # ---------------------------------------------------------------------------
 
+
 class TestWsjfScore:
     def test_exit_code_success(self, patch_console):
         result = runner.invoke(app, ["wsjf", "score", "-u", "8", "-t", "5", "-r", "3", "-j", "4"])
@@ -47,13 +50,21 @@ class TestWsjfScore:
         assert "4.0" in patch_console.getvalue()
 
     def test_long_flags(self, patch_console):
-        result = runner.invoke(app, [
-            "wsjf", "score",
-            "--user-value", "5",
-            "--time-crit", "5",
-            "--risk-reduction", "5",
-            "--job-size", "5",
-        ])
+        result = runner.invoke(
+            app,
+            [
+                "wsjf",
+                "score",
+                "--user-value",
+                "5",
+                "--time-crit",
+                "5",
+                "--risk-reduction",
+                "5",
+                "--job-size",
+                "5",
+            ],
+        )
         assert result.exit_code == 0
         # CoD = 15, WSJF = 15/5 = 3.0
         assert "15" in patch_console.getvalue()
@@ -62,7 +73,7 @@ class TestWsjfScore:
     def test_minimum_values(self, patch_console):
         result = runner.invoke(app, ["wsjf", "score", "-u", "1", "-t", "1", "-r", "1", "-j", "1"])
         assert result.exit_code == 0
-        assert "3" in patch_console.getvalue()   # CoD = 3
+        assert "3" in patch_console.getvalue()  # CoD = 3
         assert "3.0" in patch_console.getvalue()  # WSJF = 3/1 = 3.0
 
     def test_missing_user_value(self, patch_console):
@@ -81,6 +92,7 @@ class TestWsjfScore:
 # ---------------------------------------------------------------------------
 # safe capacity calc
 # ---------------------------------------------------------------------------
+
 
 class TestCapacityCalc:
     def test_exit_code_success(self, patch_console):
@@ -125,6 +137,7 @@ class TestCapacityCalc:
 # safe pi predictability
 # ---------------------------------------------------------------------------
 
+
 class TestPIPredictability:
     def test_perfect_predictability(self, patch_console):
         result = runner.invoke(app, ["pi", "predictability", "-p", "10", "-a", "10"])
@@ -139,11 +152,21 @@ class TestPIPredictability:
 
     def test_multiple_teams(self, patch_console):
         # planned: 10+10=20, actual: 8+9=17 → 85%
-        result = runner.invoke(app, [
-            "pi", "predictability",
-            "-p", "10", "-p", "10",
-            "-a", "8", "-a", "9",
-        ])
+        result = runner.invoke(
+            app,
+            [
+                "pi",
+                "predictability",
+                "-p",
+                "10",
+                "-p",
+                "10",
+                "-a",
+                "8",
+                "-a",
+                "9",
+            ],
+        )
         assert result.exit_code == 0
         assert "85.0%" in patch_console.getvalue()
 
@@ -154,19 +177,35 @@ class TestPIPredictability:
         assert "125.0%" in patch_console.getvalue()
 
     def test_mismatched_counts_exit_1(self, patch_console):
-        result = runner.invoke(app, [
-            "pi", "predictability",
-            "-p", "10", "-p", "8",
-            "-a", "9",
-        ])
+        result = runner.invoke(
+            app,
+            [
+                "pi",
+                "predictability",
+                "-p",
+                "10",
+                "-p",
+                "8",
+                "-a",
+                "9",
+            ],
+        )
         assert result.exit_code == 1
 
     def test_mismatched_error_message(self, patch_console):
-        runner.invoke(app, [
-            "pi", "predictability",
-            "-p", "10", "-p", "8",
-            "-a", "9",
-        ])
+        runner.invoke(
+            app,
+            [
+                "pi",
+                "predictability",
+                "-p",
+                "10",
+                "-p",
+                "8",
+                "-a",
+                "9",
+            ],
+        )
         assert "Error" in patch_console.getvalue() or "error" in patch_console.getvalue().lower()
 
     def test_missing_planned(self, patch_console):
@@ -185,6 +224,7 @@ class TestPIPredictability:
 # ---------------------------------------------------------------------------
 # Top-level app
 # ---------------------------------------------------------------------------
+
 
 class TestAppRoot:
     def test_no_args_shows_help(self, patch_console):

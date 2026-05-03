@@ -1,4 +1,5 @@
 from pydantic import Field, computed_field
+
 from safe.logic.capacity import available_capacity as _available_capacity
 from safe.models.base import SAFeBaseModel
 
@@ -15,4 +16,6 @@ class CapacityPlan(SAFeBaseModel):
     @computed_field
     @property
     def available_capacity(self) -> float:
-        return _available_capacity(self.team_size, self.iteration_days, self.pto_days, self.overhead_pct)
+        return _available_capacity(
+            self.team_size, self.iteration_days, self.pto_days, self.overhead_pct
+        )

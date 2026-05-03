@@ -1,5 +1,6 @@
 import pytest
-from safe.logic.wsjf import cost_of_delay, wsjf, rank_features
+
+from safe.logic.wsjf import cost_of_delay, rank_features, wsjf
 
 
 def test_cost_of_delay():

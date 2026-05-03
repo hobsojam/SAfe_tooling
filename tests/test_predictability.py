@@ -1,5 +1,6 @@
 import pytest
-from safe.logic.predictability import team_predictability, art_predictability, predictability_rating
+
+from safe.logic.predictability import art_predictability, predictability_rating, team_predictability
 
 
 def test_team_predictability_perfect():

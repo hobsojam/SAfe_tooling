@@ -1,7 +1,9 @@
 FEATURE_BASE = {
     "name": "Auth Service",
-    "user_business_value": 8, "time_criticality": 5,
-    "risk_reduction_opportunity_enablement": 3, "job_size": 4,
+    "user_business_value": 8,
+    "time_criticality": 5,
+    "risk_reduction_opportunity_enablement": 3,
+    "job_size": 4,
 }
 
 
@@ -12,10 +14,16 @@ def _setup(client):
 
 
 def _create_story(client, feature_id, team_id, **overrides):
-    return client.post("/stories", json={
-        "name": "Login flow", "feature_id": feature_id,
-        "team_id": team_id, "points": 3, **overrides,
-    })
+    return client.post(
+        "/stories",
+        json={
+            "name": "Login flow",
+            "feature_id": feature_id,
+            "team_id": team_id,
+            "points": 3,
+            **overrides,
+        },
+    )
 
 
 class TestStoryCreate:

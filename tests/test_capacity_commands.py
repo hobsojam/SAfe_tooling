@@ -1,7 +1,8 @@
 import csv
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
@@ -46,22 +47,52 @@ def _setup(db_path):
     """Create ART → PI → Team → Iteration, return (pi_id, team_id, iter_id)."""
     invoke(db_path, "art", "create", "--name", "ART")
     art_id = repos_for(db_path).arts.get_all()[0].id
-    invoke(db_path, "pi", "create", "--name", "PI 1", "--art-id", art_id,
-           "--start", "2026-01-05", "--end", "2026-03-27")
+    invoke(
+        db_path,
+        "pi",
+        "create",
+        "--name",
+        "PI 1",
+        "--art-id",
+        art_id,
+        "--start",
+        "2026-01-05",
+        "--end",
+        "2026-03-27",
+    )
     pi_id = repos_for(db_path).pis.get_all()[0].id
     invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
     team_id = repos_for(db_path).teams.get_all()[0].id
-    invoke(db_path, "pi", "iteration", "add", "--pi-id", pi_id,
-           "--number", "1", "--start", "2026-01-05", "--end", "2026-01-16")
+    invoke(
+        db_path,
+        "pi",
+        "iteration",
+        "add",
+        "--pi-id",
+        pi_id,
+        "--number",
+        "1",
+        "--start",
+        "2026-01-05",
+        "--end",
+        "2026-01-16",
+    )
     iter_id = repos_for(db_path).iterations.get_all()[0].id
     return pi_id, team_id, iter_id
 
 
 def _set_plan(db_path, pi_id, team_id, iter_id, team_size=7, extra=None):
     args = [
-        "capacity", "set",
-        "--pi-id", pi_id, "--team-id", team_id, "--iteration-id", iter_id,
-        "--team-size", str(team_size),
+        "capacity",
+        "set",
+        "--pi-id",
+        pi_id,
+        "--team-id",
+        team_id,
+        "--iteration-id",
+        iter_id,
+        "--team-size",
+        str(team_size),
     ]
     return invoke(db_path, *(args + (extra or [])))
 
@@ -93,23 +124,53 @@ class TestCapacitySet:
     def test_unknown_pi_exits_1(self, db_path, patch_console):
         _, team_id, iter_id = _setup(db_path)
         pi_id, team_id, iter_id = _setup(db_path)
-        result = invoke(db_path, "capacity", "set",
-                        "--pi-id", "bad", "--team-id", team_id,
-                        "--iteration-id", iter_id, "--team-size", "5")
+        result = invoke(
+            db_path,
+            "capacity",
+            "set",
+            "--pi-id",
+            "bad",
+            "--team-id",
+            team_id,
+            "--iteration-id",
+            iter_id,
+            "--team-size",
+            "5",
+        )
         assert result.exit_code == 1
 
     def test_unknown_team_exits_1(self, db_path, patch_console):
         pi_id, _, iter_id = _setup(db_path)
-        result = invoke(db_path, "capacity", "set",
-                        "--pi-id", pi_id, "--team-id", "bad",
-                        "--iteration-id", iter_id, "--team-size", "5")
+        result = invoke(
+            db_path,
+            "capacity",
+            "set",
+            "--pi-id",
+            pi_id,
+            "--team-id",
+            "bad",
+            "--iteration-id",
+            iter_id,
+            "--team-size",
+            "5",
+        )
         assert result.exit_code == 1
 
     def test_unknown_iteration_exits_1(self, db_path, patch_console):
         pi_id, team_id, _ = _setup(db_path)
-        result = invoke(db_path, "capacity", "set",
-                        "--pi-id", pi_id, "--team-id", team_id,
-                        "--iteration-id", "bad", "--team-size", "5")
+        result = invoke(
+            db_path,
+            "capacity",
+            "set",
+            "--pi-id",
+            pi_id,
+            "--team-id",
+            team_id,
+            "--iteration-id",
+            "bad",
+            "--team-size",
+            "5",
+        )
         assert result.exit_code == 1
 
 
@@ -145,8 +206,7 @@ class TestCapacityExport:
         pi_id, team_id, iter_id = _setup(db_path)
         _set_plan(db_path, pi_id, team_id, iter_id, team_size=6)
         out = tmp_path / "cap.csv"
-        result = invoke(db_path, "capacity", "export",
-                        "--pi-id", pi_id, "--output", str(out))
+        result = invoke(db_path, "capacity", "export", "--pi-id", pi_id, "--output", str(out))
         assert result.exit_code == 0
         assert out.exists()
 

@@ -6,8 +6,8 @@ from rich.console import Console
 from rich.table import Table
 
 import safe.cli.state as state
+from safe.logic.capacity import available_capacity, capacity_warning, load_percentage
 from safe.models.capacity_plan import CapacityPlan
-from safe.logic.capacity import available_capacity, load_percentage, capacity_warning
 from safe.store.db import get_db
 from safe.store.repos import get_repos
 
@@ -21,7 +21,8 @@ def _repos():
 
 def _find_existing(repos, pi_id: str, team_id: str, iteration_id: str) -> CapacityPlan | None:
     matches = [
-        p for p in repos.capacity_plans.find(pi_id=pi_id)
+        p
+        for p in repos.capacity_plans.find(pi_id=pi_id)
         if p.team_id == team_id and p.iteration_id == iteration_id
     ]
     return matches[0] if matches else None
@@ -63,12 +64,14 @@ def capacity_set(
 
     existing = _find_existing(repos, pi_id, team_id, iteration_id)
     if existing is not None:
-        plan = existing.model_copy(update={
-            "team_size": team_size,
-            "iteration_days": iteration_days,
-            "pto_days": pto_days,
-            "overhead_pct": overhead_pct,
-        })
+        plan = existing.model_copy(
+            update={
+                "team_size": team_size,
+                "iteration_days": iteration_days,
+                "pto_days": pto_days,
+                "overhead_pct": overhead_pct,
+            }
+        )
     else:
         plan = CapacityPlan(
             pi_id=pi_id,
@@ -125,9 +128,14 @@ def capacity_show(
             status = "-"
 
         table.add_row(
-            team_name, iter_label,
-            str(plan.team_size), str(plan.iteration_days), str(plan.pto_days),
-            str(plan.available_capacity), load_str, status,
+            team_name,
+            iter_label,
+            str(plan.team_size),
+            str(plan.iteration_days),
+            str(plan.pto_days),
+            str(plan.available_capacity),
+            load_str,
+            status,
         )
     console.print(table)
 
@@ -149,15 +157,29 @@ def capacity_export(
 
     with output.open("w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["team", "iteration", "team_size", "iteration_days",
-                         "pto_days", "overhead_pct", "available_capacity"])
+        writer.writerow(
+            [
+                "team",
+                "iteration",
+                "team_size",
+                "iteration_days",
+                "pto_days",
+                "overhead_pct",
+                "available_capacity",
+            ]
+        )
         for plan in plans:
             team = repos.teams.get(plan.team_id)
             iteration = repos.iterations.get(plan.iteration_id)
-            writer.writerow([
-                team.name if team else plan.team_id,
-                f"I{iteration.number}" if iteration else plan.iteration_id,
-                plan.team_size, plan.iteration_days, plan.pto_days,
-                plan.overhead_pct, plan.available_capacity,
-            ])
+            writer.writerow(
+                [
+                    team.name if team else plan.team_id,
+                    f"I{iteration.number}" if iteration else plan.iteration_id,
+                    plan.team_size,
+                    plan.iteration_days,
+                    plan.pto_days,
+                    plan.overhead_pct,
+                    plan.available_capacity,
+                ]
+            )
     console.print(f"Exported {len(plans)} plan(s) to [bold]{output}[/bold]")

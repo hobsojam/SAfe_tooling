@@ -29,8 +29,14 @@ def backlog_show(
     for rank, f in enumerate(features, 1):
         story_count = str(len(repos.stories.find(feature_id=f.id)))
         table.add_row(
-            str(rank), f.name, f.status.value,
-            str(f.cost_of_delay), str(f.job_size), str(f.wsjf_score),
-            story_count, f.team_id or "-", f.pi_id or "-",
+            str(rank),
+            f.name,
+            f.status.value,
+            str(f.cost_of_delay),
+            str(f.job_size),
+            str(f.wsjf_score),
+            story_count,
+            f.team_id or "-",
+            f.pi_id or "-",
         )
     console.print(table)

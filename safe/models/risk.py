@@ -1,10 +1,12 @@
 from datetime import date
-from enum import Enum
+from enum import StrEnum
+
 from pydantic import Field
+
 from safe.models.base import SAFeBaseModel
 
 
-class ROAMStatus(str, Enum):
+class ROAMStatus(StrEnum):
     RESOLVED = "resolved"
     OWNED = "owned"
     ACCEPTED = "accepted"

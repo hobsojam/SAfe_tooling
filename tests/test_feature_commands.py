@@ -1,6 +1,7 @@
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
@@ -13,11 +14,16 @@ from safe.store.repos import get_repos
 runner = CliRunner()
 
 FEATURE_ARGS = [
-    "--name", "Auth Service",
-    "--user-value", "8",
-    "--time-crit", "5",
-    "--risk-reduction", "3",
-    "--job-size", "4",
+    "--name",
+    "Auth Service",
+    "--user-value",
+    "8",
+    "--time-crit",
+    "5",
+    "--risk-reduction",
+    "3",
+    "--job-size",
+    "4",
 ]
 
 
@@ -115,8 +121,21 @@ class TestFeatureList:
 
 class TestFeatureRank:
     def test_ranks_by_wsjf(self, db_path, patch_console):
-        invoke(db_path, "feature", "add", "--name", "Low WSJF",
-               "--user-value", "1", "--time-crit", "1", "--risk-reduction", "1", "--job-size", "13")
+        invoke(
+            db_path,
+            "feature",
+            "add",
+            "--name",
+            "Low WSJF",
+            "--user-value",
+            "1",
+            "--time-crit",
+            "1",
+            "--risk-reduction",
+            "1",
+            "--job-size",
+            "13",
+        )
         invoke(db_path, "feature", "add", *FEATURE_ARGS)
         patch_console.truncate(0)
         patch_console.seek(0)
@@ -184,8 +203,19 @@ class TestFeatureDelete:
         f = _add_feature(db_path)
         invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
         team = repos_for(db_path).teams.get_all()[0]
-        invoke(db_path, "story", "add",
-               "--name", "S1", "--feature-id", f.id, "--team-id", team.id, "--points", "3")
+        invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S1",
+            "--feature-id",
+            f.id,
+            "--team-id",
+            team.id,
+            "--points",
+            "3",
+        )
         story = repos_for(db_path).stories.get_all()[0]
         invoke(db_path, "feature", "delete", f.id)
         assert repos_for(db_path).stories.get(story.id) is None

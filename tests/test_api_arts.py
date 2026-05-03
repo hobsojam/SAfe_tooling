@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_list_empty(client):
     r = client.get("/art")
     assert r.status_code == 200

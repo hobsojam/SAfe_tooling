@@ -1,8 +1,10 @@
-from typing import Generic, TypeVar, Type
-from pydantic import BaseModel
-from tinydb import TinyDB, Query
+from typing import Generic, TypeVar
 
-T = TypeVar("T", bound=BaseModel)
+from tinydb import Query, TinyDB
+
+from safe.models.base import SAFeBaseModel
+
+T = TypeVar("T", bound=SAFeBaseModel)
 
 # Module-level singleton avoids rebuilding Query() on every method call — TinyDB
 # Query objects are stateless field-accessor proxies, so sharing one is safe.
@@ -14,7 +16,7 @@ class ReferentialIntegrityError(Exception):
 
 
 class Repository(Generic[T]):
-    def __init__(self, db: TinyDB, table_name: str, model: Type[T]) -> None:
+    def __init__(self, db: TinyDB, table_name: str, model: type[T]) -> None:
         self._table = db.table(table_name)
         self._model = model
 
@@ -36,11 +38,14 @@ class Repository(Generic[T]):
 
     def find(self, **kwargs) -> list[T]:
         if not kwargs:
-            raise ValueError("find() requires at least one filter — use get_all() for unrestricted access")
+            raise ValueError(
+                "find() requires at least one filter — use get_all() for unrestricted access"
+            )
         cond = None
         for k, v in kwargs.items():
             clause = getattr(_Q, k) == v
             cond = clause if cond is None else (cond & clause)
+        assert cond is not None
         return [self._model.model_validate(r) for r in self._table.search(cond)]
 
     def delete(self, entity_id: str) -> bool:

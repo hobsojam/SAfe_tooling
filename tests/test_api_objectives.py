@@ -3,7 +3,15 @@ def _create_art(client):
 
 
 def _create_pi(client, art_id):
-    return client.post("/pi", json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"}).json()["id"]
+    return client.post(
+        "/pi",
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
+    ).json()["id"]
 
 
 def _create_team(client):
@@ -14,7 +22,9 @@ OBJ_BASE = {"description": "Deliver auth service", "planned_business_value": 8}
 
 
 def _create_objective(client, team_id, pi_id, **overrides):
-    return client.post("/objectives", json={"team_id": team_id, "pi_id": pi_id, **OBJ_BASE, **overrides})
+    return client.post(
+        "/objectives", json={"team_id": team_id, "pi_id": pi_id, **OBJ_BASE, **overrides}
+    )
 
 
 def test_create_returns_201(client):
@@ -40,7 +50,15 @@ def test_stretch_objective(client):
 def test_list_filter_by_pi(client):
     art_id = _create_art(client)
     pi1 = _create_pi(client, art_id)
-    pi2 = client.post("/pi", json={"name": "PI 2", "art_id": art_id, "start_date": "2026-04-06", "end_date": "2026-06-26"}).json()["id"]
+    pi2 = client.post(
+        "/pi",
+        json={
+            "name": "PI 2",
+            "art_id": art_id,
+            "start_date": "2026-04-06",
+            "end_date": "2026-06-26",
+        },
+    ).json()["id"]
     team_id = _create_team(client)
     _create_objective(client, team_id, pi1)
     _create_objective(client, team_id, pi2)

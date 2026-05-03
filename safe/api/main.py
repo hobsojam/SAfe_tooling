@@ -3,8 +3,17 @@ from fastapi import FastAPI
 
 from safe.api.deps import lifespan
 from safe.api.routers import (
-    arts, teams, pi, iterations, features, stories,
-    objectives, risks, dependencies, capacity_plans, compute,
+    arts,
+    capacity_plans,
+    compute,
+    dependencies,
+    features,
+    iterations,
+    objectives,
+    pi,
+    risks,
+    stories,
+    teams,
 )
 
 app = FastAPI(
@@ -29,6 +38,7 @@ app.include_router(compute.router)
 
 def run() -> None:
     import os
+
     host = os.environ.get("SAFE_API_HOST", "127.0.0.1")
     port = int(os.environ.get("SAFE_API_PORT", "8000"))
     uvicorn.run("safe.api.main:app", host=host, port=port, reload=False)

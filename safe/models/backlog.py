@@ -1,9 +1,11 @@
-from enum import Enum
+from enum import StrEnum
+
 from pydantic import Field, computed_field
+
 from safe.models.base import SAFeBaseModel
 
 
-class FeatureStatus(str, Enum):
+class FeatureStatus(StrEnum):
     FUNNEL = "funnel"
     ANALYZING = "analyzing"
     BACKLOG = "backlog"
@@ -28,7 +30,11 @@ class Feature(SAFeBaseModel):
     @computed_field
     @property
     def cost_of_delay(self) -> int:
-        return self.user_business_value + self.time_criticality + self.risk_reduction_opportunity_enablement
+        return (
+            self.user_business_value
+            + self.time_criticality
+            + self.risk_reduction_opportunity_enablement
+        )
 
     @computed_field
     @property
@@ -36,7 +42,7 @@ class Feature(SAFeBaseModel):
         return round(self.cost_of_delay / self.job_size, 2)
 
 
-class StoryStatus(str, Enum):
+class StoryStatus(StrEnum):
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     DONE = "done"

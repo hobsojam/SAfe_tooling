@@ -1,6 +1,3 @@
-import pytest
-
-
 def _create_art(client, name="Platform ART"):
     return client.post("/art", json={"name": name}).json()["id"]
 
@@ -29,7 +26,9 @@ def test_create_with_art_id(client):
 
 def test_create_updates_art_team_ids(client):
     art_id = _create_art(client)
-    team_id = client.post("/team", json={"name": "Gamma", "member_count": 5, "art_id": art_id}).json()["id"]
+    team_id = client.post(
+        "/team", json={"name": "Gamma", "member_count": 5, "art_id": art_id}
+    ).json()["id"]
     art = client.get(f"/art/{art_id}").json()
     assert team_id in art["team_ids"]
 
@@ -90,7 +89,9 @@ def test_delete_returns_204(client):
 
 def test_delete_removes_from_art_team_ids(client):
     art_id = _create_art(client)
-    team_id = client.post("/team", json={"name": "Gone", "member_count": 5, "art_id": art_id}).json()["id"]
+    team_id = client.post(
+        "/team", json={"name": "Gone", "member_count": 5, "art_id": art_id}
+    ).json()["id"]
     client.delete(f"/team/{team_id}")
     art = client.get(f"/art/{art_id}").json()
     assert team_id not in art["team_ids"]

@@ -1,10 +1,12 @@
 from datetime import date
-from enum import Enum
+from enum import StrEnum
+
 from pydantic import Field
+
 from safe.models.base import SAFeBaseModel
 
 
-class PIStatus(str, Enum):
+class PIStatus(StrEnum):
     PLANNING = "planning"
     ACTIVE = "active"
     CLOSED = "closed"

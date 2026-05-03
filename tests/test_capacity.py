@@ -1,5 +1,6 @@
 import pytest
-from safe.logic.capacity import available_capacity, load_percentage, capacity_warning
+
+from safe.logic.capacity import available_capacity, capacity_warning, load_percentage
 
 
 def test_available_capacity_basic():
