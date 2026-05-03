@@ -25,6 +25,7 @@ pip install -e ".[dev]"
 | Risk Register | Planned | `safe risk` |
 | Dependency Mapper | Planned | `safe dependency` |
 | PI Board | Planned | `safe board` |
+| Web Frontend | Planned | React SPA |
 
 ## Usage
 
