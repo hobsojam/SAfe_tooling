@@ -38,6 +38,7 @@ jobs:
 
       # 5. Commit and push changes if any
       - name: Commit changes
+        if: github.event_name == 'push'
         run: |
           if [[ `git status --porcelain` ]]; then
             git config --global user.name 'github-actions[bot]'
