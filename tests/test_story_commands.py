@@ -1,11 +1,12 @@
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
-import safe.cli.story as story_module
 import safe.cli.state as state
+import safe.cli.story as story_module
 from safe.cli.main import app
 from safe.store.db import get_db
 from safe.store.repos import get_repos

@@ -20,7 +20,9 @@ def feature_add(
     name: str = typer.Option(..., "--name", "-n", help="Feature name"),
     user_value: int = typer.Option(..., "--user-value", "-u", help="User/Business Value (1–10)"),
     time_crit: int = typer.Option(..., "--time-crit", "-t", help="Time Criticality (1–10)"),
-    risk_reduction: int = typer.Option(..., "--risk-reduction", "-r", help="Risk Reduction / OE (1–10)"),
+    risk_reduction: int = typer.Option(
+        ..., "--risk-reduction", "-r", help="Risk Reduction / OE (1–10)"
+    ),
     job_size: int = typer.Option(..., "--job-size", "-j", help="Job Size (1–13)"),
     description: str = typer.Option("", "--description", "-d", help="Feature description"),
     pi_id: str | None = typer.Option(None, "--pi-id", help="Assign to PI"),
@@ -40,7 +42,9 @@ def feature_add(
         pi_id=pi_id,
     )
     repos.features.save(feature)
-    console.print(f"Added feature [bold]{feature.name}[/bold] (WSJF: {feature.wsjf_score}, id: {feature.id})")
+    console.print(
+        f"Added feature [bold]{feature.name}[/bold] (WSJF: {feature.wsjf_score}, id: {feature.id})"
+    )
 
 
 @feature_app.command("show")
@@ -84,7 +88,7 @@ def feature_list(
         except ValueError:
             valid = ", ".join(s.value for s in FeatureStatus)
             console.print(f"[red]Error: invalid status '{status}'. Valid: {valid}[/red]")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
         features = [f for f in features if f.status == status_enum]
     if not features:
         console.print("No features found.")
@@ -112,7 +116,11 @@ def feature_rank(
     features.sort(key=lambda f: f.wsjf_score, reverse=True)
     table = Table("#", "Name", "CoD", "Size", "WSJF", "Status")
     for rank, f in enumerate(features, 1):
-        table.add_row(str(rank), f.name, str(f.cost_of_delay), str(f.job_size), str(f.wsjf_score), f.status.value)
+        table.add_row(
+            str(rank), f.name,
+            str(f.cost_of_delay), str(f.job_size), str(f.wsjf_score),
+            f.status.value,
+        )
     console.print(table)
 
 
@@ -143,7 +151,7 @@ def feature_update(
         except ValueError:
             valid = ", ".join(s.value for s in FeatureStatus)
             console.print(f"[red]Error: invalid status '{status}'. Valid: {valid}[/red]")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
     if user_value is not None:
         feature.user_business_value = user_value
     if time_crit is not None:

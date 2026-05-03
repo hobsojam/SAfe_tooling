@@ -5,13 +5,13 @@ from rich.console import Console
 
 import safe.cli.state as state
 from safe.cli.art import art_app
-from safe.cli.team import team_app
-from safe.cli.pi import pi_app
-from safe.cli.feature import feature_app, feature_rank
-from safe.cli.story import story_app
 from safe.cli.backlog import backlog_app
 from safe.cli.capacity import capacity_app
-from safe.logic.wsjf import wsjf, cost_of_delay
+from safe.cli.feature import feature_app, feature_rank
+from safe.cli.pi import pi_app
+from safe.cli.story import story_app
+from safe.cli.team import team_app
+from safe.logic.wsjf import cost_of_delay, wsjf
 
 app = typer.Typer(name="safe", help="SAFe PI Planning tools", no_args_is_help=True)
 console = Console()
@@ -30,7 +30,9 @@ app.add_typer(capacity_app, name="capacity")
 
 @app.callback()
 def main_callback(
-    db_path: Path | None = typer.Option(None, "--db-path", help="Path to database file (default: ~/.safe_tooling/db.json)"),
+    db_path: Path | None = typer.Option(
+        None, "--db-path", help="Path to database file (default: ~/.safe_tooling/db.json)"
+    ),
 ):
     if db_path is not None:
         state.db_path = db_path
@@ -43,7 +45,9 @@ wsjf_app.command("rank")(feature_rank)
 def wsjf_score(
     user_value: int = typer.Option(..., "--user-value", "-u", help="User/Business Value (1-10)"),
     time_criticality: int = typer.Option(..., "--time-crit", "-t", help="Time Criticality (1-10)"),
-    risk_reduction: int = typer.Option(..., "--risk-reduction", "-r", help="Risk Reduction / OE (1-10)"),
+    risk_reduction: int = typer.Option(
+        ..., "--risk-reduction", "-r", help="Risk Reduction / OE (1-10)"
+    ),
     job_size: int = typer.Option(..., "--job-size", "-j", help="Job Size (1-13)"),
 ):
     """Calculate WSJF score for a single Feature."""

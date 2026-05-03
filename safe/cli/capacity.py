@@ -6,8 +6,8 @@ from rich.console import Console
 from rich.table import Table
 
 import safe.cli.state as state
+from safe.logic.capacity import available_capacity, capacity_warning, load_percentage
 from safe.models.capacity_plan import CapacityPlan
-from safe.logic.capacity import available_capacity, load_percentage, capacity_warning
 from safe.store.db import get_db
 from safe.store.repos import get_repos
 

@@ -5,10 +5,10 @@ from rich.console import Console
 from rich.table import Table
 
 import safe.cli.state as state
+from safe.logic.predictability import art_predictability, predictability_rating
 from safe.models.pi import PI, Iteration, PIStatus
 from safe.store.db import get_db
 from safe.store.repos import get_repos
-from safe.logic.predictability import art_predictability, predictability_rating
 
 pi_app = typer.Typer(help="Manage Program Increments")
 iteration_app = typer.Typer(help="Manage PI iterations")
@@ -24,7 +24,7 @@ def _parse_date(value: str, option: str) -> date:
     try:
         return date.fromisoformat(value)
     except ValueError:
-        raise typer.BadParameter("Expected YYYY-MM-DD", param_hint=f"'--{option}'")
+        raise typer.BadParameter("Expected YYYY-MM-DD", param_hint=f"'--{option}'") from None
 
 
 @pi_app.command("create")
@@ -80,7 +80,9 @@ def pi_list(
         return
     table = Table("ID", "Name", "ART", "Status", "Start", "End")
     for pi in pis:
-        table.add_row(pi.id, pi.name, pi.art_id, pi.status.value, str(pi.start_date), str(pi.end_date))
+        table.add_row(
+            pi.id, pi.name, pi.art_id, pi.status.value, str(pi.start_date), str(pi.end_date)
+        )
     console.print(table)
 
 
@@ -93,7 +95,9 @@ def pi_activate(pi_id: str = typer.Argument(..., help="PI id")):
         console.print(f"[red]Error: PI '{pi_id}' not found[/red]")
         raise typer.Exit(1)
     if pi.status != PIStatus.PLANNING:
-        console.print(f"[red]Error: PI is {pi.status.value}, only planning PIs can be activated[/red]")
+        console.print(
+            f"[red]Error: PI is {pi.status.value}, only planning PIs can be activated[/red]"
+        )
         raise typer.Exit(1)
     active = [p for p in repos.pis.find(art_id=pi.art_id) if p.status == PIStatus.ACTIVE]
     if active:
@@ -122,14 +126,20 @@ def pi_close(pi_id: str = typer.Argument(..., help="PI id")):
 
 @pi_app.command("predictability")
 def pi_predictability(
-    planned: list[int] = typer.Option(..., "--planned", "-p", help="Planned BV per team (repeat flag)"),
-    actual: list[int] = typer.Option(..., "--actual", "-a", help="Actual BV per team (repeat flag)"),
+    planned: list[int] = typer.Option(
+        ..., "--planned", "-p", help="Planned BV per team (repeat flag)"
+    ),
+    actual: list[int] = typer.Option(
+        ..., "--actual", "-a", help="Actual BV per team (repeat flag)"
+    ),
 ):
     """Calculate ART PI Predictability."""
     if len(planned) != len(actual):
-        console.print("[red]Error: --planned and --actual must be provided the same number of times[/red]")
+        console.print(
+            "[red]Error: --planned and --actual must be provided the same number of times[/red]"
+        )
         raise typer.Exit(1)
-    score = art_predictability(list(zip(actual, planned)))
+    score = art_predictability(list(zip(actual, planned, strict=False)))
     rating = predictability_rating(score)
     console.print(f"ART Predictability : [bold {rating}]{score}%[/bold {rating}]")
 
@@ -154,7 +164,9 @@ def iteration_add(
     if not (pi.start_date <= start_date and end_date <= pi.end_date):
         console.print("[red]Error: iteration dates must fall within the PI date range[/red]")
         raise typer.Exit(1)
-    iteration = Iteration(pi_id=pi_id, number=number, start_date=start_date, end_date=end_date, name=name, is_ip=is_ip)
+    iteration = Iteration(
+        pi_id=pi_id, number=number, start_date=start_date, end_date=end_date, name=name, is_ip=is_ip
+    )
     repos.iterations.save(iteration)
     pi.iteration_ids.append(iteration.id)
     repos.pis.save(pi)
@@ -178,7 +190,10 @@ def iteration_list(
     iterations.sort(key=lambda it: it.number)
     table = Table("ID", "Number", "Name", "Start", "End", "IP")
     for it in iterations:
-        table.add_row(it.id, str(it.number), it.name or "-", str(it.start_date), str(it.end_date), "yes" if it.is_ip else "no")
+        table.add_row(
+            it.id, str(it.number), it.name or "-",
+            str(it.start_date), str(it.end_date), "yes" if it.is_ip else "no",
+        )
     console.print(table)
 
 

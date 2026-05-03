@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from tinydb import TinyDB
 
 _DB_PATH = Path.home() / ".safe_tooling" / "db.json"

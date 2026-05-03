@@ -1,8 +1,12 @@
 def _setup(client):
     art_id = client.post("/art", json={"name": "ART"}).json()["id"]
-    pi_id = client.post("/pi", json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"}).json()["id"]
+    pi_id = client.post("/pi", json={
+        "name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27",
+    }).json()["id"]
     team_id = client.post("/team", json={"name": "Alpha", "member_count": 7}).json()["id"]
-    iter_id = client.post("/iterations", json={"pi_id": pi_id, "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16"}).json()["id"]
+    iter_id = client.post("/iterations", json={
+        "pi_id": pi_id, "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16",
+    }).json()["id"]
     return pi_id, team_id, iter_id
 
 

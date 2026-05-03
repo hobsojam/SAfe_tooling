@@ -5,14 +5,15 @@ Rich's Console is created at module level pointing to the real stdout, which
 the CliRunner's buffer does not capture. We monkeypatch each module's console
 with a Console backed by a StringIO so assertions on output are reliable.
 """
-import pytest
 from io import StringIO
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
+import safe.cli.capacity as capacity_module
 import safe.cli.main as main_module
 import safe.cli.pi as pi_module
-import safe.cli.capacity as capacity_module
 from safe.cli.main import app
 
 runner = CliRunner()

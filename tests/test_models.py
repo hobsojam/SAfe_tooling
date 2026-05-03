@@ -1,15 +1,15 @@
-import pytest
 from datetime import date
+
+import pytest
 from pydantic import ValidationError
 
 from safe.models.art import ART, Team
-from safe.models.pi import PI, Iteration, PIStatus
 from safe.models.backlog import Feature, FeatureStatus, Story, StoryStatus
-from safe.models.objectives import PIObjective
-from safe.models.risk import Risk, ROAMStatus
-from safe.models.dependency import Dependency, DependencyStatus
 from safe.models.capacity_plan import CapacityPlan
-
+from safe.models.dependency import Dependency, DependencyStatus
+from safe.models.objectives import PIObjective
+from safe.models.pi import PI, Iteration, PIStatus
+from safe.models.risk import Risk, ROAMStatus
 
 # ---------------------------------------------------------------------------
 # Team
@@ -64,7 +64,10 @@ class TestART:
 
 class TestIteration:
     def _make(self, **kwargs):
-        defaults = dict(pi_id="p-1", number=1, start_date=date(2026, 1, 5), end_date=date(2026, 1, 16))
+        defaults = {
+            "pi_id": "p-1", "number": 1,
+            "start_date": date(2026, 1, 5), "end_date": date(2026, 1, 16),
+        }
         return Iteration(**{**defaults, **kwargs})
 
     def test_basic(self):
@@ -91,7 +94,10 @@ class TestIteration:
 
 class TestPI:
     def _make(self, **kwargs):
-        defaults = dict(name="PI 2026.1", art_id="art-1", start_date=date(2026, 1, 5), end_date=date(2026, 3, 27))
+        defaults = {
+            "name": "PI 2026.1", "art_id": "art-1",
+            "start_date": date(2026, 1, 5), "end_date": date(2026, 3, 27),
+        }
         return PI(**{**defaults, **kwargs})
 
     def test_defaults(self):
@@ -122,13 +128,13 @@ class TestPI:
 
 class TestFeature:
     def _make(self, **kwargs):
-        defaults = dict(
-            name="Login Flow",
-            user_business_value=8,
-            time_criticality=5,
-            risk_reduction_opportunity_enablement=3,
-            job_size=4,
-        )
+        defaults = {
+            "name": "Login Flow",
+            "user_business_value": 8,
+            "time_criticality": 5,
+            "risk_reduction_opportunity_enablement": 3,
+            "job_size": 4,
+        }
         return Feature(**{**defaults, **kwargs})
 
     def test_computed_cost_of_delay(self):
@@ -139,11 +145,17 @@ class TestFeature:
 
     def test_wsjf_rounding(self):
         # CoD = 10, size = 3 → 3.33
-        f = self._make(user_business_value=4, time_criticality=3, risk_reduction_opportunity_enablement=3, job_size=3)
+        f = self._make(
+            user_business_value=4, time_criticality=3,
+            risk_reduction_opportunity_enablement=3, job_size=3,
+        )
         assert f.wsjf_score == round(10 / 3, 2)
 
     def test_maximum_wsjf(self):
-        f = self._make(user_business_value=10, time_criticality=10, risk_reduction_opportunity_enablement=10, job_size=1)
+        f = self._make(
+            user_business_value=10, time_criticality=10,
+            risk_reduction_opportunity_enablement=10, job_size=1,
+        )
         assert f.cost_of_delay == 30
         assert f.wsjf_score == 30.0
 
@@ -202,7 +214,10 @@ class TestFeature:
 
 class TestStory:
     def _make(self, **kwargs):
-        defaults = dict(name="As a user I want to log in", feature_id="f-1", team_id="t-1", points=3)
+        defaults = {
+            "name": "As a user I want to log in", "feature_id": "f-1",
+            "team_id": "t-1", "points": 3,
+        }
         return Story(**{**defaults, **kwargs})
 
     def test_defaults(self):
@@ -231,7 +246,10 @@ class TestStory:
 
 class TestPIObjective:
     def _make(self, **kwargs):
-        defaults = dict(description="Ship feature X", team_id="t-1", pi_id="p-1", planned_business_value=8)
+        defaults = {
+            "description": "Ship feature X", "team_id": "t-1",
+            "pi_id": "p-1", "planned_business_value": 8,
+        }
         return PIObjective(**{**defaults, **kwargs})
 
     def test_committed_by_default(self):
@@ -274,7 +292,7 @@ class TestPIObjective:
 
 class TestRisk:
     def _make(self, **kwargs):
-        defaults = dict(description="Auth service unavailable", pi_id="p-1")
+        defaults = {"description": "Auth service unavailable", "pi_id": "p-1"}
         return Risk(**{**defaults, **kwargs})
 
     def test_defaults(self):
@@ -309,7 +327,10 @@ class TestRisk:
 
 class TestDependency:
     def _make(self, **kwargs):
-        defaults = dict(description="Need API", pi_id="p-1", from_team_id="t-a", to_team_id="t-b")
+        defaults = {
+            "description": "Need API", "pi_id": "p-1",
+            "from_team_id": "t-a", "to_team_id": "t-b",
+        }
         return Dependency(**{**defaults, **kwargs})
 
     def test_defaults(self):
@@ -341,7 +362,7 @@ class TestDependency:
 
 class TestCapacityPlan:
     def _make(self, **kwargs):
-        defaults = dict(team_id="t-1", iteration_id="i-1", pi_id="p-1", team_size=5)
+        defaults = {"team_id": "t-1", "iteration_id": "i-1", "pi_id": "p-1", "team_size": 5}
         return CapacityPlan(**{**defaults, **kwargs})
 
     def test_defaults(self):
@@ -384,13 +405,21 @@ class TestCapacityPlan:
 # ---------------------------------------------------------------------------
 
 def test_models_package_exports_all():
-    # Verifying all public names are importable from the package — the import itself is the assertion
+    # All public names must be importable from the package; the import itself is the assertion.
     from safe.models import (  # noqa: F401
-        ART, Team,
-        PI, Iteration, PIStatus,
-        Feature, FeatureStatus, Story, StoryStatus,
-        PIObjective,
-        Risk, ROAMStatus,
-        Dependency, DependencyStatus,
+        ART,
+        PI,
         CapacityPlan,
+        Dependency,
+        DependencyStatus,
+        Feature,
+        FeatureStatus,
+        Iteration,
+        PIObjective,
+        PIStatus,
+        Risk,
+        ROAMStatus,
+        Story,
+        StoryStatus,
+        Team,
     )

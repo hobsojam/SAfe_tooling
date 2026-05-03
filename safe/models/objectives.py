@@ -1,4 +1,5 @@
 from pydantic import Field, computed_field
+
 from safe.models.base import SAFeBaseModel
 
 

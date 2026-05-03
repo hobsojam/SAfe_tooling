@@ -31,9 +31,9 @@ def test_full_pi_planning_flow(client):
     i1 = client.post("/iterations", json={
         "pi_id": pi_id, "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16",
     }).json()
-    i2 = client.post("/iterations", json={
+    client.post("/iterations", json={
         "pi_id": pi_id, "number": 2, "start_date": "2026-01-19", "end_date": "2026-01-30",
-    }).json()
+    })
     assert len(client.get(f"/pi/{pi_id}").json()["iteration_ids"]) == 2
 
     # 5. Create features and assign to teams

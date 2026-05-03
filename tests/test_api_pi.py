@@ -1,4 +1,3 @@
-import pytest
 
 
 def _create_art(client):
@@ -14,14 +13,19 @@ def _create_pi(client, art_id, name="PI 1", start="2026-01-05", end="2026-03-27"
 class TestPICreate:
     def test_returns_201(self, client):
         art_id = _create_art(client)
-        r = client.post("/pi", json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"})
+        r = client.post("/pi", json={
+            "name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27",
+        })
         assert r.status_code == 201
         body = r.json()
         assert body["status"] == "planning"
         assert body["iteration_ids"] == []
 
     def test_unknown_art_returns_404(self, client):
-        r = client.post("/pi", json={"name": "PI 1", "art_id": "no-art", "start_date": "2026-01-05", "end_date": "2026-03-27"})
+        r = client.post("/pi", json={
+            "name": "PI 1", "art_id": "no-art",
+            "start_date": "2026-01-05", "end_date": "2026-03-27",
+        })
         assert r.status_code == 404
 
     def test_missing_field_returns_422(self, client):

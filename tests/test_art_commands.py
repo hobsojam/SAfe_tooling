@@ -1,6 +1,7 @@
-import pytest
 from io import StringIO
 from pathlib import Path
+
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 

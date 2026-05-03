@@ -50,7 +50,9 @@ def get_iteration(iteration_id: str, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.patch("/{iteration_id}", response_model=Iteration)
-def update_iteration(iteration_id: str, body: IterationUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_iteration(
+    iteration_id: str, body: IterationUpdate, repos: Repos = Depends(get_repos_dep)
+):
     iteration = _get_or_404(repos, iteration_id)
     updated = iteration.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.iterations.save(updated)
@@ -63,5 +65,7 @@ def delete_iteration(iteration_id: str, repos: Repos = Depends(get_repos_dep)):
 
     pi = repos.pis.get(iteration.pi_id)
     if pi is not None:
-        updated_pi = pi.model_copy(update={"iteration_ids": [i for i in pi.iteration_ids if i != iteration_id]})
+        updated_pi = pi.model_copy(
+            update={"iteration_ids": [i for i in pi.iteration_ids if i != iteration_id]}
+        )
         repos.pis.save(updated_pi)

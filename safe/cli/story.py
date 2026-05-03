@@ -22,7 +22,9 @@ def story_add(
     team_id: str = typer.Option(..., "--team-id", help="Team id"),
     points: int = typer.Option(..., "--points", "-p", help="Story points (≥1)"),
     description: str = typer.Option("", "--description", "-d", help="Story description"),
-    iteration_id: str | None = typer.Option(None, "--iteration-id", "-i", help="Assign to iteration"),
+    iteration_id: str | None = typer.Option(
+        None, "--iteration-id", "-i", help="Assign to iteration"
+    ),
 ):
     """Add a story to a feature."""
     repos = _repos()
@@ -57,7 +59,9 @@ def story_add(
 def story_list(
     feature_id: str | None = typer.Option(None, "--feature-id", "-f", help="Filter by feature"),
     team_id: str | None = typer.Option(None, "--team-id", help="Filter by team"),
-    iteration_id: str | None = typer.Option(None, "--iteration-id", "-i", help="Filter by iteration"),
+    iteration_id: str | None = typer.Option(
+        None, "--iteration-id", "-i", help="Filter by iteration"
+    ),
 ):
     """List stories, with optional filters."""
     repos = _repos()
@@ -87,7 +91,9 @@ def story_update(
     points: int | None = typer.Option(None, "--points", "-p"),
     status: str | None = typer.Option(None, "--status", "-s"),
     description: str | None = typer.Option(None, "--description", "-d"),
-    iteration_id: str | None = typer.Option(None, "--iteration-id", "-i", help="Assign to iteration (use '' to clear)"),
+    iteration_id: str | None = typer.Option(
+        None, "--iteration-id", "-i", help="Assign to iteration (use '' to clear)"
+    ),
 ):
     """Update story fields."""
     repos = _repos()
@@ -108,7 +114,7 @@ def story_update(
         except ValueError:
             valid = ", ".join(s.value for s in StoryStatus)
             console.print(f"[red]Error: invalid status '{status}'. Valid: {valid}[/red]")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
     if description is not None:
         story.description = description
     if iteration_id is not None:

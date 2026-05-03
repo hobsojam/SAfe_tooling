@@ -37,7 +37,9 @@ def get_objective(objective_id: str, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.patch("/{objective_id}", response_model=PIObjective)
-def update_objective(objective_id: str, body: PIObjectiveUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_objective(
+    objective_id: str, body: PIObjectiveUpdate, repos: Repos = Depends(get_repos_dep)
+):
     obj = _get_or_404(repos, objective_id)
     updated = obj.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.objectives.save(updated)

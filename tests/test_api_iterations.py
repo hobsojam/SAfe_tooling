@@ -1,4 +1,3 @@
-import pytest
 
 
 def _create_art(client):
@@ -37,7 +36,8 @@ class TestIterationCreate:
 
     def test_unknown_pi_returns_404(self, client):
         r = client.post("/iterations", json={
-            "pi_id": "no-such-pi", "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16",
+            "pi_id": "no-such-pi", "number": 1,
+            "start_date": "2026-01-05", "end_date": "2026-01-16",
         })
         assert r.status_code == 404
 
@@ -61,7 +61,8 @@ class TestIterationCreate:
         art_id = _create_art(client)
         pi_id = _create_pi(client, art_id)
         r = client.post("/iterations", json={
-            "pi_id": pi_id, "number": 5, "start_date": "2026-03-16", "end_date": "2026-03-27", "is_ip": True,
+            "pi_id": pi_id, "number": 5,
+            "start_date": "2026-03-16", "end_date": "2026-03-27", "is_ip": True,
         })
         assert r.status_code == 201
         assert r.json()["is_ip"] is True

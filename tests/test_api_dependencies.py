@@ -3,7 +3,9 @@ def _create_art(client):
 
 
 def _create_pi(client, art_id):
-    return client.post("/pi", json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"}).json()["id"]
+    return client.post("/pi", json={
+        "name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27",
+    }).json()["id"]
 
 
 def _create_teams(client):
@@ -31,7 +33,9 @@ def test_create_returns_201(client):
 def test_list_filter_by_pi(client):
     art_id = _create_art(client)
     pi1 = _create_pi(client, art_id)
-    pi2 = client.post("/pi", json={"name": "PI 2", "art_id": art_id, "start_date": "2026-04-06", "end_date": "2026-06-26"}).json()["id"]
+    pi2 = client.post("/pi", json={
+        "name": "PI 2", "art_id": art_id, "start_date": "2026-04-06", "end_date": "2026-06-26",
+    }).json()["id"]
     t1, t2 = _create_teams(client)
     _create_dep(client, pi1, t1, t2)
     _create_dep(client, pi2, t1, t2)
@@ -44,13 +48,16 @@ def test_roam_sets_status(client):
     pi_id = _create_pi(client, art_id)
     t1, t2 = _create_teams(client)
     did = _create_dep(client, pi_id, t1, t2).json()["id"]
-    r = client.post(f"/dependencies/{did}/roam", json={"status": "resolved", "resolution_notes": "Done"})
+    r = client.post(
+        f"/dependencies/{did}/roam", json={"status": "resolved", "resolution_notes": "Done"}
+    )
     assert r.status_code == 200
     assert r.json()["status"] == "resolved"
 
 
 def test_roam_unknown_returns_404(client):
-    assert client.post("/dependencies/no-such-id/roam", json={"status": "resolved"}).status_code == 404
+    r = client.post("/dependencies/no-such-id/roam", json={"status": "resolved"})
+    assert r.status_code == 404
 
 
 def test_get_unknown_returns_404(client):

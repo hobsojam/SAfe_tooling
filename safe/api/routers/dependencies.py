@@ -37,14 +37,18 @@ def get_dependency(dependency_id: str, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.patch("/{dependency_id}", response_model=Dependency)
-def update_dependency(dependency_id: str, body: DependencyUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_dependency(
+    dependency_id: str, body: DependencyUpdate, repos: Repos = Depends(get_repos_dep)
+):
     dep = _get_or_404(repos, dependency_id)
     updated = dep.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.dependencies.save(updated)
 
 
 @router.post("/{dependency_id}/roam", response_model=Dependency)
-def roam_dependency(dependency_id: str, body: DependencyROAM, repos: Repos = Depends(get_repos_dep)):
+def roam_dependency(
+    dependency_id: str, body: DependencyROAM, repos: Repos = Depends(get_repos_dep)
+):
     dep = _get_or_404(repos, dependency_id)
     updated = dep.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.dependencies.save(updated)

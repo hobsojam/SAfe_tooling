@@ -2,8 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 from tinydb import TinyDB
 
-from safe.api.main import app
 from safe.api.deps import get_repos_dep
+from safe.api.main import app
 from safe.store.repos import Repos
 
 

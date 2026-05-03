@@ -1,16 +1,17 @@
-import pytest
 from datetime import date
 from pathlib import Path
+
+import pytest
 from tinydb import TinyDB
 
 import safe.store.db as db_module
-from safe.store.db import get_db, close_db
-from safe.store.repository import Repository
-from safe.store.repos import Repos
 from safe.models.art import ART, Team
 from safe.models.backlog import Feature
-from safe.models.dependency import Dependency, DependencyStatus
 from safe.models.capacity_plan import CapacityPlan
+from safe.models.dependency import Dependency, DependencyStatus
+from safe.store.db import close_db, get_db
+from safe.store.repos import Repos
+from safe.store.repository import Repository
 
 
 @pytest.fixture

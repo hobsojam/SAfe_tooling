@@ -23,7 +23,11 @@ def list_features(
     sort: str | None = Query(default=None, pattern="^(wsjf_desc|name_asc)$"),
     repos: Repos = Depends(get_repos_dep),
 ):
-    filters = {k: v for k, v in {"pi_id": pi_id, "team_id": team_id, "status": status}.items() if v is not None}
+    filters = {
+        k: v
+        for k, v in {"pi_id": pi_id, "team_id": team_id, "status": status}.items()
+        if v is not None
+    }
     features = repos.features.find(**filters) if filters else repos.features.get_all()
 
     if sort == "wsjf_desc":

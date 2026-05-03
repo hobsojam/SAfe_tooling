@@ -4,9 +4,7 @@ from pydantic import BaseModel, Field
 
 from safe.models.backlog import FeatureStatus, StoryStatus
 from safe.models.dependency import DependencyStatus
-from safe.models.pi import PIStatus
 from safe.models.risk import ROAMStatus
-
 
 # --- ART ---
 

@@ -1,6 +1,7 @@
-from typing import Generic, TypeVar, Type
+from typing import Generic, TypeVar
+
 from pydantic import BaseModel
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -14,7 +15,7 @@ class ReferentialIntegrityError(Exception):
 
 
 class Repository(Generic[T]):
-    def __init__(self, db: TinyDB, table_name: str, model: Type[T]) -> None:
+    def __init__(self, db: TinyDB, table_name: str, model: type[T]) -> None:
         self._table = db.table(table_name)
         self._model = model
 
@@ -36,7 +37,9 @@ class Repository(Generic[T]):
 
     def find(self, **kwargs) -> list[T]:
         if not kwargs:
-            raise ValueError("find() requires at least one filter — use get_all() for unrestricted access")
+            raise ValueError(
+                "find() requires at least one filter — use get_all() for unrestricted access"
+            )
         cond = None
         for k, v in kwargs.items():
             clause = getattr(_Q, k) == v

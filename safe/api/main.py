@@ -3,8 +3,17 @@ from fastapi import FastAPI
 
 from safe.api.deps import lifespan
 from safe.api.routers import (
-    arts, teams, pi, iterations, features, stories,
-    objectives, risks, dependencies, capacity_plans, compute,
+    arts,
+    capacity_plans,
+    compute,
+    dependencies,
+    features,
+    iterations,
+    objectives,
+    pi,
+    risks,
+    stories,
+    teams,
 )
 
 app = FastAPI(
