@@ -7,6 +7,12 @@ services:
       - safe_data:/data
     environment:
       SAFE_DB_PATH: /data/db.json
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   frontend:
     build:
@@ -15,7 +21,8 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   safe_data:

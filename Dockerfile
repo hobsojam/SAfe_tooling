@@ -5,7 +5,7 @@ WORKDIR /app
 COPY pyproject.toml .
 COPY safe/ safe/
 
-RUN pip install --no-cache-dir ".[dev]"
+RUN pip install --no-cache-dir "."
 
 ENV SAFE_API_HOST=0.0.0.0
 ENV SAFE_API_PORT=8000
