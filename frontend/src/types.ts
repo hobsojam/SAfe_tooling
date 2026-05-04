@@ -93,6 +93,21 @@ export interface PICreate {
   end_date: string;
 }
 
+export interface PIUpdate {
+  name?: string;
+  start_date?: string;
+  end_date?: string;
+}
+
+export interface IterationCreate {
+  pi_id: string;
+  number: number;
+  name?: string;
+  start_date: string;
+  end_date: string;
+  is_ip?: boolean;
+}
+
 export interface RiskCreate {
   description: string;
   pi_id: string;

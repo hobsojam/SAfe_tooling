@@ -82,7 +82,7 @@ npm run dev
 # Starts on http://localhost:5173 by default
 ```
 
-Open **http://localhost:5173** in your browser (check the terminal output for the exact URL — if 5173 is already in use, Vite will automatically try 5174, 5175, etc.). Select a PI from the sidebar to see the Board, Backlog, Risks, and Dependencies pages.
+Open **http://localhost:5173** in your browser (check the terminal output for the exact URL — if 5173 is already in use, Vite will automatically try 5174, 5175, etc.). Select a PI from the sidebar to see the Board, Backlog, Risks, Dependencies, and Setup pages.
 
 > The Vite dev server proxies `/api/*` to FastAPI on port 8000 — no CORS configuration needed.
 
@@ -120,14 +120,15 @@ podman compose up -d --build
 
 ## Web frontend
 
-The React SPA provides read-only views across all four key PI artifacts for a selected PI.
+The React SPA provides views across all key PI artifacts for a selected PI.
 
 | Page | Route | Description |
 |------|-------|-------------|
-| **Board** | `/pi/:id/board` | Program Board — feature cards placed in team × iteration grid |
+| **Board** | `/pi/:id/board` | Program Board — feature cards placed in team × iteration grid with dependency arrows |
 | **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list |
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
+| **Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
 
 Built with Vite, React 18, TypeScript, Tailwind CSS v4, TanStack Query, and React Router.
 
@@ -305,7 +306,7 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Risks, Dependencies
+    pages/          Board, Backlog, Risks, Dependencies, Setup
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/
