@@ -14,20 +14,40 @@ def _create_pi(client, art_id):
     ).json()["id"]
 
 
-def _create_teams(client):
-    t1 = client.post("/team", json={"name": "Alpha", "member_count": 5}).json()["id"]
-    t2 = client.post("/team", json={"name": "Beta", "member_count": 5}).json()["id"]
-    return t1, t2
+def _create_features(client, pi_id):
+    f1 = client.post(
+        "/features",
+        json={
+            "name": "Auth Service",
+            "pi_id": pi_id,
+            "user_business_value": 8,
+            "time_criticality": 5,
+            "risk_reduction_opportunity_enablement": 3,
+            "job_size": 4,
+        },
+    ).json()["id"]
+    f2 = client.post(
+        "/features",
+        json={
+            "name": "SSO Integration",
+            "pi_id": pi_id,
+            "user_business_value": 5,
+            "time_criticality": 8,
+            "risk_reduction_opportunity_enablement": 2,
+            "job_size": 5,
+        },
+    ).json()["id"]
+    return f1, f2
 
 
-def _create_dep(client, pi_id, t1, t2, **overrides):
+def _create_dep(client, pi_id, f1, f2, **overrides):
     return client.post(
         "/dependencies",
         json={
             "description": "Needs auth API",
             "pi_id": pi_id,
-            "from_team_id": t1,
-            "to_team_id": t2,
+            "from_feature_id": f1,
+            "to_feature_id": f2,
             **overrides,
         },
     )
@@ -36,10 +56,19 @@ def _create_dep(client, pi_id, t1, t2, **overrides):
 def test_create_returns_201(client):
     art_id = _create_art(client)
     pi_id = _create_pi(client, art_id)
-    t1, t2 = _create_teams(client)
-    r = _create_dep(client, pi_id, t1, t2)
+    f1, f2 = _create_features(client, pi_id)
+    r = _create_dep(client, pi_id, f1, f2)
     assert r.status_code == 201
     assert r.json()["status"] == "identified"
+
+
+def test_create_stores_feature_ids(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    f1, f2 = _create_features(client, pi_id)
+    body = _create_dep(client, pi_id, f1, f2).json()
+    assert body["from_feature_id"] == f1
+    assert body["to_feature_id"] == f2
 
 
 def test_list_filter_by_pi(client):
@@ -54,9 +83,10 @@ def test_list_filter_by_pi(client):
             "end_date": "2026-06-26",
         },
     ).json()["id"]
-    t1, t2 = _create_teams(client)
-    _create_dep(client, pi1, t1, t2)
-    _create_dep(client, pi2, t1, t2)
+    f1, f2 = _create_features(client, pi1)
+    f3, f4 = _create_features(client, pi2)
+    _create_dep(client, pi1, f1, f2)
+    _create_dep(client, pi2, f3, f4)
     deps = client.get(f"/dependencies?pi_id={pi1}").json()
     assert len(deps) == 1
 
@@ -64,8 +94,8 @@ def test_list_filter_by_pi(client):
 def test_roam_sets_status(client):
     art_id = _create_art(client)
     pi_id = _create_pi(client, art_id)
-    t1, t2 = _create_teams(client)
-    did = _create_dep(client, pi_id, t1, t2).json()["id"]
+    f1, f2 = _create_features(client, pi_id)
+    did = _create_dep(client, pi_id, f1, f2).json()["id"]
     r = client.post(
         f"/dependencies/{did}/roam", json={"status": "resolved", "resolution_notes": "Done"}
     )
@@ -85,7 +115,7 @@ def test_get_unknown_returns_404(client):
 def test_delete_returns_204(client):
     art_id = _create_art(client)
     pi_id = _create_pi(client, art_id)
-    t1, t2 = _create_teams(client)
-    did = _create_dep(client, pi_id, t1, t2).json()["id"]
+    f1, f2 = _create_features(client, pi_id)
+    did = _create_dep(client, pi_id, f1, f2).json()["id"]
     assert client.delete(f"/dependencies/{did}").status_code == 204
     assert client.get(f"/dependencies/{did}").status_code == 404

@@ -356,16 +356,14 @@ class TestDependency:
         defaults = {
             "description": "Need API",
             "pi_id": "p-1",
-            "from_team_id": "t-a",
-            "to_team_id": "t-b",
+            "from_feature_id": "feat-a",
+            "to_feature_id": "feat-b",
         }
         return Dependency(**{**defaults, **kwargs})
 
     def test_defaults(self):
         d = self._make()
         assert d.status == DependencyStatus.IDENTIFIED
-        assert d.feature_id is None
-        assert d.iteration_id is None
         assert d.needed_by_date is None
         assert d.raised_date == date.today()
         assert d.resolution_notes == ""
@@ -378,10 +376,10 @@ class TestDependency:
         d = self._make(needed_by_date=date(2026, 6, 15))
         assert d.needed_by_date == date(2026, 6, 15)
 
-    def test_with_feature_and_iteration(self):
-        d = self._make(feature_id="f-1", iteration_id="i-2")
-        assert d.feature_id == "f-1"
-        assert d.iteration_id == "i-2"
+    def test_feature_ids_stored(self):
+        d = self._make(from_feature_id="feat-x", to_feature_id="feat-y")
+        assert d.from_feature_id == "feat-x"
+        assert d.to_feature_id == "feat-y"
 
 
 # ---------------------------------------------------------------------------

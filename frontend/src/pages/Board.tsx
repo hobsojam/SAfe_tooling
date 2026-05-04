@@ -278,21 +278,27 @@ export function Board() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {deps.map((d) => (
-                  <tr key={d.id}>
-                    <td className="px-4 py-2.5 text-slate-700">
-                      {teamMap[d.from_team_id] ?? d.from_team_id}
-                    </td>
-                    <td className="px-4 py-2.5 text-slate-700">
-                      {teamMap[d.to_team_id] ?? d.to_team_id}
-                    </td>
-                    <td className="px-4 py-2.5 text-slate-600">{d.description}</td>
-                    <td className="px-4 py-2.5">
-                      <DepBadge status={d.status} />
-                    </td>
-                    <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
-                  </tr>
-                ))}
+                {deps.map((d) => {
+                  const fromFeature = features.find((f) => f.id === d.from_feature_id);
+                  const toFeature = features.find((f) => f.id === d.to_feature_id);
+                  const fromLabel = fromFeature
+                    ? `${fromFeature.name}${fromFeature.team_id ? ` (${teamMap[fromFeature.team_id] ?? ''})` : ''}`
+                    : d.from_feature_id;
+                  const toLabel = toFeature
+                    ? `${toFeature.name}${toFeature.team_id ? ` (${teamMap[toFeature.team_id] ?? ''})` : ''}`
+                    : d.to_feature_id;
+                  return (
+                    <tr key={d.id}>
+                      <td className="px-4 py-2.5 text-slate-700">{fromLabel}</td>
+                      <td className="px-4 py-2.5 text-slate-700">{toLabel}</td>
+                      <td className="px-4 py-2.5 text-slate-600">{d.description}</td>
+                      <td className="px-4 py-2.5">
+                        <DepBadge status={d.status} />
+                      </td>
+                      <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

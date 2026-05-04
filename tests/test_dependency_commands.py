@@ -43,6 +43,7 @@ def repos_for(db_path: Path):
 
 
 def _setup(db_path):
+    """Create an ART, PI, and two features (one per team)."""
     invoke(db_path, "art", "create", "--name", "ART")
     art_id = repos_for(db_path).arts.get_all()[0].id
     invoke(
@@ -59,15 +60,49 @@ def _setup(db_path):
         "2026-03-27",
     )
     pi_id = repos_for(db_path).pis.get_all()[0].id
-    invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
-    invoke(db_path, "team", "create", "--name", "Beta", "--members", "5")
-    teams = repos_for(db_path).teams.get_all()
-    alpha_id = next(t.id for t in teams if t.name == "Alpha")
-    beta_id = next(t.id for t in teams if t.name == "Beta")
-    return pi_id, alpha_id, beta_id
+    invoke(
+        db_path,
+        "feature",
+        "add",
+        "--name",
+        "Auth Service",
+        "--pi-id",
+        pi_id,
+        "--user-value",
+        "8",
+        "--time-crit",
+        "5",
+        "--risk-reduction",
+        "3",
+        "--job-size",
+        "4",
+    )
+    invoke(
+        db_path,
+        "feature",
+        "add",
+        "--name",
+        "SSO Integration",
+        "--pi-id",
+        pi_id,
+        "--user-value",
+        "5",
+        "--time-crit",
+        "8",
+        "--risk-reduction",
+        "2",
+        "--job-size",
+        "5",
+    )
+    features = repos_for(db_path).features.get_all()
+    auth_id = next(f.id for f in features if f.name == "Auth Service")
+    sso_id = next(f.id for f in features if f.name == "SSO Integration")
+    return pi_id, auth_id, sso_id
 
 
-def _add_dep(db_path, pi_id, from_team_id, to_team_id, description="Auth service integration"):
+def _add_dep(
+    db_path, pi_id, from_feature_id, to_feature_id, description="Auth service integration"
+):
     return invoke(
         db_path,
         "dependency",
@@ -76,41 +111,41 @@ def _add_dep(db_path, pi_id, from_team_id, to_team_id, description="Auth service
         description,
         "--pi-id",
         pi_id,
-        "--from-team-id",
-        from_team_id,
-        "--to-team-id",
-        to_team_id,
+        "--from-feature-id",
+        from_feature_id,
+        "--to-feature-id",
+        to_feature_id,
     )
 
 
 class TestDependencyAdd:
     def test_exit_code_success(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        result = _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        result = _add_dep(db_path, pi_id, auth_id, sso_id)
         assert result.exit_code == 0
 
     def test_stored_in_db(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id, description="API contract")
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id, description="API contract")
         deps = repos_for(db_path).dependencies.get_all()
         assert len(deps) == 1
         assert deps[0].description == "API contract"
 
     def test_default_status_identified(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
         assert dep.status == "identified"
 
-    def test_teams_stored_correctly(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+    def test_features_stored_correctly(self, db_path, patch_console):
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
-        assert dep.from_team_id == alpha_id
-        assert dep.to_team_id == beta_id
+        assert dep.from_feature_id == auth_id
+        assert dep.to_feature_id == sso_id
 
     def test_unknown_pi_exits_1(self, db_path, patch_console):
-        _, alpha_id, beta_id = _setup(db_path)
+        _, auth_id, sso_id = _setup(db_path)
         result = invoke(
             db_path,
             "dependency",
@@ -119,15 +154,15 @@ class TestDependencyAdd:
             "X",
             "--pi-id",
             "bad",
-            "--from-team-id",
-            alpha_id,
-            "--to-team-id",
-            beta_id,
+            "--from-feature-id",
+            auth_id,
+            "--to-feature-id",
+            sso_id,
         )
         assert result.exit_code == 1
 
-    def test_unknown_from_team_exits_1(self, db_path, patch_console):
-        pi_id, _, beta_id = _setup(db_path)
+    def test_unknown_from_feature_exits_1(self, db_path, patch_console):
+        pi_id, _, sso_id = _setup(db_path)
         result = invoke(
             db_path,
             "dependency",
@@ -136,15 +171,15 @@ class TestDependencyAdd:
             "X",
             "--pi-id",
             pi_id,
-            "--from-team-id",
+            "--from-feature-id",
             "bad",
-            "--to-team-id",
-            beta_id,
+            "--to-feature-id",
+            sso_id,
         )
         assert result.exit_code == 1
 
-    def test_unknown_to_team_exits_1(self, db_path, patch_console):
-        pi_id, alpha_id, _ = _setup(db_path)
+    def test_unknown_to_feature_exits_1(self, db_path, patch_console):
+        pi_id, auth_id, _ = _setup(db_path)
         result = invoke(
             db_path,
             "dependency",
@@ -153,15 +188,15 @@ class TestDependencyAdd:
             "X",
             "--pi-id",
             pi_id,
-            "--from-team-id",
-            alpha_id,
-            "--to-team-id",
+            "--from-feature-id",
+            auth_id,
+            "--to-feature-id",
             "bad",
         )
         assert result.exit_code == 1
 
     def test_invalid_date_exits_1(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
+        pi_id, auth_id, sso_id = _setup(db_path)
         result = invoke(
             db_path,
             "dependency",
@@ -170,17 +205,17 @@ class TestDependencyAdd:
             "X",
             "--pi-id",
             pi_id,
-            "--from-team-id",
-            alpha_id,
-            "--to-team-id",
-            beta_id,
+            "--from-feature-id",
+            auth_id,
+            "--to-feature-id",
+            sso_id,
             "--needed-by",
             "not-a-date",
         )
         assert result.exit_code == 1
 
     def test_with_needed_by_date(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
+        pi_id, auth_id, sso_id = _setup(db_path)
         invoke(
             db_path,
             "dependency",
@@ -189,10 +224,10 @@ class TestDependencyAdd:
             "X",
             "--pi-id",
             pi_id,
-            "--from-team-id",
-            alpha_id,
-            "--to-team-id",
-            beta_id,
+            "--from-feature-id",
+            auth_id,
+            "--to-feature-id",
+            sso_id,
             "--needed-by",
             "2026-02-01",
         )
@@ -206,52 +241,52 @@ class TestDependencyList:
         assert "No dependencies found" in patch_console.getvalue()
 
     def test_lists_dependency(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id, description="Shared library")
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id, description="Shared library")
         patch_console.truncate(0)
         patch_console.seek(0)
         invoke(db_path, "dependency", "list")
         assert "Shared library" in patch_console.getvalue()
 
     def test_filter_by_pi(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         result = invoke(db_path, "dependency", "list", "--pi-id", pi_id)
         assert result.exit_code == 0
 
-    def test_filter_by_from_team(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
-        result = invoke(db_path, "dependency", "list", "--from-team-id", alpha_id)
+    def test_filter_by_from_feature(self, db_path, patch_console):
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
+        result = invoke(db_path, "dependency", "list", "--from-feature-id", auth_id)
         assert result.exit_code == 0
 
-    def test_filter_by_to_team(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
-        result = invoke(db_path, "dependency", "list", "--to-team-id", beta_id)
+    def test_filter_by_to_feature(self, db_path, patch_console):
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
+        result = invoke(db_path, "dependency", "list", "--to-feature-id", sso_id)
         assert result.exit_code == 0
 
     def test_filter_by_status(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         result = invoke(db_path, "dependency", "list", "--status", "identified")
         assert result.exit_code == 0
 
-    def test_team_names_shown(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+    def test_feature_names_shown(self, db_path, patch_console):
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         patch_console.truncate(0)
         patch_console.seek(0)
         invoke(db_path, "dependency", "list")
         output = patch_console.getvalue()
-        assert "Alpha" in output
-        assert "Beta" in output
+        assert "Auth Service" in output
+        assert "SSO Integration" in output
 
 
 class TestDependencyShow:
     def test_shows_all_fields(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id, description="Platform API needed")
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id, description="Platform API needed")
         dep = repos_for(db_path).dependencies.get_all()[0]
         patch_console.truncate(0)
         patch_console.seek(0)
@@ -259,8 +294,8 @@ class TestDependencyShow:
         output = patch_console.getvalue()
         assert "Platform API needed" in output
         assert "identified" in output
-        assert "Alpha" in output
-        assert "Beta" in output
+        assert "Auth Service" in output
+        assert "SSO Integration" in output
 
     def test_unknown_exits_1(self, db_path, patch_console):
         result = invoke(db_path, "dependency", "show", "no-such-id")
@@ -269,24 +304,24 @@ class TestDependencyShow:
 
 class TestDependencyROAM:
     def test_updates_status(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
         invoke(db_path, "dependency", "roam", dep.id, "--status", "owned")
         updated = repos_for(db_path).dependencies.get(dep.id)
         assert updated.status == "owned"
 
     def test_sets_owner(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
         invoke(db_path, "dependency", "roam", dep.id, "--status", "owned", "--owner", "Alice")
         updated = repos_for(db_path).dependencies.get(dep.id)
         assert updated.owner == "Alice"
 
     def test_sets_resolution_notes(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
         invoke(
             db_path,
@@ -306,9 +341,9 @@ class TestDependencyROAM:
         assert result.exit_code == 1
 
     def test_all_statuses_accepted(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
+        pi_id, auth_id, sso_id = _setup(db_path)
         for status in ("identified", "owned", "accepted", "mitigated", "resolved"):
-            _add_dep(db_path, pi_id, alpha_id, beta_id)
+            _add_dep(db_path, pi_id, auth_id, sso_id)
             dep = repos_for(db_path).dependencies.get_all()[-1]
             result = invoke(db_path, "dependency", "roam", dep.id, "--status", status)
             assert result.exit_code == 0
@@ -316,8 +351,8 @@ class TestDependencyROAM:
 
 class TestDependencyDelete:
     def test_removes_dependency(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id = _setup(db_path)
-        _add_dep(db_path, pi_id, alpha_id, beta_id)
+        pi_id, auth_id, sso_id = _setup(db_path)
+        _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
         invoke(db_path, "dependency", "delete", dep.id)
         assert repos_for(db_path).dependencies.get(dep.id) is None

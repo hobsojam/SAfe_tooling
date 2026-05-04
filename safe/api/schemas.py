@@ -182,10 +182,8 @@ class RiskROAM(BaseModel):
 class DependencyCreate(BaseModel):
     description: str
     pi_id: str
-    feature_id: str | None = None
-    from_team_id: str
-    to_team_id: str
-    iteration_id: str | None = None
+    from_feature_id: str
+    to_feature_id: str
     status: DependencyStatus = DependencyStatus.IDENTIFIED
     owner: str | None = None
     resolution_notes: str = ""
@@ -194,8 +192,6 @@ class DependencyCreate(BaseModel):
 
 class DependencyUpdate(BaseModel):
     description: str | None = None
-    feature_id: str | None = None
-    iteration_id: str | None = None
     status: DependencyStatus | None = None
     owner: str | None = None
     resolution_notes: str | None = None
