@@ -309,10 +309,27 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
 safe/
   models/           Pydantic models (ART, Team, PI, Feature, Story, ...)
   logic/            Pure business logic (WSJF, capacity, predictability, board)
-  cli/              Typer CLI — one module per domain
-  api/              FastAPI app — one router per domain
-  store/            TinyDB persistence (Repository[T])
-tests/              pytest suite — CLI and API
+  cli/
+    main.py         Root Typer app; wsjf score/rank; --db-path global option
+    state.py        Shared CLI state (db_path)
+    art.py          safe art commands
+    team.py         safe team commands
+    pi.py           safe pi and safe pi iteration commands
+    feature.py      safe feature commands (add/show/list/rank/update/assign/delete)
+    story.py        safe story commands (add/list/update/delete)
+    backlog.py      safe backlog show
+    capacity.py     safe capacity commands (calc/set/show/export)
+    objective.py    safe objective commands (add/list/score/update/delete)
+    risk.py         safe risk commands (add/list/show/roam/delete)
+    dependency.py   safe dependency commands (add/list/show/roam/delete)
+    board.py        safe board commands (show/export)
+  api/
+    main.py         FastAPI app; lifespan; router registration; run() entry point
+    deps.py         get_repos_dep() Depends factory; DB lifecycle via lifespan
+    schemas.py      Create/Update/action request body schemas
+    routers/        One file per resource (arts, teams, pi, iterations, features, ...)
+  store/            TinyDB persistence (Repository[T], get_repos())
+tests/              pytest test suite (464 tests — unit, CLI, API, smoke)
 Dockerfile          Python API image
 docker-compose.yml  API (port 8000) + frontend/nginx (port 3000)
 pyproject.toml

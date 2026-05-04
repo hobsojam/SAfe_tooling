@@ -121,7 +121,7 @@ safe/
     objective.py         # safe objective add / list / score / update / delete
     risk.py              # safe risk add / list / show / roam / delete
     dependency.py        # safe dependency add / list / show / roam / delete
-    board.py             # safe board show / export
+    board.py             # safe board show / export (PI program board)
   api/
     main.py              # FastAPI app; lifespan; router registration; run() entry point
     deps.py              # get_repos_dep() Depends factory; DB lifecycle via lifespan
@@ -149,8 +149,8 @@ tests/
   test_wsjf.py
   test_capacity.py
   test_predictability.py
-  test_repository.py
   test_models.py
+  test_repository.py
   test_cli.py                # stateless wsjf / capacity / pi predictability commands
   test_art_commands.py
   test_team_commands.py
@@ -163,7 +163,7 @@ tests/
   test_risk_commands.py
   test_dependency_commands.py
   test_board_commands.py
-  test_api_smoke.py          # basic reachability smoke tests for every router
+  test_board_commands.py
   test_api_arts.py           # one test file per API router
   test_api_teams.py
   test_api_pi.py
@@ -175,6 +175,7 @@ tests/
   test_api_dependencies.py
   test_api_capacity_plans.py
   test_api_compute.py
+  test_api_smoke.py          # end-to-end smoke test across all routers
 Dockerfile
 docker-compose.yml       # podman compose up -d --build
 pyproject.toml
