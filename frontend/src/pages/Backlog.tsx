@@ -191,7 +191,12 @@ export function Backlog() {
                 <tr key={f.id} className="hover:bg-slate-50/60">
                   <td className="px-4 py-2.5 text-slate-400 tabular-nums">{i + 1}</td>
                   <td className="px-4 py-2.5">
-                    <p className="font-medium text-slate-800">{f.name}</p>
+                    <button
+                      onClick={() => openEdit(f)}
+                      className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                    >
+                      {f.name}
+                    </button>
                     {f.description && (
                       <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
                         {f.description}
