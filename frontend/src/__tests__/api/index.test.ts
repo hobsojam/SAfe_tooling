@@ -8,40 +8,62 @@ import type {
   RiskCreate,
   RiskUpdate,
 } from '../../types';
-import { api } from '../../api/index';const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);function resolveOk(data: unknown = null) {
+import { api } from '../../api/index';
+
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
+
+function resolveOk(data: unknown = null) {
   mockFetch.mockResolvedValue({
     ok: true,
     json: () => Promise.resolve(data),
   });
-}function resolveError(status: number, statusText: string) {
+}
+
+function resolveError(status: number, statusText: string) {
   mockFetch.mockResolvedValue({ ok: false, status, statusText });
-}beforeEach(() => {
+}
+
+beforeEach(() => {
   mockFetch.mockReset();
-});// ---------------------------------------------------------------------------
+});
+
+// ---------------------------------------------------------------------------
 // GET
-// ---------------------------------------------------------------------------describe('GET methods', () => {
+// ---------------------------------------------------------------------------
+
+describe('GET methods', () => {
   it('listPIs calls GET /api/pi', async () => {
     resolveOk([]);
     await api.listPIs();
     expect(mockFetch).toHaveBeenCalledWith('/api/pi');
-  });  it('getPI calls GET /api/pi/:id', async () => {
+  });
+
+  it('getPI calls GET /api/pi/:id', async () => {
     resolveOk({});
     await api.getPI('abc');
     expect(mockFetch).toHaveBeenCalledWith('/api/pi/abc');
-  });  it('listARTs calls GET /api/art', async () => {
+  });
+
+  it('listARTs calls GET /api/art', async () => {
     resolveOk([]);
     await api.listARTs();
     expect(mockFetch).toHaveBeenCalledWith('/api/art');
-  });  it('listTeams calls GET /api/team', async () => {
+  });
+
+  it('listTeams calls GET /api/team', async () => {
     resolveOk([]);
     await api.listTeams();
     expect(mockFetch).toHaveBeenCalledWith('/api/team');
-  });  it('listIterations calls GET /api/iterations?pi_id=...', async () => {
+  });
+
+  it('listIterations calls GET /api/iterations?pi_id=...', async () => {
     resolveOk([]);
     await api.listIterations('pi1');
     expect(mockFetch).toHaveBeenCalledWith('/api/iterations?pi_id=pi1');
-  });  it('listFeatures calls GET /api/features?pi_id=...', async () => {
+  });
+
+  it('listFeatures calls GET /api/features?pi_id=...', async () => {
     resolveOk([]);
     await api.listFeatures('pi1');
     expect(mockFetch).toHaveBeenCalledWith('/api/features?pi_id=pi1');
