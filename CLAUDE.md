@@ -80,6 +80,7 @@ All relationships use ID references (never embedded objects). `PI.iteration_ids`
 | Terminal output | Rich (bundled with Typer) | Colored tables, status indicators |
 | Spreadsheet I/O | openpyxl | Import/export for PI Planning Excel artifacts |
 | Testing | pytest + pytest-cov + httpx | |
+| Mutation testing | mutmut `>=2,<3` | Nightly CI job scoped to `safe/logic/`; pinned to v2 because v3 removed the `html` subcommand used in the report step |
 
 Install: `pip install -e ".[dev]"`
 Run CLI: `safe --help`
