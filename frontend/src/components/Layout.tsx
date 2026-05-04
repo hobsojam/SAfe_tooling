@@ -33,13 +33,19 @@ export function Layout() {
 
         {/* PI selector */}
         <div className="px-3 pb-4">
-          <label className="mb-1 block text-xs text-slate-400">Program Increment</label>
+          <label
+            htmlFor="pi-select"
+            className="mb-1 block text-xs text-slate-400"
+          >
+            Program Increment
+          </label>
           <select
+            id="pi-select"
             value={piId ?? ''}
             onChange={(e) => {
               if (e.target.value) navigate(`/pi/${e.target.value}/board`);
             }}
-            className="w-full rounded bg-slate-700 px-2 py-1.5 text-sm text-slate-100 focus:outline-none"
+            className="w-full rounded bg-slate-700 px-2 py-1.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400"
           >
             <option value="" disabled>
               Select PI…
