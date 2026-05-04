@@ -67,8 +67,10 @@ def test_delete_with_pi_returns_409(client):
     client.post(
         "/pi",
         json={
-            "name": "PI 1", "art_id": art_id,
-            "start_date": "2026-01-05", "end_date": "2026-03-27",
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
         },
     )
     assert client.delete(f"/art/{art_id}").status_code == 409

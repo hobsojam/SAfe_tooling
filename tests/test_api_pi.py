@@ -105,8 +105,10 @@ class TestPIDelete:
         iter_id = client.post(
             "/iterations",
             json={
-                "pi_id": pi_id, "number": 1,
-                "start_date": "2026-01-05", "end_date": "2026-01-16",
+                "pi_id": pi_id,
+                "number": 1,
+                "start_date": "2026-01-05",
+                "end_date": "2026-01-16",
             },
         ).json()["id"]
         client.delete(f"/pi/{pi_id}")
@@ -118,9 +120,12 @@ class TestPIDelete:
         client.post(
             "/features",
             json={
-                "name": "F", "pi_id": pi_id,
-                "user_business_value": 5, "time_criticality": 5,
-                "risk_reduction_opportunity_enablement": 5, "job_size": 5,
+                "name": "F",
+                "pi_id": pi_id,
+                "user_business_value": 5,
+                "time_criticality": 5,
+                "risk_reduction_opportunity_enablement": 5,
+                "job_size": 5,
             },
         )
         assert client.delete(f"/pi/{pi_id}").status_code == 409

@@ -102,9 +102,12 @@ def test_delete_with_feature_returns_409(client):
     client.post(
         "/features",
         json={
-            "name": "F", "team_id": team_id,
-            "user_business_value": 5, "time_criticality": 5,
-            "risk_reduction_opportunity_enablement": 5, "job_size": 5,
+            "name": "F",
+            "team_id": team_id,
+            "user_business_value": 5,
+            "time_criticality": 5,
+            "risk_reduction_opportunity_enablement": 5,
+            "job_size": 5,
         },
     )
     assert client.delete(f"/team/{team_id}").status_code == 409
