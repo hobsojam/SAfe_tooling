@@ -15,7 +15,7 @@ from safe.store.repos import Repos
 
 
 def seed(repos: Repos) -> None:
-    if repos.arts.find():
+    if repos.arts.get_all():
         return  # already seeded
 
     # --- ART ---
