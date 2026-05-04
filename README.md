@@ -77,10 +77,10 @@ The server starts on **http://127.0.0.1:8000**. Interactive API docs are at **ht
 cd frontend
 npm install   # first time only
 npm run dev
-# Starts on http://localhost:5173
+# Starts on http://localhost:5173 by default
 ```
 
-Open **http://localhost:5173** in your browser. Select a PI from the sidebar to see the Board, Backlog, Risks, and Dependencies pages.
+Open **http://localhost:5173** in your browser (check the terminal output for the exact URL — if 5173 is already in use, Vite will automatically try 5174, 5175, etc.). Select a PI from the sidebar to see the Board, Backlog, Risks, and Dependencies pages.
 
 > The Vite dev server proxies `/api/*` to FastAPI on port 8000 — no CORS configuration needed.
 
