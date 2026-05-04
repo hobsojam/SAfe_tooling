@@ -70,4 +70,10 @@ def delete_feature(feature_id: str, repos: Repos = Depends(get_repos_dep)):
     _get_or_404(repos, feature_id)
     for story in repos.stories.find(feature_id=feature_id):
         repos.stories.delete(story.id)
+    for objective in repos.objectives.get_all():
+        if feature_id in objective.feature_ids:
+            updated = objective.model_copy(
+                update={"feature_ids": [fid for fid in objective.feature_ids if fid != feature_id]}
+            )
+            repos.objectives.save(updated)
     repos.features.delete(feature_id)

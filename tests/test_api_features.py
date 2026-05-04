@@ -147,5 +147,21 @@ class TestFeatureDelete:
         client.delete(f"/features/{fid}")
         assert client.get(f"/stories/{sid}").status_code == 404
 
+    def test_delete_cleans_objective_feature_ids(self, client):
+        fid = _create_feature(client).json()["id"]
+        oid = client.post(
+            "/objectives",
+            json={
+                "team_id": "t1",
+                "pi_id": "p1",
+                "description": "Obj",
+                "planned_business_value": 5,
+                "feature_ids": [fid],
+            },
+        ).json()["id"]
+        client.delete(f"/features/{fid}")
+        objective = client.get(f"/objectives/{oid}").json()
+        assert fid not in objective["feature_ids"]
+
     def test_unknown_returns_404(self, client):
         assert client.delete("/features/no-such-id").status_code == 404
