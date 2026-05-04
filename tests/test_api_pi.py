@@ -104,7 +104,10 @@ class TestPIDelete:
         pi_id = _create_pi(client, art_id)
         iter_id = client.post(
             "/iterations",
-            json={"pi_id": pi_id, "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16"},
+            json={
+                "pi_id": pi_id, "number": 1,
+                "start_date": "2026-01-05", "end_date": "2026-01-16",
+            },
         ).json()["id"]
         client.delete(f"/pi/{pi_id}")
         assert client.get(f"/iterations/{iter_id}").status_code == 404
