@@ -195,7 +195,14 @@ export function Dependencies() {
                   <td className="px-4 py-2.5 font-medium text-slate-700">
                     {teamMap[d.to_team_id] ?? d.to_team_id}
                   </td>
-                  <td className="px-4 py-2.5 text-slate-600">{d.description}</td>
+                  <td className="px-4 py-2.5">
+                    <button
+                      onClick={() => openEdit(d)}
+                      className="text-slate-600 hover:text-slate-800 hover:underline text-left"
+                    >
+                      {d.description}
+                    </button>
+                  </td>
                   <td className="px-4 py-2.5">
                     <DepBadge status={d.status} />
                   </td>

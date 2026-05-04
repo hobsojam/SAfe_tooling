@@ -169,7 +169,14 @@ export function Risks() {
             <tbody className="divide-y divide-slate-100">
               {risks.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-2.5 font-medium text-slate-800">{r.description}</td>
+                  <td className="px-4 py-2.5">
+                    <button
+                      onClick={() => openEdit(r)}
+                      className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                    >
+                      {r.description}
+                    </button>
+                  </td>
                   <td className="px-4 py-2.5 text-slate-600">
                     {r.team_id ? (teamMap[r.team_id] ?? r.team_id) : '—'}
                   </td>
