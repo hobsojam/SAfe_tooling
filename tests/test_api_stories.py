@@ -36,6 +36,12 @@ class TestStoryCreate:
         assert body["status"] == "not_started"
         assert body["points"] == 3
 
+    def test_create_adds_id_to_feature_story_ids(self, client):
+        fid, tid = _setup(client)
+        sid = _create_story(client, fid, tid).json()["id"]
+        feature = client.get(f"/features/{fid}").json()
+        assert sid in feature["story_ids"]
+
     def test_unknown_feature_returns_404(self, client):
         _, tid = _setup(client)
         r = _create_story(client, "no-feature", tid)
@@ -122,6 +128,13 @@ class TestStoryDelete:
         sid = _create_story(client, fid, tid).json()["id"]
         assert client.delete(f"/stories/{sid}").status_code == 204
         assert client.get(f"/stories/{sid}").status_code == 404
+
+    def test_delete_removes_id_from_feature_story_ids(self, client):
+        fid, tid = _setup(client)
+        sid = _create_story(client, fid, tid).json()["id"]
+        client.delete(f"/stories/{sid}")
+        feature = client.get(f"/features/{fid}").json()
+        assert sid not in feature["story_ids"]
 
     def test_unknown_returns_404(self, client):
         assert client.delete("/stories/no-such-id").status_code == 404

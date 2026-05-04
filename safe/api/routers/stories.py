@@ -27,12 +27,16 @@ def list_stories(
 
 @router.post("", response_model=Story, status_code=201)
 def create_story(body: StoryCreate, repos: Repos = Depends(get_repos_dep)):
-    if repos.features.get(body.feature_id) is None:
+    feature = repos.features.get(body.feature_id)
+    if feature is None:
         raise HTTPException(status_code=404, detail=f"Feature '{body.feature_id}' not found")
     if repos.teams.get(body.team_id) is None:
         raise HTTPException(status_code=404, detail=f"Team '{body.team_id}' not found")
     story = Story(**body.model_dump())
-    return repos.stories.save(story)
+    repos.stories.save(story)
+    updated_feature = feature.model_copy(update={"story_ids": feature.story_ids + [story.id]})
+    repos.features.save(updated_feature)
+    return story
 
 
 @router.get("/{story_id}", response_model=Story)
@@ -49,5 +53,11 @@ def update_story(story_id: str, body: StoryUpdate, repos: Repos = Depends(get_re
 
 @router.delete("/{story_id}", status_code=204)
 def delete_story(story_id: str, repos: Repos = Depends(get_repos_dep)):
-    _get_or_404(repos, story_id)
+    story = _get_or_404(repos, story_id)
+    feature = repos.features.get(story.feature_id)
+    if feature is not None and story_id in feature.story_ids:
+        updated_feature = feature.model_copy(
+            update={"story_ids": [sid for sid in feature.story_ids if sid != story_id]}
+        )
+        repos.features.save(updated_feature)
     repos.stories.delete(story_id)
