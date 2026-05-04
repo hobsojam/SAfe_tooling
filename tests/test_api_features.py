@@ -138,5 +138,14 @@ class TestFeatureDelete:
         assert client.delete(f"/features/{fid}").status_code == 204
         assert client.get(f"/features/{fid}").status_code == 404
 
+    def test_delete_cascades_stories(self, client):
+        tid = _create_team(client)
+        fid = _create_feature(client).json()["id"]
+        sid = client.post(
+            "/stories", json={"name": "S", "feature_id": fid, "team_id": tid, "points": 2}
+        ).json()["id"]
+        client.delete(f"/features/{fid}")
+        assert client.get(f"/stories/{sid}").status_code == 404
+
     def test_unknown_returns_404(self, client):
         assert client.delete("/features/no-such-id").status_code == 404

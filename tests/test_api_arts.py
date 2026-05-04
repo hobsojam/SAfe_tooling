@@ -56,6 +56,26 @@ def test_delete_returns_204(client):
     assert client.get(f"/art/{art_id}").status_code == 404
 
 
+def test_delete_with_team_returns_409(client):
+    art_id = client.post("/art", json={"name": "ART"}).json()["id"]
+    client.post("/team", json={"name": "Alpha", "member_count": 6, "art_id": art_id})
+    assert client.delete(f"/art/{art_id}").status_code == 409
+
+
+def test_delete_with_pi_returns_409(client):
+    art_id = client.post("/art", json={"name": "ART"}).json()["id"]
+    client.post(
+        "/pi",
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
+    )
+    assert client.delete(f"/art/{art_id}").status_code == 409
+
+
 def test_delete_unknown_returns_404(client):
     r = client.delete("/art/no-such-id")
     assert r.status_code == 404

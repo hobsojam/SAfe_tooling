@@ -41,4 +41,8 @@ def update_art(art_id: str, body: ARTUpdate, repos: Repos = Depends(get_repos_de
 @router.delete("/{art_id}", status_code=204)
 def delete_art(art_id: str, repos: Repos = Depends(get_repos_dep)):
     _get_or_404(repos, art_id)
+    if repos.teams.find(art_id=art_id):
+        raise HTTPException(status_code=409, detail="ART has teams — delete them first")
+    if repos.pis.find(art_id=art_id):
+        raise HTTPException(status_code=409, detail="ART has PIs — delete them first")
     repos.arts.delete(art_id)

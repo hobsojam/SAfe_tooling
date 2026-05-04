@@ -68,4 +68,6 @@ def assign_feature(feature_id: str, body: FeatureAssign, repos: Repos = Depends(
 @router.delete("/{feature_id}", status_code=204)
 def delete_feature(feature_id: str, repos: Repos = Depends(get_repos_dep)):
     _get_or_404(repos, feature_id)
+    for story in repos.stories.find(feature_id=feature_id):
+        repos.stories.delete(story.id)
     repos.features.delete(feature_id)
