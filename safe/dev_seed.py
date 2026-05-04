@@ -130,7 +130,7 @@ def seed(repos: Repos) -> None:
         team_id=alpha.id,
         owner="Bob",
         roam_status=ROAMStatus.MITIGATED,
-        notes="Pinned to v2.x; upgrade deferred to next PI",
+        mitigation_notes="Pinned to v2.x; upgrade deferred to next PI",
     )
     r3 = Risk(
         description="Grafana Cloud trial expires mid-PI",
@@ -149,9 +149,9 @@ def seed(repos: Repos) -> None:
         from_team_id=alpha.id,
         to_team_id=alpha.id,
         owner="Alice",
-        needed_by=date(2026, 1, 16),
+        needed_by_date=date(2026, 1, 16),
         status=DependencyStatus.RESOLVED,
-        notes="Contract agreed in Iteration 1 kick-off",
+        resolution_notes="Contract agreed in Iteration 1 kick-off",
     )
     d2 = Dependency(
         description="Observability metrics endpoint needed by CI/CD pipeline health checks",
@@ -159,7 +159,7 @@ def seed(repos: Repos) -> None:
         from_team_id=beta.id,
         to_team_id=beta.id,
         owner="Carol",
-        needed_by=date(2026, 2, 13),
+        needed_by_date=date(2026, 2, 13),
         status=DependencyStatus.IDENTIFIED,
     )
     d3 = Dependency(
@@ -168,9 +168,9 @@ def seed(repos: Repos) -> None:
         from_team_id=beta.id,
         to_team_id=alpha.id,
         owner="Bob",
-        needed_by=date(2026, 1, 30),
+        needed_by_date=date(2026, 1, 30),
         status=DependencyStatus.MITIGATED,
-        notes="Interface agreed; implementation tracked via story",
+        resolution_notes="Interface agreed; implementation tracked via story",
     )
     for d in [d1, d2, d3]:
         repos.dependencies.save(d)
