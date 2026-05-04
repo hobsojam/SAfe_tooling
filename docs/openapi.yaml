@@ -38,7 +38,7 @@ tags:
 - name: risks
   description: ROAM Risk Register
 - name: dependencies
-  description: Cross-team Dependencies
+  description: Cross-feature Dependencies
 - name: capacity-plans
   description: Team Capacity Plans
 - name: compute
@@ -1631,6 +1631,10 @@ components:
           type: string
           format: uuid
           nullable: true
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
         status:
           $ref: '#/components/schemas/FeatureStatus'
         acceptance_criteria:
@@ -1693,6 +1697,10 @@ components:
           type: string
           format: uuid
           nullable: true
+        iteration_id:
+          type: string
+          format: uuid
+          nullable: true
         status:
           $ref: '#/components/schemas/FeatureStatus'
           default: backlog
@@ -1727,6 +1735,10 @@ components:
           format: uuid
           nullable: true
         team_id:
+          type: string
+          format: uuid
+          nullable: true
+        iteration_id:
           type: string
           format: uuid
           nullable: true
@@ -2081,12 +2093,18 @@ components:
         to_feature_id:
           type: string
           format: uuid
+        status:
+          $ref: '#/components/schemas/DependencyStatus'
+          default: identified
+        owner:
+          type: string
+          nullable: true
+        resolution_notes:
+          type: string
+          default: ''
         needed_by_date:
           type: string
           format: date
-          nullable: true
-        owner:
-          type: string
           nullable: true
     DependencyUpdate:
       type: object

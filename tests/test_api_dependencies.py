@@ -119,3 +119,37 @@ def test_delete_returns_204(client):
     did = _create_dep(client, pi_id, f1, f2).json()["id"]
     assert client.delete(f"/dependencies/{did}").status_code == 204
     assert client.get(f"/dependencies/{did}").status_code == 404
+
+
+def test_list_filter_by_from_feature(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    f1, f2 = _create_features(client, pi_id)
+    _create_dep(client, pi_id, f1, f2)
+    _create_dep(client, pi_id, f2, f1)
+    deps = client.get(f"/dependencies?from_feature_id={f1}").json()
+    assert len(deps) == 1
+    assert deps[0]["from_feature_id"] == f1
+
+
+def test_list_filter_by_to_feature(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    f1, f2 = _create_features(client, pi_id)
+    _create_dep(client, pi_id, f1, f2)
+    _create_dep(client, pi_id, f2, f1)
+    deps = client.get(f"/dependencies?to_feature_id={f2}").json()
+    assert len(deps) == 1
+    assert deps[0]["to_feature_id"] == f2
+
+
+def test_list_filter_by_status(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    f1, f2 = _create_features(client, pi_id)
+    did = _create_dep(client, pi_id, f1, f2).json()["id"]
+    _create_dep(client, pi_id, f2, f1)
+    client.post(f"/dependencies/{did}/roam", json={"status": "resolved"})
+    deps = client.get("/dependencies?status=resolved").json()
+    assert len(deps) == 1
+    assert deps[0]["status"] == "resolved"

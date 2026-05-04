@@ -47,3 +47,18 @@ test('dependencies table shown below the board', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /Dependencies/ })).toBeVisible();
   await expect(page.getByText('Auth API contract')).toBeVisible();
 });
+
+test('cross-team dependency shown as red arrow on the board grid', async ({ page }) => {
+  // The fixture has exactly 1 cross-team dependency (Observability Dashboard → Auth Service)
+  // and 2 same-team dependencies; only the cross-team one should produce an SVG arrow.
+  await expect(page.locator('[data-dep-id]')).toHaveCount(1);
+});
+
+test('same-team dependencies do not produce board arrows', async ({ page }) => {
+  // Total deps = 3, cross-team = 1, so same-team = 2 produce no arrows
+  const arrows = page.locator('[data-dep-id]');
+  await expect(arrows).toHaveCount(1);
+  // Confirm the two same-team dep descriptions are visible in the table but not as arrows
+  await expect(page.getByText('Auth API contract', { exact: false })).toBeVisible();
+  await expect(page.getByText('Observability metrics endpoint', { exact: false })).toBeVisible();
+});

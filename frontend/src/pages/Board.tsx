@@ -9,15 +9,24 @@ import {
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
 import { DepBadge, FeatureStatusBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Spinner } from '../components/Spinner';
-import type { Feature, Story } from '../types';
+import type { Dependency, Feature, Story } from '../types';
 
 type BoardGrid = Record<string, Record<string, Feature[]>>;
+
+interface Arrow {
+  depId: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  resolved: boolean;
+}
 
 function featurePrimaryIteration(featureId: string, stories: Story[]): string {
   const weight: Record<string, number> = {};
@@ -67,6 +76,7 @@ function DraggableFeatureCard({ feature }: { feature: Feature }) {
     <div
       ref={setNodeRef}
       style={style}
+      data-feature-id={feature.id}
       {...attributes}
       {...listeners}
       className={isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
@@ -88,10 +98,20 @@ function DroppableCell({ id, children }: { id: string; children: React.ReactNode
   );
 }
 
+function crossTeamOnly(deps: Dependency[], features: Feature[]): Dependency[] {
+  return deps.filter((d) => {
+    const from = features.find((f) => f.id === d.from_feature_id);
+    const to = features.find((f) => f.id === d.to_feature_id);
+    return from?.team_id && to?.team_id && from.team_id !== to.team_id;
+  });
+}
+
 export function Board() {
   const { piId } = useParams<{ piId: string }>();
   const queryClient = useQueryClient();
   const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [arrows, setArrows] = useState<Arrow[]>([]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -128,6 +148,43 @@ export function Board() {
     queryFn: () => api.listDependencies(piId!),
     enabled: !!piId,
   });
+
+  const ctDeps = useMemo(() => crossTeamOnly(deps, features), [deps, features]);
+
+  const measureArrows = useCallback(() => {
+    if (!boardRef.current) return;
+    const container = boardRef.current;
+    const cr = container.getBoundingClientRect();
+    const measured: Arrow[] = [];
+    for (const dep of ctDeps) {
+      const fromEl = container.querySelector<HTMLElement>(`[data-feature-id="${dep.from_feature_id}"]`);
+      const toEl = container.querySelector<HTMLElement>(`[data-feature-id="${dep.to_feature_id}"]`);
+      if (!fromEl || !toEl) continue;
+      const fr = fromEl.getBoundingClientRect();
+      const tr = toEl.getBoundingClientRect();
+      measured.push({
+        depId: dep.id,
+        x1: fr.right - cr.left,
+        y1: fr.top + fr.height / 2 - cr.top,
+        x2: tr.left - cr.left,
+        y2: tr.top + tr.height / 2 - cr.top,
+        resolved: dep.status === 'resolved',
+      });
+    }
+    setArrows(measured);
+  }, [ctDeps]);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(measureArrows);
+    return () => cancelAnimationFrame(id);
+  }, [measureArrows]);
+
+  useEffect(() => {
+    if (!boardRef.current) return;
+    const ro = new ResizeObserver(() => requestAnimationFrame(measureArrows));
+    ro.observe(boardRef.current);
+    return () => ro.disconnect();
+  }, [measureArrows]);
 
   const moveMutation = useMutation({
     mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string; iterationId: string | null }) =>
@@ -190,6 +247,7 @@ export function Board() {
       </p>
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div ref={boardRef} style={{ position: 'relative' }}>
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div style={{ display: 'grid', gridTemplateColumns }}>
             {/* Header row */}
@@ -255,6 +313,35 @@ export function Board() {
             ) : null}
           </DragOverlay>
         </DndContext>
+        {arrows.length > 0 && (
+          <svg
+            aria-hidden="true"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible' }}
+          >
+            <defs>
+              <marker id="dep-arrow" markerWidth="6" markerHeight="4" refX="5.5" refY="2" orient="auto">
+                <polygon points="0 0, 6 2, 0 4" fill="#dc2626" />
+              </marker>
+            </defs>
+            {arrows.map((a) => {
+              const dx = Math.max(40, Math.abs(a.x2 - a.x1) * 0.4);
+              return (
+                <path
+                  key={a.depId}
+                  data-dep-id={a.depId}
+                  d={`M ${a.x1} ${a.y1} C ${a.x1 + dx} ${a.y1}, ${a.x2 - dx} ${a.y2}, ${a.x2} ${a.y2}`}
+                  stroke="#dc2626"
+                  strokeWidth="2"
+                  fill="none"
+                  opacity={a.resolved ? 0.35 : 0.85}
+                  strokeDasharray={a.resolved ? '5 3' : undefined}
+                  markerEnd="url(#dep-arrow)"
+                />
+              );
+            })}
+          </svg>
+        )}
+        </div>
       </div>
 
       {/* Dependencies */}
