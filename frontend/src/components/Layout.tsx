@@ -12,6 +12,7 @@ const NAV = [
   { to: 'risks', label: 'Risks' },
   { to: 'dependencies', label: 'Dependencies' },
   { to: 'setup', label: 'PI Setup' },
+  { to: 'team-setup', label: 'Team Setup' },
 ];
 
 const EMPTY_PI_FORM: PICreate = {

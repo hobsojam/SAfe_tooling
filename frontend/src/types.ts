@@ -108,6 +108,17 @@ export interface IterationCreate {
   is_ip?: boolean;
 }
 
+export interface TeamCreate {
+  name: string;
+  member_count: number;
+  art_id: string;
+}
+
+export interface TeamUpdate {
+  name?: string;
+  member_count?: number;
+}
+
 export interface RiskCreate {
   description: string;
   pi_id: string;

@@ -5,6 +5,7 @@ import { Board } from './pages/Board';
 import { Dependencies } from './pages/Dependencies';
 import { Risks } from './pages/Risks';
 import { Setup } from './pages/Setup';
+import { TeamSetup } from './pages/TeamSetup';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="pi/:piId/risks" element={<Risks />} />
           <Route path="pi/:piId/dependencies" element={<Dependencies />} />
           <Route path="pi/:piId/setup" element={<Setup />} />
+          <Route path="pi/:piId/team-setup" element={<TeamSetup />} />
         </Route>
       </Routes>
     </Router>

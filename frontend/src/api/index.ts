@@ -16,6 +16,8 @@ import type {
   RiskUpdate,
   Story,
   Team,
+  TeamCreate,
+  TeamUpdate,
 } from '../types';
 
 const BASE = '/api';
@@ -63,6 +65,10 @@ export const api = {
   listARTs: () => get<ART[]>('/art'),
 
   listTeams: () => get<Team[]>('/team'),
+  listTeamsByArt: (artId: string) => get<Team[]>(`/team?art_id=${artId}`),
+  createTeam: (body: TeamCreate) => post<Team>('/team', body),
+  updateTeam: (id: string, body: TeamUpdate) => patch<Team>(`/team/${id}`, body),
+  deleteTeam: (id: string) => del(`/team/${id}`),
 
   listIterations: (piId: string) => get<Iteration[]>(`/iterations?pi_id=${piId}`),
   createIteration: (body: IterationCreate) => post<Iteration>('/iterations', body),
