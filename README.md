@@ -41,19 +41,63 @@ pip install -e ".[dev]"
 
 ### Option A — Web UI + API (recommended)
 
-```bash
-# Terminal 1: start the API
-safe-api
+Open **two terminal windows** in the project root.
 
-# Terminal 2: start the frontend dev server
+**Terminal 1 — API server:**
+```bash
+safe-api
+# Starts on http://127.0.0.1:8000
+# Interactive docs: http://127.0.0.1:8000/docs
+```
+
+**Terminal 2 — Frontend dev server:**
+```bash
 cd frontend
 npm install   # first time only
 npm run dev
+# Starts on http://localhost:5173
 ```
 
 Open **http://localhost:5173** in your browser. Select a PI from the sidebar to see the Board, Backlog, Risks, and Dependencies pages.
 
 > The Vite dev server proxies `/api/*` to FastAPI on port 8000 — no CORS configuration needed.
+
+#### Seed data for manual testing
+
+If you have an empty database, run these commands to create enough data to explore the UI:
+
+```bash
+# Create an ART
+ART=$(safe art create --name "Platform ART" | grep -oP '[0-9a-f-]{36}')
+
+# Create two teams
+T1=$(safe team create --name "Alpha" --members 6 --art-id $ART | grep -oP '[0-9a-f-]{36}')
+T2=$(safe team create --name "Beta"  --members 5 --art-id $ART | grep -oP '[0-9a-f-]{36}')
+
+# Create a PI with two iterations
+PI=$(safe pi create --name "PI 2026.1" --art-id $ART --start 2026-01-05 --end 2026-03-27 | grep -oP '[0-9a-f-]{36}')
+I1=$(safe pi iteration add --pi-id $PI --number 1 --start 2026-01-05 --end 2026-01-16 | grep -oP '[0-9a-f-]{36}')
+I2=$(safe pi iteration add --pi-id $PI --number 2 --start 2026-01-19 --end 2026-01-30 | grep -oP '[0-9a-f-]{36}')
+safe pi activate $PI
+
+# Add features and assign them
+F1=$(safe feature add --name "Auth Service" --user-value 8 --time-crit 5 --risk-reduction 3 --job-size 3 --pi-id $PI | grep -oP '[0-9a-f-]{36}')
+F2=$(safe feature add --name "SSO Integration" --user-value 5 --time-crit 8 --risk-reduction 2 --job-size 5 --pi-id $PI | grep -oP '[0-9a-f-]{36}')
+safe feature assign $F1 --team-id $T1
+safe feature assign $F2 --team-id $T2
+
+# Place stories in iterations (drives the Board view)
+safe story add --name "Login flow"    --feature-id $F1 --team-id $T1 --points 3 --iteration-id $I1
+safe story add --name "Token refresh" --feature-id $F1 --team-id $T1 --points 2 --iteration-id $I1
+safe story add --name "SSO handshake" --feature-id $F2 --team-id $T2 --points 5 --iteration-id $I2
+
+# Add a risk and a dependency
+safe risk add --description "Auth service availability" --pi-id $PI --team-id $T1 --owner "Alice"
+safe dependency add --description "Auth API contract" --pi-id $PI \
+  --from-team-id $T2 --to-team-id $T1 --owner "Bob" --needed-by 2026-01-12
+```
+
+> On Windows PowerShell, replace `$(...)` with `$(... | Select-String -Pattern '[0-9a-f-]{36}' | ForEach-Object { $_.Matches[0].Value })` or just copy the UUIDs manually from the CLI output.
 
 ### Option B — CLI only
 
