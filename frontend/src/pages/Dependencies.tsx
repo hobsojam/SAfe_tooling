@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
-import type { Dependency, DependencyCreate, DependencyStatus, DependencyUpdate } from '../types';
+import type { Dependency, DependencyCreate, DependencyStatus, DependencyUpdate, Feature } from '../types';
 import { DepBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
@@ -12,8 +12,8 @@ const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'owned', 'accepted', '
 
 interface DepFormState {
   description: string;
-  from_team_id: string;
-  to_team_id: string;
+  from_feature_id: string;
+  to_feature_id: string;
   status: DependencyStatus;
   owner: string | null;
   needed_by_date: string | null;
@@ -22,13 +22,18 @@ interface DepFormState {
 
 const EMPTY_FORM: DepFormState = {
   description: '',
-  from_team_id: '',
-  to_team_id: '',
+  from_feature_id: '',
+  to_feature_id: '',
   status: 'identified',
   owner: null,
   needed_by_date: null,
   resolution_notes: '',
 };
+
+function featureLabel(feature: Feature, teamMap: Record<string, string>): string {
+  const team = feature.team_id ? (teamMap[feature.team_id] ?? '') : '';
+  return team ? `${feature.name} (${team})` : feature.name;
+}
 
 export function Dependencies() {
   const { piId } = useParams<{ piId: string }>();
@@ -48,6 +53,12 @@ export function Dependencies() {
   const { data: deps = [], isLoading } = useQuery({
     queryKey: ['dependencies', piId],
     queryFn: () => api.listDependencies(piId!),
+    enabled: !!piId,
+  });
+
+  const { data: features = [] } = useQuery({
+    queryKey: ['features', piId],
+    queryFn: () => api.listFeatures(piId!),
     enabled: !!piId,
   });
 
@@ -79,14 +90,15 @@ export function Dependencies() {
   if (isLoading) return <Spinner />;
 
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
+  const featureMap = Object.fromEntries(features.map((f) => [f.id, f]));
   const unresolved = deps.filter((d) => d.status !== 'resolved').length;
 
   function openNew() {
     setEditing(null);
     setForm({
       ...EMPTY_FORM,
-      from_team_id: teams[0]?.id ?? '',
-      to_team_id: teams[1]?.id ?? teams[0]?.id ?? '',
+      from_feature_id: features[0]?.id ?? '',
+      to_feature_id: features[1]?.id ?? features[0]?.id ?? '',
     });
     setError('');
     setModalOpen(true);
@@ -96,8 +108,8 @@ export function Dependencies() {
     setEditing(d);
     setForm({
       description: d.description,
-      from_team_id: d.from_team_id,
-      to_team_id: d.to_team_id,
+      from_feature_id: d.from_feature_id,
+      to_feature_id: d.to_feature_id,
       status: d.status,
       owner: d.owner,
       needed_by_date: d.needed_by_date,
@@ -116,7 +128,10 @@ export function Dependencies() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.description.trim()) { setError('Description is required.'); return; }
-    if (!form.from_team_id || !form.to_team_id) { setError('From and To teams are required.'); return; }
+    if (!form.from_feature_id || !form.to_feature_id) {
+      setError('From and To features are required.');
+      return;
+    }
     if (editing) {
       updateMut.mutate({
         id: editing.id,
@@ -132,8 +147,8 @@ export function Dependencies() {
       createMut.mutate({
         description: form.description,
         pi_id: piId!,
-        from_team_id: form.from_team_id,
-        to_team_id: form.to_team_id,
+        from_feature_id: form.from_feature_id,
+        to_feature_id: form.to_feature_id,
         owner: form.owner || null,
         needed_by_date: form.needed_by_date || null,
       });
@@ -146,6 +161,16 @@ export function Dependencies() {
   }
 
   const isPending = createMut.isPending || updateMut.isPending;
+
+  function depFromLabel(d: Dependency): string {
+    const f = featureMap[d.from_feature_id];
+    return f ? featureLabel(f, teamMap) : d.from_feature_id;
+  }
+
+  function depToLabel(d: Dependency): string {
+    const f = featureMap[d.to_feature_id];
+    return f ? featureLabel(f, teamMap) : d.to_feature_id;
+  }
 
   return (
     <div className="p-6">
@@ -189,12 +214,8 @@ export function Dependencies() {
             <tbody className="divide-y divide-slate-100">
               {deps.map((d) => (
                 <tr key={d.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-2.5 font-medium text-slate-700">
-                    {teamMap[d.from_team_id] ?? d.from_team_id}
-                  </td>
-                  <td className="px-4 py-2.5 font-medium text-slate-700">
-                    {teamMap[d.to_team_id] ?? d.to_team_id}
-                  </td>
+                  <td className="px-4 py-2.5 font-medium text-slate-700">{depFromLabel(d)}</td>
+                  <td className="px-4 py-2.5 font-medium text-slate-700">{depToLabel(d)}</td>
                   <td className="px-4 py-2.5">
                     <button
                       onClick={() => openEdit(d)}
@@ -255,35 +276,35 @@ export function Dependencies() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="dep-from" className="mb-1 block text-sm font-medium text-slate-700">
-                From Team<span aria-hidden="true"> *</span>
+                From Feature<span aria-hidden="true"> *</span>
               </label>
               <select
                 id="dep-from"
-                value={form.from_team_id}
-                onChange={(e) => setForm({ ...form, from_team_id: e.target.value })}
+                value={form.from_feature_id}
+                onChange={(e) => setForm({ ...form, from_feature_id: e.target.value })}
                 disabled={!!editing}
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:bg-slate-50 disabled:text-slate-400"
               >
                 <option value="">Select…</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
+                {features.map((f) => (
+                  <option key={f.id} value={f.id}>{featureLabel(f, teamMap)}</option>
                 ))}
               </select>
             </div>
             <div>
               <label htmlFor="dep-to" className="mb-1 block text-sm font-medium text-slate-700">
-                To Team<span aria-hidden="true"> *</span>
+                To Feature<span aria-hidden="true"> *</span>
               </label>
               <select
                 id="dep-to"
-                value={form.to_team_id}
-                onChange={(e) => setForm({ ...form, to_team_id: e.target.value })}
+                value={form.to_feature_id}
+                onChange={(e) => setForm({ ...form, to_feature_id: e.target.value })}
                 disabled={!!editing}
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:bg-slate-50 disabled:text-slate-400"
               >
                 <option value="">Select…</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
+                {features.map((f) => (
+                  <option key={f.id} value={f.id}>{featureLabel(f, teamMap)}</option>
                 ))}
               </select>
             </div>

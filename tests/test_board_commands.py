@@ -201,7 +201,7 @@ class TestBoardShow:
         assert "Reporting Dashboard" in patch_console.getvalue()
 
     def test_shows_dependencies_section(self, db_path, patch_console):
-        pi_id, alpha_id, beta_id, *_ = _setup(db_path)
+        pi_id, _alpha_id, _beta_id, _iter1_id, feat1_id, feat2_id = _setup(db_path)
         invoke(
             db_path,
             "dependency",
@@ -210,10 +210,10 @@ class TestBoardShow:
             "Shared API contract",
             "--pi-id",
             pi_id,
-            "--from-team-id",
-            alpha_id,
-            "--to-team-id",
-            beta_id,
+            "--from-feature-id",
+            feat1_id,
+            "--to-feature-id",
+            feat2_id,
         )
         patch_console.truncate(0)
         patch_console.seek(0)
@@ -285,7 +285,7 @@ class TestBoardExport:
         assert any("Reporting Dashboard" in v for v in values)
 
     def test_dependencies_sheet_created(self, db_path, patch_console, tmp_path):
-        pi_id, alpha_id, beta_id, *_ = _setup(db_path)
+        pi_id, _alpha_id, _beta_id, _iter1_id, feat1_id, feat2_id = _setup(db_path)
         invoke(
             db_path,
             "dependency",
@@ -294,10 +294,10 @@ class TestBoardExport:
             "Platform contract",
             "--pi-id",
             pi_id,
-            "--from-team-id",
-            alpha_id,
-            "--to-team-id",
-            beta_id,
+            "--from-feature-id",
+            feat1_id,
+            "--to-feature-id",
+            feat2_id,
         )
         output = tmp_path / "board.xlsx"
         invoke(db_path, "board", "export", "--pi-id", pi_id, "--output", str(output))

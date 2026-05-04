@@ -77,10 +77,8 @@ export interface Dependency {
   id: string;
   description: string;
   pi_id: string;
-  feature_id: string | null;
-  from_team_id: string;
-  to_team_id: string;
-  iteration_id: string | null;
+  from_feature_id: string;
+  to_feature_id: string;
   status: DependencyStatus;
   owner: string | null;
   resolution_notes: string;
@@ -115,10 +113,8 @@ export interface RiskUpdate {
 export interface DependencyCreate {
   description: string;
   pi_id: string;
-  from_team_id: string;
-  to_team_id: string;
-  feature_id?: string | null;
-  iteration_id?: string | null;
+  from_feature_id: string;
+  to_feature_id: string;
   needed_by_date?: string | null;
   owner?: string | null;
 }

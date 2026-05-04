@@ -149,10 +149,10 @@ def test_full_pi_planning_flow(client):
     dep = client.post(
         "/dependencies",
         json={
-            "description": "Alpha needs SSO endpoint from Beta",
+            "description": "Auth Service needs Search endpoint",
             "pi_id": pi_id,
-            "from_team_id": t1["id"],
-            "to_team_id": t2["id"],
+            "from_feature_id": f1["id"],
+            "to_feature_id": f2["id"],
         },
     ).json()
     resolved = client.post(f"/dependencies/{dep['id']}/roam", json={"status": "resolved"}).json()

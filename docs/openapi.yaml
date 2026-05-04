@@ -926,18 +926,18 @@ paths:
           type: string
           format: uuid
         description: Filter by PI
-      - name: from_team_id
+      - name: from_feature_id
         in: query
         schema:
           type: string
           format: uuid
-        description: Filter by requesting team
-      - name: to_team_id
+        description: Filter by the feature that has the dependency
+      - name: to_feature_id
         in: query
         schema:
           type: string
           format: uuid
-        description: Filter by providing team
+        description: Filter by the feature that must fulfil the dependency
       - name: status
         in: query
         schema:
@@ -2025,8 +2025,8 @@ components:
       - id
       - description
       - pi_id
-      - from_team_id
-      - to_team_id
+      - from_feature_id
+      - to_feature_id
       - status
       - raised_date
       properties:
@@ -2035,27 +2035,18 @@ components:
           format: uuid
         description:
           type: string
-          example: Team Alpha needs the API gateway from Team Infra
+          example: Auth Service needs the API contract from SSO Integration
         pi_id:
           type: string
           format: uuid
-        feature_id:
+        from_feature_id:
           type: string
           format: uuid
-          nullable: true
-        from_team_id:
+          description: The feature that has the dependency
+        to_feature_id:
           type: string
           format: uuid
-          description: The team that needs the dependency
-        to_team_id:
-          type: string
-          format: uuid
-          description: The team that must provide the dependency
-        iteration_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: Iteration by which the dependency must be delivered
+          description: The feature that must fulfil the dependency
         status:
           $ref: '#/components/schemas/DependencyStatus'
         owner:
@@ -2076,28 +2067,20 @@ components:
       required:
       - description
       - pi_id
-      - from_team_id
-      - to_team_id
+      - from_feature_id
+      - to_feature_id
       properties:
         description:
           type: string
         pi_id:
           type: string
           format: uuid
-        feature_id:
+        from_feature_id:
           type: string
           format: uuid
-          nullable: true
-        from_team_id:
+        to_feature_id:
           type: string
           format: uuid
-        to_team_id:
-          type: string
-          format: uuid
-        iteration_id:
-          type: string
-          format: uuid
-          nullable: true
         needed_by_date:
           type: string
           format: date
@@ -2110,14 +2093,6 @@ components:
       properties:
         description:
           type: string
-        feature_id:
-          type: string
-          format: uuid
-          nullable: true
-        iteration_id:
-          type: string
-          format: uuid
-          nullable: true
         status:
           $ref: '#/components/schemas/DependencyStatus'
         owner:

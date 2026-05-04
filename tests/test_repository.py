@@ -162,10 +162,10 @@ def test_capacity_plan_computed_reloads(db: TinyDB) -> None:
 def test_dependency_date_roundtrip(db: TinyDB) -> None:
     repo: Repository[Dependency] = Repository(db, "dependencies", Dependency)
     dep = Dependency(
-        description="Team A needs API from Team B",
+        description="Feature A depends on Feature B",
         pi_id="pi-1",
-        from_team_id="team-a",
-        to_team_id="team-b",
+        from_feature_id="feature-a",
+        to_feature_id="feature-b",
         needed_by_date=date(2026, 6, 15),
     )
     repo.save(dep)

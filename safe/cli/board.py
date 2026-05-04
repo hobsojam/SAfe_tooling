@@ -39,6 +39,17 @@ def _cell_text(features) -> str:
     return "\n".join(f.name[:24] + ("…" if len(f.name) > 24 else "") for f in features)
 
 
+def _feature_label(repos: Repos, feature_id: str) -> str:
+    feature = repos.features.get(feature_id)
+    if feature is None:
+        return feature_id
+    if feature.team_id:
+        team = repos.teams.get(feature.team_id)
+        team_name = team.name if team else feature.team_id
+        return f"{feature.name} ({team_name})"
+    return feature.name
+
+
 @board_app.command("show")
 def board_show(
     pi_id: str = typer.Option(..., "--pi-id", help="PI id"),
@@ -81,12 +92,10 @@ def board_show(
     if deps:
         dep_table = Table("From", "To", "Description", "Status", title="Dependencies")
         for dep in deps:
-            from_team = repos.teams.get(dep.from_team_id)
-            to_team = repos.teams.get(dep.to_team_id)
             colour = _DEP_STATUS_COLOUR.get(dep.status, "white")
             dep_table.add_row(
-                from_team.name if from_team else dep.from_team_id,
-                to_team.name if to_team else dep.to_team_id,
+                _feature_label(repos, dep.from_feature_id),
+                _feature_label(repos, dep.to_feature_id),
                 dep.description[:50] + ("…" if len(dep.description) > 50 else ""),
                 f"[{colour}]{dep.status}[/{colour}]",
             )
@@ -137,14 +146,14 @@ def board_export(
     deps = repos.dependencies.find(pi_id=pi_id)
     if deps:
         ws_deps = wb.create_sheet("Dependencies")
-        ws_deps.append(["From Team", "To Team", "Description", "Status", "Owner", "Needed By"])
+        ws_deps.append(
+            ["From Feature", "To Feature", "Description", "Status", "Owner", "Needed By"]
+        )
         for dep in deps:
-            from_team = repos.teams.get(dep.from_team_id)
-            to_team = repos.teams.get(dep.to_team_id)
             ws_deps.append(
                 [
-                    from_team.name if from_team else dep.from_team_id,
-                    to_team.name if to_team else dep.to_team_id,
+                    _feature_label(repos, dep.from_feature_id),
+                    _feature_label(repos, dep.to_feature_id),
                     dep.description,
                     dep.status,
                     dep.owner or "",

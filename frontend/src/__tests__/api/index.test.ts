@@ -138,8 +138,8 @@ describe('POST methods', () => {
     const body: DependencyCreate = {
       description: 'Dep 1',
       pi_id: 'pi1',
-      from_team_id: 'team1',
-      to_team_id: 'team2',
+      from_feature_id: 'feature1',
+      to_feature_id: 'feature2',
     };
     await api.createDependency(body);
     expect(mockFetch).toHaveBeenCalledWith('/api/dependencies', postOpts(body));

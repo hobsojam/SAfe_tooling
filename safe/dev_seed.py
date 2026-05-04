@@ -146,8 +146,8 @@ def seed(repos: Repos) -> None:
     d1 = Dependency(
         description="Auth API contract must be finalised before SSO integration begins",
         pi_id=pi.id,
-        from_team_id=alpha.id,
-        to_team_id=alpha.id,
+        from_feature_id=auth.id,
+        to_feature_id=sso.id,
         owner="Alice",
         needed_by_date=date(2026, 1, 16),
         status=DependencyStatus.RESOLVED,
@@ -156,8 +156,8 @@ def seed(repos: Repos) -> None:
     d2 = Dependency(
         description="Observability metrics endpoint needed by CI/CD pipeline health checks",
         pi_id=pi.id,
-        from_team_id=beta.id,
-        to_team_id=beta.id,
+        from_feature_id=observability.id,
+        to_feature_id=pipeline.id,
         owner="Carol",
         needed_by_date=date(2026, 2, 13),
         status=DependencyStatus.IDENTIFIED,
@@ -165,8 +165,8 @@ def seed(repos: Repos) -> None:
     d3 = Dependency(
         description="Auth service token validation endpoint needed by Observability team",
         pi_id=pi.id,
-        from_team_id=beta.id,
-        to_team_id=alpha.id,
+        from_feature_id=auth.id,
+        to_feature_id=observability.id,
         owner="Bob",
         needed_by_date=date(2026, 1, 30),
         status=DependencyStatus.MITIGATED,

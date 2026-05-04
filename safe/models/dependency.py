@@ -17,10 +17,8 @@ class DependencyStatus(StrEnum):
 class Dependency(SAFeBaseModel):
     description: str
     pi_id: str
-    feature_id: str | None = None
-    from_team_id: str
-    to_team_id: str
-    iteration_id: str | None = None
+    from_feature_id: str
+    to_feature_id: str
     status: DependencyStatus = DependencyStatus.IDENTIFIED
     owner: str | None = None
     resolution_notes: str = ""
