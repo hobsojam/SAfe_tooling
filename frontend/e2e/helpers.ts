@@ -18,8 +18,13 @@ export async function selectPI(page: Page, name = 'PI 2026.1') {
   await page.waitForURL(/\/pi\/.+\/board/);
 }
 
-export async function goToPage(page: Page, label: 'Board' | 'Backlog' | 'Risks' | 'Dependencies' | 'PI Setup') {
+const PAGE_SLUGS: Partial<Record<string, string>> = {
+  'PI Setup': 'setup',
+  'Team Setup': 'team-setup',
+};
+
+export async function goToPage(page: Page, label: 'Board' | 'Backlog' | 'Risks' | 'Dependencies' | 'PI Setup' | 'Team Setup') {
   await page.getByRole('link', { name: label }).click();
-  const slug = label.split(' ').pop()!.toLowerCase();
+  const slug = PAGE_SLUGS[label] ?? label.toLowerCase();
   await page.waitForURL(new RegExp(`/${slug}`));
 }

@@ -128,7 +128,8 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 | **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list |
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
-| **Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
+| **PI Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
+| **Team Setup** | `/pi/:id/team-setup` | Create, rename, and delete ART teams |
 
 Built with Vite, React 18, TypeScript, Tailwind CSS v4, TanStack Query, and React Router.
 
@@ -306,7 +307,7 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Risks, Dependencies, Setup
+    pages/          Board, Backlog, Risks, Dependencies, Setup, TeamSetup
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/
