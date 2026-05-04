@@ -48,6 +48,16 @@ def update_pi(pi_id: str, body: PIUpdate, repos: Repos = Depends(get_repos_dep))
 @router.delete("/{pi_id}", status_code=204)
 def delete_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
     _get_or_404(repos, pi_id)
+    if repos.features.find(pi_id=pi_id):
+        raise HTTPException(status_code=409, detail="PI has features — delete them first")
+    if repos.objectives.find(pi_id=pi_id):
+        raise HTTPException(status_code=409, detail="PI has objectives — delete them first")
+    if repos.risks.find(pi_id=pi_id):
+        raise HTTPException(status_code=409, detail="PI has risks — delete them first")
+    if repos.dependencies.find(pi_id=pi_id):
+        raise HTTPException(status_code=409, detail="PI has dependencies — delete them first")
+    for iteration in repos.iterations.find(pi_id=pi_id):
+        repos.iterations.delete(iteration.id)
     repos.pis.delete(pi_id)
 
 

@@ -99,6 +99,36 @@ class TestPIDelete:
         assert client.delete(f"/pi/{pi_id}").status_code == 204
         assert client.get(f"/pi/{pi_id}").status_code == 404
 
+    def test_delete_cascades_iterations(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        iter_id = client.post(
+            "/iterations",
+            json={"pi_id": pi_id, "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16"},
+        ).json()["id"]
+        client.delete(f"/pi/{pi_id}")
+        assert client.get(f"/iterations/{iter_id}").status_code == 404
+
+    def test_delete_with_feature_returns_409(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        client.post(
+            "/features",
+            json={
+                "name": "F", "pi_id": pi_id,
+                "user_business_value": 5, "time_criticality": 5,
+                "risk_reduction_opportunity_enablement": 5, "job_size": 5,
+            },
+        )
+        assert client.delete(f"/pi/{pi_id}").status_code == 409
+
+    def test_delete_with_risk_returns_409(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        team_id = client.post("/team", json={"name": "T", "member_count": 5}).json()["id"]
+        client.post("/risks", json={"description": "R", "pi_id": pi_id, "team_id": team_id})
+        assert client.delete(f"/pi/{pi_id}").status_code == 409
+
     def test_unknown_returns_404(self, client):
         assert client.delete("/pi/no-such-id").status_code == 404
 

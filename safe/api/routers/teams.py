@@ -57,8 +57,15 @@ def update_team(team_id: str, body: TeamUpdate, repos: Repos = Depends(get_repos
 @router.delete("/{team_id}", status_code=204)
 def delete_team(team_id: str, repos: Repos = Depends(get_repos_dep)):
     team = _get_or_404(repos, team_id)
+    if repos.features.find(team_id=team_id):
+        raise HTTPException(status_code=409, detail="Team has features — reassign them first")
+    if repos.stories.find(team_id=team_id):
+        raise HTTPException(status_code=409, detail="Team has stories — reassign them first")
+    if repos.objectives.find(team_id=team_id):
+        raise HTTPException(status_code=409, detail="Team has objectives — delete them first")
+    if repos.capacity_plans.find(team_id=team_id):
+        raise HTTPException(status_code=409, detail="Team has capacity plans — delete them first")
     repos.teams.delete(team_id)
-
     if team.art_id is not None:
         art = repos.arts.get(team.art_id)
         if art is not None:

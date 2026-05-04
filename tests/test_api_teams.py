@@ -97,6 +97,19 @@ def test_delete_removes_from_art_team_ids(client):
     assert team_id not in art["team_ids"]
 
 
+def test_delete_with_feature_returns_409(client):
+    team_id = client.post("/team", json={"name": "T", "member_count": 5}).json()["id"]
+    client.post(
+        "/features",
+        json={
+            "name": "F", "team_id": team_id,
+            "user_business_value": 5, "time_criticality": 5,
+            "risk_reduction_opportunity_enablement": 5, "job_size": 5,
+        },
+    )
+    assert client.delete(f"/team/{team_id}").status_code == 409
+
+
 def test_delete_unknown_returns_404(client):
     r = client.delete("/team/no-such-id")
     assert r.status_code == 404
