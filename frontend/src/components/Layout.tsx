@@ -133,8 +133,24 @@ export function Layout() {
           </nav>
         )}
 
+        {/* Global nav */}
+        <div className="mt-auto border-t border-slate-700 px-2 pt-2">
+          <NavLink
+            to="/art-setup"
+            className={({ isActive }) =>
+              `block rounded px-3 py-2 text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-slate-700 text-white'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
+              }`
+            }
+          >
+            ART Setup
+          </NavLink>
+        </div>
+
         {/* New PI button */}
-        <div className="mt-auto px-3 pb-2">
+        <div className="px-3 py-2">
           <button
             onClick={openNewPI}
             className="w-full rounded bg-slate-700 px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"

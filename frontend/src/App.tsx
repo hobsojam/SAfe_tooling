@@ -4,6 +4,7 @@ import { Backlog } from './pages/Backlog';
 import { Board } from './pages/Board';
 import { Dependencies } from './pages/Dependencies';
 import { Risks } from './pages/Risks';
+import { ARTSetup } from './pages/ARTSetup';
 import { Setup } from './pages/Setup';
 import { TeamSetup } from './pages/TeamSetup';
 
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="pi/:piId/dependencies" element={<Dependencies />} />
           <Route path="pi/:piId/setup" element={<Setup />} />
           <Route path="pi/:piId/team-setup" element={<TeamSetup />} />
+          <Route path="art-setup" element={<ARTSetup />} />
         </Route>
       </Routes>
     </Router>
