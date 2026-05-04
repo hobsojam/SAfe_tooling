@@ -4,7 +4,7 @@ import { goToPage, resetDb, selectPI } from './helpers';
 test.beforeEach(async ({ page }) => {
   resetDb();
   await selectPI(page);
-  await goToPage(page, 'Setup');
+  await goToPage(page, 'PI Setup');
 });
 
 test('shows Setup heading', async ({ page }) => {

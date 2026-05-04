@@ -11,7 +11,7 @@ const NAV = [
   { to: 'backlog', label: 'Backlog' },
   { to: 'risks', label: 'Risks' },
   { to: 'dependencies', label: 'Dependencies' },
-  { to: 'setup', label: 'Setup' },
+  { to: 'setup', label: 'PI Setup' },
 ];
 
 const EMPTY_PI_FORM: PICreate = {
