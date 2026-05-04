@@ -18,11 +18,19 @@ def _get_or_404(repos: Repos, dependency_id: str) -> Dependency:
 @router.get("", response_model=list[Dependency])
 def list_dependencies(
     pi_id: str | None = Query(default=None),
+    from_feature_id: str | None = Query(default=None),
+    to_feature_id: str | None = Query(default=None),
+    status: str | None = Query(default=None),
     repos: Repos = Depends(get_repos_dep),
 ):
-    if pi_id is not None:
-        return repos.dependencies.find(pi_id=pi_id)
-    return repos.dependencies.get_all()
+    deps = repos.dependencies.find(pi_id=pi_id) if pi_id else repos.dependencies.get_all()
+    if from_feature_id:
+        deps = [d for d in deps if d.from_feature_id == from_feature_id]
+    if to_feature_id:
+        deps = [d for d in deps if d.to_feature_id == to_feature_id]
+    if status:
+        deps = [d for d in deps if d.status == status]
+    return deps
 
 
 @router.post("", response_model=Dependency, status_code=201)
