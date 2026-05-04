@@ -25,7 +25,7 @@ pip install -e ".[dev]"
 | Risk Register | Working | `safe risk add/list/show/roam/delete` |
 | Dependency Mapper | Working | `safe dependency add/list/show/roam/delete` |
 | PI Board | Working | `safe board show/export` |
-| Web Frontend | Planned | React SPA |
+| Web Frontend | Working | React SPA — Board, Backlog, Risks, Dependencies |
 
 ## Usage
 
@@ -246,6 +246,37 @@ Calculate ART predictability at end of PI. Repeat `--planned` and `--actual` onc
 ```bash
 safe pi predictability --planned 10 --planned 8 --actual 9 --actual 7
 # ART Predictability : 84.4%
+```
+
+## Web Frontend
+
+React SPA built with Vite, TypeScript, Tailwind CSS v4, React Router, and TanStack Query.
+
+### Development
+
+```bash
+cd frontend
+npm install
+npm run dev          # http://localhost:5173 — proxies /api/* → FastAPI on :8000
+```
+
+Requires the FastAPI server to be running (`safe-api` or `podman compose up api`).
+
+### Pages
+
+| Page | Route | Description |
+|------|-------|-------------|
+| PI Board | `/pi/:id/board` | Visual grid — teams × iterations with feature cards |
+| Backlog | `/pi/:id/backlog` | WSJF-ranked feature list |
+| Risks | `/pi/:id/risks` | ROAM risk register |
+| Dependencies | `/pi/:id/dependencies` | Cross-team dependency tracker |
+
+### Production (Docker)
+
+```bash
+podman compose up -d --build
+# API:      http://localhost:8000
+# Frontend: http://localhost:3000  (nginx serves SPA, proxies /api/* to API)
 ```
 
 ## HTTP API

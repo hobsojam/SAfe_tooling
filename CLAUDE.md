@@ -210,7 +210,7 @@ pyproject.toml
 | 7 | Dependency Mapper (CLI) | **Done** |
 | 8 | FastAPI HTTP layer — full OpenAPI implementation | **Done** |
 | 9 | PI Board (integrating view) | **Done** |
-| 10 | Web frontend — React SPA consuming the FastAPI layer | Not started |
+| 10 | Web frontend — React SPA consuming the FastAPI layer | **Done** |
 
 ## Planned CLI Command Tree
 

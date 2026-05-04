@@ -1,0 +1,23 @@
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Layout } from './components/Layout';
+import { Backlog } from './pages/Backlog';
+import { Board } from './pages/Board';
+import { Dependencies } from './pages/Dependencies';
+import { Risks } from './pages/Risks';
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="/pi" replace />} />
+          <Route path="pi" element={null} />
+          <Route path="pi/:piId/board" element={<Board />} />
+          <Route path="pi/:piId/backlog" element={<Backlog />} />
+          <Route path="pi/:piId/risks" element={<Risks />} />
+          <Route path="pi/:piId/dependencies" element={<Dependencies />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+}

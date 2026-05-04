@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from safe.api.deps import lifespan
 from safe.api.routers import (
@@ -21,6 +22,13 @@ app = FastAPI(
     version="1.0.0",
     description="HTTP API for SAFe PI Planning tooling",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(arts.router)
