@@ -39,18 +39,34 @@ A local PI Planning platform for Scaled Agile Framework (SAFe) teams. Manage you
 pip install -e ".[dev]"
 ```
 
-### Option A — Web UI + API (recommended)
+This installs two executables on your `PATH`:
+
+| Command | Description |
+|---------|-------------|
+| `safe` | CLI for creating and managing all SAFe entities |
+| `safe-api` | FastAPI/uvicorn server on `http://127.0.0.1:8000` |
+
+### Running in dev mode (recommended for local testing)
+
+Dev mode starts the API with a realistic pre-seeded dataset (one ART, two teams, one active PI, four features, ten stories, risks, and dependencies). This is the easiest way to explore the web UI without manually creating data first.
 
 Open **two terminal windows** in the project root.
 
-**Terminal 1 — API server:**
+**Terminal 1 — API server (dev mode):**
+
+Linux / macOS:
 ```bash
 SAFE_SEED_DEV=1 safe-api
-# Starts on http://127.0.0.1:8000
-# Interactive docs: http://127.0.0.1:8000/docs
-# SAFE_SEED_DEV=1 populates the database with sample data on first run
-# Windows PowerShell: $env:SAFE_SEED_DEV = "1"; safe-api
 ```
+
+Windows PowerShell:
+```powershell
+$env:SAFE_SEED_DEV = "1"; safe-api
+```
+
+The server starts on **http://127.0.0.1:8000**. Interactive API docs are at **http://127.0.0.1:8000/docs**.
+
+> `SAFE_SEED_DEV=1` triggers the built-in dev seed on startup. The seed only runs when the database is empty, so it is safe to set on every startup. **Without this flag the database starts empty and the PI dropdown in the web UI will show no options.**
 
 **Terminal 2 — Frontend dev server:**
 ```bash
@@ -64,23 +80,15 @@ Open **http://localhost:5173** in your browser. Select a PI from the sidebar to 
 
 > The Vite dev server proxies `/api/*` to FastAPI on port 8000 — no CORS configuration needed.
 
-#### Seed data for manual testing
+### Option A — API only (no seed data)
 
-The API includes a built-in dev seed that populates a realistic PI (two teams, four features, ten stories, risks, and dependencies). Enable it by setting `SAFE_SEED_DEV=1` when starting the API server:
+To start the API against your real database (no seed data):
 
-**Linux / macOS:**
 ```bash
-SAFE_SEED_DEV=1 safe-api
+safe-api
 ```
 
-**Windows PowerShell:**
-```powershell
-$env:SAFE_SEED_DEV = "1"; safe-api
-```
-
-The seed only runs when the database is empty, so it is safe to set on every startup. Once any ART exists the seed is skipped.
-
-> **Without this flag the database starts empty and the PI dropdown in the web UI will show no options.**
+Use the CLI (`safe`) to create your own ARTs, teams, PIs, and features, then use the web UI or API docs to browse them.
 
 ### Option B — CLI only
 
