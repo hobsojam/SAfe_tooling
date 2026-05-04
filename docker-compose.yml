@@ -8,5 +8,14 @@ services:
     environment:
       SAFE_DB_PATH: /data/db.json
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
 volumes:
   safe_data:

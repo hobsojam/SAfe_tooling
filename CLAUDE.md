@@ -80,10 +80,13 @@ All relationships use ID references (never embedded objects). `PI.iteration_ids`
 | Terminal output | Rich (bundled with Typer) | Colored tables, status indicators |
 | Spreadsheet I/O | openpyxl | Import/export for PI Planning Excel artifacts |
 | Testing | pytest + pytest-cov + httpx | |
+| Mutation testing | mutmut `>=2,<3` | Nightly CI job scoped to `safe/logic/`; pinned to v2 because v3 removed the `html` subcommand used in the report step |
 
 Install: `pip install -e ".[dev]"`
 Run CLI: `safe --help`
 Run API: `safe-api` (or `podman compose up -d --build`)
+
+> **Package discovery:** `pyproject.toml` pins setuptools to `include = ["safe*"]` via `[tool.setuptools.packages.find]`. If you add a new top-level directory (e.g. a second language runtime, a docs generator, a scripts folder), setuptools flat-layout auto-discovery will break the build with "Multiple top-level packages discovered". Either keep non-Python directories out of the project root, or update the `include` list explicitly.
 
 ## Project Structure
 
@@ -103,8 +106,9 @@ safe/
     wsjf.py              # cost_of_delay(), wsjf(), rank_features()
     capacity.py          # available_capacity(), load_percentage(), capacity_warning()
     predictability.py    # team_predictability(), art_predictability(), predictability_rating()
+    board.py             # build_board() — feature-to-iteration grid logic
   cli/
-    main.py              # root Typer app; --db-path callback; wsjf score/rank
+    main.py              # root Typer app; --db-path callback; wsjf score; registers all sub-apps
     state.py             # shared CLI state: db_path (set by --db-path, read by _repos())
     art.py               # safe art create / show / list
     team.py              # safe team create / show / list / delete
@@ -112,11 +116,11 @@ safe/
                          # safe pi iteration add / list / delete
     feature.py           # safe feature add / show / list / rank / update / assign / delete
     story.py             # safe story add / list / update / delete
-    backlog.py           # safe backlog show (WSJF-ranked with story counts)
+    backlog.py           # safe backlog show (WSJF-ranked view with story counts)
     capacity.py          # safe capacity calc / set / show / export
     objective.py         # safe objective add / list / score / update / delete
-    risk.py              # safe risk add / show / list / roam / delete
-    dependency.py        # safe dependency add / show / list / roam / delete
+    risk.py              # safe risk add / list / show / roam / delete
+    dependency.py        # safe dependency add / list / show / roam / delete
     board.py             # safe board show / export (PI program board)
   api/
     main.py              # FastAPI app; lifespan; router registration; run() entry point
@@ -147,7 +151,7 @@ tests/
   test_predictability.py
   test_models.py
   test_repository.py
-  test_cli.py                # stateless wsjf score / capacity calc / pi predictability
+  test_cli.py                # stateless wsjf / capacity / pi predictability commands
   test_art_commands.py
   test_team_commands.py
   test_pi_commands.py
@@ -158,6 +162,7 @@ tests/
   test_objective_commands.py
   test_risk_commands.py
   test_dependency_commands.py
+  test_board_commands.py
   test_board_commands.py
   test_api_arts.py           # one test file per API router
   test_api_teams.py
@@ -227,7 +232,7 @@ pyproject.toml
 | 7 | Dependency Mapper (CLI) | **Done** |
 | 8 | FastAPI HTTP layer — full OpenAPI implementation | **Done** |
 | 9 | PI Board (integrating view) | **Done** |
-| 10 | Web frontend — React SPA consuming the FastAPI layer | Not started |
+| 10 | Web frontend — React SPA consuming the FastAPI layer | **Done** |
 
 ## Planned CLI Command Tree
 

@@ -17,6 +17,10 @@ async def lifespan(app):
     path = Path(os.environ.get("SAFE_DB_PATH", str(_DEFAULT_DB_PATH)))
     path.parent.mkdir(parents=True, exist_ok=True)
     _db = TinyDB(path)
+    if os.environ.get("SAFE_SEED_DEV") == "1":
+        from safe.dev_seed import seed
+
+        seed(Repos(_db))
     yield
     if _db is not None:
         _db.close()
