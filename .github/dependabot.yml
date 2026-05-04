@@ -8,3 +8,19 @@ updates:
     python-packages:
       patterns:
         - "*"
+  ignore:
+    # mutmut v3 removed the `mutmut html` subcommand used in mutation.yml to
+    # generate the HTML artifact. The nightly workflow and pyproject.toml are
+    # both pinned to >=2,<3. Do not upgrade until the workflow is updated to
+    # work without HTML reporting (e.g. via `mutmut results` + step summary).
+    - dependency-name: "mutmut"
+      versions: [">=3"]
+
+- package-ecosystem: npm
+  directory: "/frontend"
+  schedule:
+    interval: weekly
+  groups:
+    npm-packages:
+      patterns:
+        - "*"
