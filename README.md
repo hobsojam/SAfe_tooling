@@ -46,6 +46,8 @@ This installs two executables on your `PATH`:
 | `safe` | CLI for creating and managing all SAFe entities |
 | `safe-api` | FastAPI/uvicorn server on `http://127.0.0.1:8000` |
 
+> **Not sure if the executables are on your PATH?** You can always use the Python module form instead — `python -m safe.api.main` is equivalent to `safe-api`, and `python -m safe.cli.main` is equivalent to `safe`. All examples below show both forms.
+
 ### Running in dev mode (recommended for local testing)
 
 Dev mode starts the API with a realistic pre-seeded dataset (one ART, two teams, one active PI, four features, ten stories, risks, and dependencies). This is the easiest way to explore the web UI without manually creating data first.
@@ -57,11 +59,13 @@ Open **two terminal windows** in the project root.
 Linux / macOS:
 ```bash
 SAFE_SEED_DEV=1 safe-api
+# or: SAFE_SEED_DEV=1 python -m safe.api.main
 ```
 
 Windows PowerShell:
 ```powershell
 $env:SAFE_SEED_DEV = "1"; safe-api
+# or: $env:SAFE_SEED_DEV = "1"; python -m safe.api.main
 ```
 
 The server starts on **http://127.0.0.1:8000**. Interactive API docs are at **http://127.0.0.1:8000/docs**.
@@ -86,14 +90,16 @@ To start the API against your real database (no seed data):
 
 ```bash
 safe-api
+# or: python -m safe.api.main
 ```
 
-Use the CLI (`safe`) to create your own ARTs, teams, PIs, and features, then use the web UI or API docs to browse them.
+Use the CLI (`safe` or `python -m safe.cli.main`) to create your own ARTs, teams, PIs, and features, then use the web UI or API docs to browse them.
 
 ### Option B — CLI only
 
 ```bash
 safe --help
+# or: python -m safe.cli.main --help
 ```
 
 All commands accept `--db-path PATH` to use a custom database file instead of `~/.safe_tooling/db.json`.
