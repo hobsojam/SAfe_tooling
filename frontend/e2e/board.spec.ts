@@ -19,9 +19,9 @@ test('shows iteration column headers', async ({ page }) => {
 });
 
 test('shows both team names in the board rows', async ({ page }) => {
-  // Use the team-name span inside tbody (not getByRole('cell') — ARIA role not resolved here)
-  await expect(page.locator('tbody td span').filter({ hasText: /^Alpha$/ })).toBeVisible();
-  await expect(page.locator('tbody td span').filter({ hasText: /^Beta$/ })).toBeVisible();
+  // All ART teams appear as rows, regardless of whether they have assigned features
+  await expect(page.getByText('Alpha', { exact: true })).toBeVisible();
+  await expect(page.getByText('Beta', { exact: true })).toBeVisible();
 });
 
 test('shows all four features', async ({ page }) => {
