@@ -94,6 +94,7 @@ Run API: `safe-api` (or `podman compose up -d --build`)
 > ```
 > `ruff check` and `ruff format` are **independent** — passing one does not imply passing the other. Always run both. To auto-fix, run `ruff check . --fix && ruff format .` before committing.
 
+
 > **Package discovery:** `pyproject.toml` pins setuptools to `include = ["safe*"]` via `[tool.setuptools.packages.find]`. If you add a new top-level directory (e.g. a second language runtime, a docs generator, a scripts folder), setuptools flat-layout auto-discovery will break the build with "Multiple top-level packages discovered". Either keep non-Python directories out of the project root, or update the `include` list explicitly.
 
 ## Project Structure
