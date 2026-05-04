@@ -115,7 +115,7 @@ export function Board() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-  const { data: pi } = useQuery({
+  const { data: pi, isLoading: loadingPi } = useQuery({
     queryKey: ['pi', piId],
     queryFn: () => api.getPI(piId!),
     enabled: !!piId,
@@ -138,7 +138,7 @@ export function Board() {
     queryFn: api.listStories,
   });
 
-  const { data: teams = [] } = useQuery({
+  const { data: teams = [], isLoading: loadingTeams } = useQuery({
     queryKey: ['teams'],
     queryFn: api.listTeams,
   });
@@ -216,18 +216,20 @@ export function Board() {
     moveMutation.mutate({ featureId: feature.id, teamId: newTeamId, iterationId: newIterationId });
   }
 
-  if (loadingFeatures) return <Spinner />;
+  if (loadingFeatures || loadingTeams || loadingPi) return <Spinner />;
 
   const sortedIters = [...iterations].sort((a, b) => a.number - b.number);
   const assignedFeatures = features.filter((f) => f.team_id);
 
-  if (assignedFeatures.length === 0) {
-    return <EmptyState message="No features assigned to teams for this PI." />;
+  const artTeams = teams.filter((t) => t.art_id === pi?.art_id);
+
+  if (artTeams.length === 0) {
+    return <EmptyState message="No teams configured for this PI's ART." />;
   }
 
   const grid = buildBoard(assignedFeatures, stories);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
-  const teamIds = [...new Set(assignedFeatures.map((f) => f.team_id!))];
+  const teamIds = artTeams.map((t) => t.id);
 
   const iterCols = sortedIters.map((i) => ({
     id: i.id,
