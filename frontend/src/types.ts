@@ -3,6 +3,11 @@ export type FeatureStatus = 'funnel' | 'analyzing' | 'backlog' | 'implementing' 
 export type ROAMStatus = 'unroamed' | 'owned' | 'accepted' | 'mitigated' | 'resolved';
 export type DependencyStatus = 'identified' | 'owned' | 'accepted' | 'mitigated' | 'resolved';
 
+export interface ART {
+  id: string;
+  name: string;
+}
+
 export interface PI {
   id: string;
   name: string;
@@ -80,4 +85,71 @@ export interface Dependency {
   resolution_notes: string;
   raised_date: string;
   needed_by_date: string | null;
+}
+
+export interface PICreate {
+  name: string;
+  art_id: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface RiskCreate {
+  description: string;
+  pi_id: string;
+  team_id?: string | null;
+  roam_status?: ROAMStatus;
+  owner?: string | null;
+  mitigation_notes?: string;
+}
+
+export interface RiskUpdate {
+  description?: string;
+  team_id?: string | null;
+  roam_status?: ROAMStatus;
+  owner?: string | null;
+  mitigation_notes?: string;
+}
+
+export interface DependencyCreate {
+  description: string;
+  pi_id: string;
+  from_team_id: string;
+  to_team_id: string;
+  feature_id?: string | null;
+  iteration_id?: string | null;
+  needed_by_date?: string | null;
+  owner?: string | null;
+}
+
+export interface DependencyUpdate {
+  description?: string;
+  status?: DependencyStatus;
+  owner?: string | null;
+  needed_by_date?: string | null;
+  resolution_notes?: string;
+}
+
+export interface FeatureCreate {
+  name: string;
+  description?: string;
+  pi_id?: string | null;
+  team_id?: string | null;
+  status?: FeatureStatus;
+  user_business_value: number;
+  time_criticality: number;
+  risk_reduction_opportunity_enablement: number;
+  job_size: number;
+}
+
+export interface FeatureUpdate {
+  name?: string;
+  description?: string;
+  pi_id?: string | null;
+  team_id?: string | null;
+  status?: FeatureStatus;
+  user_business_value?: number;
+  time_criticality?: number;
+  risk_reduction_opportunity_enablement?: number;
+  job_size?: number;
 }
