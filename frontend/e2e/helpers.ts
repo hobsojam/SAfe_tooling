@@ -18,7 +18,7 @@ export async function selectPI(page: Page, name = 'PI 2026.1') {
   await page.waitForURL(/\/pi\/.+\/board/);
 }
 
-export async function goToPage(page: Page, label: 'Board' | 'Backlog' | 'Risks' | 'Dependencies') {
+export async function goToPage(page: Page, label: 'Board' | 'Backlog' | 'Risks' | 'Dependencies' | 'Setup') {
   await page.getByRole('link', { name: label }).click();
   await page.waitForURL(new RegExp(`/${label.toLowerCase()}`));
 }

@@ -7,8 +7,10 @@ import type {
   FeatureCreate,
   FeatureUpdate,
   Iteration,
+  IterationCreate,
   PI,
   PICreate,
+  PIUpdate,
   Risk,
   RiskCreate,
   RiskUpdate,
@@ -53,6 +55,9 @@ export const api = {
   listPIs: () => get<PI[]>('/pi'),
   getPI: (id: string) => get<PI>(`/pi/${id}`),
   createPI: (body: PICreate) => post<PI>('/pi', body),
+  updatePI: (id: string, body: PIUpdate) => patch<PI>(`/pi/${id}`, body),
+  activatePI: (id: string) => post<PI>(`/pi/${id}/activate`, {}),
+  closePI: (id: string) => post<PI>(`/pi/${id}/close`, {}),
   deletePI: (id: string) => del(`/pi/${id}`),
 
   listARTs: () => get<ART[]>('/art'),
@@ -60,6 +65,8 @@ export const api = {
   listTeams: () => get<Team[]>('/team'),
 
   listIterations: (piId: string) => get<Iteration[]>(`/iterations?pi_id=${piId}`),
+  createIteration: (body: IterationCreate) => post<Iteration>('/iterations', body),
+  deleteIteration: (id: string) => del(`/iterations/${id}`),
 
   listFeatures: (piId: string) => get<Feature[]>(`/features?pi_id=${piId}`),
   createFeature: (body: FeatureCreate) => post<Feature>('/features', body),
