@@ -77,6 +77,7 @@ class FeatureCreate(BaseModel):
     description: str = ""
     pi_id: str | None = None
     team_id: str | None = None
+    iteration_id: str | None = None
     status: FeatureStatus = FeatureStatus.BACKLOG
     acceptance_criteria: str = ""
     user_business_value: int = Field(ge=1, le=10)
@@ -90,6 +91,7 @@ class FeatureUpdate(BaseModel):
     description: str | None = None
     pi_id: str | None = None
     team_id: str | None = None
+    iteration_id: str | None = None
     status: FeatureStatus | None = None
     acceptance_criteria: str | None = None
     user_business_value: int | None = Field(default=None, ge=1, le=10)

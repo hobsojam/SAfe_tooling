@@ -1,4 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
 import { DepBadge, FeatureStatusBadge } from '../components/Badge';
@@ -24,7 +35,8 @@ function buildBoard(features: Feature[], stories: Story[]): BoardGrid {
   const grid: BoardGrid = {};
   for (const feature of features) {
     if (!feature.team_id) continue;
-    const key = featurePrimaryIteration(feature.id, stories);
+    // Prefer explicit iteration_id override; fall back to story-majority
+    const key = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
     (grid[feature.team_id] ??= {})[key] ??= [];
     grid[feature.team_id][key].push(feature);
   }
@@ -43,8 +55,45 @@ function FeatureCard({ feature }: { feature: Feature }) {
   );
 }
 
+function DraggableFeatureCard({ feature }: { feature: Feature }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: feature.id,
+    data: { feature },
+  });
+  const style = transform
+    ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+    : undefined;
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
+    >
+      <FeatureCard feature={feature} />
+    </div>
+  );
+}
+
+function DroppableCell({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`min-h-[4rem] p-2 space-y-1.5 border-r border-slate-100 transition-colors ${isOver ? 'bg-blue-50' : ''}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function Board() {
   const { piId } = useParams<{ piId: string }>();
+  const queryClient = useQueryClient();
+  const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const { data: pi } = useQuery({
     queryKey: ['pi', piId],
@@ -80,6 +129,36 @@ export function Board() {
     enabled: !!piId,
   });
 
+  const moveMutation = useMutation({
+    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string; iterationId: string | null }) =>
+      api.updateFeature(featureId, { team_id: teamId, iteration_id: iterationId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['features', piId] });
+    },
+  });
+
+  function handleDragStart(event: DragStartEvent) {
+    const feature = (event.active.data.current as { feature: Feature }).feature;
+    setActiveFeature(feature);
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveFeature(null);
+    if (!event.over) return;
+
+    const overId = event.over.id as string;
+    const [newTeamId, newIterColId] = overId.split('|');
+    const feature = (event.active.data.current as { feature: Feature }).feature;
+
+    const newIterationId = newIterColId === 'unplanned' ? null : newIterColId;
+    const currentIterKey = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
+    const currentIterColId = currentIterKey === null ? 'unplanned' : currentIterKey;
+
+    if (feature.team_id === newTeamId && currentIterColId === newIterColId) return;
+
+    moveMutation.mutate({ featureId: feature.id, teamId: newTeamId, iterationId: newIterationId });
+  }
+
   if (loadingFeatures) return <Spinner />;
 
   const sortedIters = [...iterations].sort((a, b) => a.number - b.number);
@@ -98,69 +177,84 @@ export function Board() {
     label: `I${i.number}${i.is_ip ? ' (IP)' : ''}`,
   }));
 
+  const numCols = iterCols.length + 1; // +1 for Unplanned
+  const gridTemplateColumns = `8rem repeat(${numCols}, minmax(120px, 1fr))`;
+
   return (
     <div className="p-6">
       <h1 className="mb-1 text-xl font-semibold text-slate-800">
         Program Board — {pi?.name}
       </h1>
       <p className="mb-5 text-sm text-slate-500">
-        Features placed by story-point majority per iteration
+        Drag features between cells to reassign team and iteration
       </p>
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-        <table className="w-full table-fixed border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-50">
-              <th className="w-32 px-3 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                Team
-              </th>
-              {iterCols.map((c) => (
-                <th
-                  key={c.id}
-                  className="px-3 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
-                >
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <div style={{ display: 'grid', gridTemplateColumns }}>
+            {/* Header row */}
+            <div className="border-b border-r border-slate-200 bg-slate-50 px-3 py-2.5">
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Team</span>
+            </div>
+            {iterCols.map((c) => (
+              <div
+                key={c.id}
+                className="border-b border-r border-slate-200 bg-slate-50 px-3 py-2.5"
+              >
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   {c.label}
-                </th>
-              ))}
-              <th className="px-3 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                </span>
+              </div>
+            ))}
+            <div className="border-b border-slate-200 bg-slate-50 px-3 py-2.5">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Unplanned
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {teamIds.map((teamId, i) => {
+              </span>
+            </div>
+
+            {/* Team rows */}
+            {teamIds.map((teamId, rowIdx) => {
               const teamGrid = grid[teamId] ?? {};
+              const rowBg = rowIdx % 2 === 0 ? '' : 'bg-slate-50/60';
               return (
-                <tr
-                  key={teamId}
-                  className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}
-                >
-                  <td className="border-r border-slate-100 px-3 py-2 align-top">
-                    <span className="font-medium text-slate-700">
+                <>
+                  <div
+                    key={`${teamId}-name`}
+                    className={`border-b border-r border-slate-100 px-3 py-2 flex items-start ${rowBg}`}
+                  >
+                    <span className="font-medium text-sm text-slate-700">
                       {teamMap[teamId] ?? teamId}
                     </span>
-                  </td>
+                  </div>
                   {iterCols.map((c) => (
-                    <td key={c.id} className="border-r border-slate-100 px-2 py-2 align-top">
-                      <div className="space-y-1.5">
+                    <div key={`${teamId}-${c.id}`} className={`border-b border-slate-100 ${rowBg}`}>
+                      <DroppableCell id={`${teamId}|${c.id}`}>
                         {(teamGrid[c.id] ?? []).map((f) => (
-                          <FeatureCard key={f.id} feature={f} />
+                          <DraggableFeatureCard key={f.id} feature={f} />
                         ))}
-                      </div>
-                    </td>
-                  ))}
-                  <td className="px-2 py-2 align-top">
-                    <div className="space-y-1.5">
-                      {(teamGrid['unplanned'] ?? []).map((f) => (
-                        <FeatureCard key={f.id} feature={f} />
-                      ))}
+                      </DroppableCell>
                     </div>
-                  </td>
-                </tr>
+                  ))}
+                  <div key={`${teamId}-unplanned`} className={`border-b border-slate-100 ${rowBg}`}>
+                    <DroppableCell id={`${teamId}|unplanned`}>
+                      {(teamGrid['unplanned'] ?? []).map((f) => (
+                        <DraggableFeatureCard key={f.id} feature={f} />
+                      ))}
+                    </DroppableCell>
+                  </div>
+                </>
               );
             })}
-          </tbody>
-        </table>
+          </div>
+
+          <DragOverlay>
+            {activeFeature ? (
+              <div className="opacity-90 shadow-lg">
+                <FeatureCard feature={activeFeature} />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
 
       {/* Dependencies */}

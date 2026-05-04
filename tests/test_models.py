@@ -215,10 +215,15 @@ class TestFeature:
         f = self._make()
         assert f.pi_id is None
         assert f.team_id is None
+        assert f.iteration_id is None
         assert f.description == ""
         assert f.acceptance_criteria == ""
         assert f.story_ids == []
         assert f.dependency_ids == []
+
+    def test_iteration_id_set(self):
+        f = self._make(iteration_id="i-1")
+        assert f.iteration_id == "i-1"
 
 
 # ---------------------------------------------------------------------------

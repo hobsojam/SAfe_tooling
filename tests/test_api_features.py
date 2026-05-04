@@ -109,6 +109,19 @@ class TestFeaturePatch:
         r = client.patch(f"/features/{fid}", json={"job_size": 8})
         assert r.json()["wsjf_score"] == 2.0
 
+    def test_patch_iteration_id(self, client):
+        fid = _create_feature(client).json()["id"]
+        r = client.patch(f"/features/{fid}", json={"iteration_id": "iter-abc"})
+        assert r.status_code == 200
+        assert r.json()["iteration_id"] == "iter-abc"
+
+    def test_patch_iteration_id_clear(self, client):
+        fid = _create_feature(client).json()["id"]
+        client.patch(f"/features/{fid}", json={"iteration_id": "iter-abc"})
+        r = client.patch(f"/features/{fid}", json={"iteration_id": None})
+        assert r.status_code == 200
+        assert r.json()["iteration_id"] is None
+
     def test_unknown_returns_404(self, client):
         assert client.patch("/features/no-such-id", json={"name": "X"}).status_code == 404
 

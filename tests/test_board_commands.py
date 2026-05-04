@@ -345,3 +345,45 @@ class TestBoardLogic:
         )
         grid = build_board([f], [])
         assert grid == {}
+
+    def test_iteration_id_override_preferred_over_story_majority(self, db_path, patch_console):
+        from safe.logic.board import build_board
+        from safe.models.backlog import Feature, Story
+
+        f = Feature(
+            id="f1",
+            name="F1",
+            team_id="t1",
+            iteration_id="i-override",
+            user_business_value=5,
+            time_criticality=5,
+            risk_reduction_opportunity_enablement=5,
+            job_size=5,
+        )
+        # Stories say i2, but iteration_id override says i-override
+        stories = [
+            Story(name="S1", feature_id="f1", team_id="t1", iteration_id="i2", points=10),
+        ]
+        grid = build_board([f], stories)
+        assert "i-override" in grid["t1"]
+        assert "i2" not in grid["t1"]
+
+    def test_iteration_id_none_falls_back_to_story_majority(self, db_path, patch_console):
+        from safe.logic.board import build_board
+        from safe.models.backlog import Feature, Story
+
+        f = Feature(
+            id="f1",
+            name="F1",
+            team_id="t1",
+            iteration_id=None,
+            user_business_value=5,
+            time_criticality=5,
+            risk_reduction_opportunity_enablement=5,
+            job_size=5,
+        )
+        stories = [
+            Story(name="S1", feature_id="f1", team_id="t1", iteration_id="i3", points=5),
+        ]
+        grid = build_board([f], stories)
+        assert "i3" in grid["t1"]
