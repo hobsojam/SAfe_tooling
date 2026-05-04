@@ -18,6 +18,7 @@ class Feature(SAFeBaseModel):
     description: str = ""
     pi_id: str | None = None
     team_id: str | None = None
+    iteration_id: str | None = None
     status: FeatureStatus = FeatureStatus.BACKLOG
     acceptance_criteria: str = ""
     story_ids: list[str] = []

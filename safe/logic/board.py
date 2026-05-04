@@ -17,12 +17,13 @@ def build_board(features: list[Feature], stories: list[Story]) -> BoardGrid:
     """
     Build a {team_id: {iteration_id | None: [Feature]}} grid.
     Features without a team_id are excluded.
-    Features with no iteration-assigned stories land in the None (Unplanned) slot.
+    Prefers feature.iteration_id override; falls back to story-point majority.
+    Features with neither land in the None (Unplanned) slot.
     """
     grid: BoardGrid = {}
     for feature in features:
         if feature.team_id is None:
             continue
-        iter_id = feature_primary_iteration(feature.id, stories)
+        iter_id = feature.iteration_id or feature_primary_iteration(feature.id, stories)
         grid.setdefault(feature.team_id, {}).setdefault(iter_id, []).append(feature)
     return grid

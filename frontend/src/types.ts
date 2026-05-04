@@ -41,6 +41,7 @@ export interface Feature {
   description: string;
   pi_id: string | null;
   team_id: string | null;
+  iteration_id: string | null;
   status: FeatureStatus;
   story_ids: string[];
   user_business_value: number;
@@ -135,6 +136,7 @@ export interface FeatureCreate {
   description?: string;
   pi_id?: string | null;
   team_id?: string | null;
+  iteration_id?: string | null;
   status?: FeatureStatus;
   user_business_value: number;
   time_criticality: number;
@@ -147,6 +149,7 @@ export interface FeatureUpdate {
   description?: string;
   pi_id?: string | null;
   team_id?: string | null;
+  iteration_id?: string | null;
   status?: FeatureStatus;
   user_business_value?: number;
   time_criticality?: number;
