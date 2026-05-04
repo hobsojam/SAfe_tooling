@@ -228,6 +228,30 @@ pyproject.toml
 - CLI tests use `typer.testing.CliRunner` with `--db-path` pointing to a tmp file. Each test module includes an `autouse` `reset_state` fixture that sets `state.db_path = None` before and after each test to prevent state leaking between invocations.
 - API tests use `fastapi.testclient.TestClient` with `app.dependency_overrides` to inject a `tmp_path` TinyDB — see `tests/conftest.py`.
 
+**Testing standards — follow the test pyramid**
+
+Apply coverage at the right level. Prefer many fast, focused tests over a few broad ones:
+
+| Layer | Where | What to cover |
+|-------|-------|---------------|
+| **Unit** | `tests/test_wsjf.py`, `test_capacity.py`, `test_predictability.py`, `test_models.py` | Every pure function, all edge cases and error paths |
+| **Integration** | `tests/test_*_commands.py`, `tests/test_api_*.py` | Happy path + key error cases for every CLI command and API endpoint |
+| **E2e** | `frontend/e2e/*.spec.ts` | Critical user flows end-to-end; not exhaustive field validation (that lives in unit tests) |
+
+Rules:
+- **New business logic** → unit test in `tests/`.
+- **New CLI command or API endpoint** → integration test; at minimum happy path + 404/409.
+- **New UI page or mutation flow** → Playwright e2e test covering open modal, submit, and result visible.
+- **Before any non-trivial commit** (new feature, bug fix, refactor) run the full suite:
+  ```bash
+  python -m ruff check . && python -m ruff format --check . && python -m pytest tests/
+  ```
+  For changes that touch the frontend or API together, also run:
+  ```bash
+  cd frontend && npx playwright test
+  ```
+- E2e tests use `tests/e2e_fixture.clean.json` as a static DB snapshot. Mutation test files call `resetDb()` in `beforeEach` to restore it. Never modify `e2e_fixture.clean.json` directly — regenerate it intentionally when the fixture data needs to change.
+
 ## Build Phases
 
 | Phase | Scope | Status |

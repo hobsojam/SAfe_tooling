@@ -1,5 +1,7 @@
 # SAFe Tooling
 
+> **Disclaimer:** This is an independent, open-source project and is not an official Scaled Agile product. It is not affiliated with, endorsed by, or sponsored by Scaled Agile, Inc. SAFe® and Scaled Agile Framework® are registered trademarks of Scaled Agile, Inc.
+
 A local PI Planning platform for Scaled Agile Framework (SAFe) teams. Manage your ART's Program Increments through a web interface, a REST API, or a terminal CLI — all backed by a single JSON store at `~/.safe_tooling/db.json`.
 
 ## What it does

@@ -1,0 +1,39 @@
+import { expect, test } from '@playwright/test';
+import { goToPage, selectPI } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await selectPI(page);
+  await goToPage(page, 'Backlog');
+});
+
+test('shows backlog heading with PI name', async ({ page }) => {
+  await expect(page.getByRole('heading', { name: /Program Backlog — PI 2026\.1/ })).toBeVisible();
+});
+
+test('shows all four features', async ({ page }) => {
+  await expect(page.getByText('Auth Service')).toBeVisible();
+  await expect(page.getByText('SSO Integration')).toBeVisible();
+  await expect(page.getByText('Observability Dashboard')).toBeVisible();
+  await expect(page.getByText('CI/CD Pipeline Upgrade')).toBeVisible();
+});
+
+test('top-ranked feature has highest WSJF score', async ({ page }) => {
+  // CI/CD Pipeline Upgrade: WSJF = (4+2+5)/2 = 5.5 — highest
+  const rows = page.locator('tbody tr');
+  const firstRow = rows.first();
+  await expect(firstRow.getByText('CI/CD Pipeline Upgrade')).toBeVisible();
+  await expect(firstRow.getByText('5.5')).toBeVisible();
+});
+
+test('shows column headers for WSJF table', async ({ page }) => {
+  for (const col of ['Feature', 'Status', 'Team', 'CoD', 'Size', 'WSJF']) {
+    await expect(page.getByRole('columnheader', { name: col })).toBeVisible();
+  }
+});
+
+test('shows team assignments', async ({ page }) => {
+  // All features are assigned to either Alpha or Beta
+  const alphaCount = await page.getByRole('cell', { name: 'Alpha' }).count();
+  const betaCount = await page.getByRole('cell', { name: 'Beta' }).count();
+  expect(alphaCount + betaCount).toBe(4);
+});

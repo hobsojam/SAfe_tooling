@@ -34,3 +34,8 @@ frontend/node_modules/
 frontend/dist/
 frontend/.env.local
 frontend/.env
+frontend/.vite/
+frontend/test-results/
+
+# E2e working DB — generated from tests/e2e_fixture.clean.json at test time
+tests/e2e_fixture.db.json
