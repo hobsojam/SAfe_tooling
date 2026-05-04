@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import type { PICreate } from '../types';
 import { Modal } from './Modal';
@@ -24,6 +24,7 @@ const EMPTY_PI_FORM: PICreate = {
 
 export function Layout() {
   const { piId } = useParams<{ piId: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -167,7 +168,7 @@ export function Layout() {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto">
-        {piId ? (
+        {piId || !location.pathname.startsWith('/pi') ? (
           <Outlet />
         ) : (
           <div className="flex h-full items-center justify-center text-slate-400">
