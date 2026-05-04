@@ -341,6 +341,17 @@ Data is stored at `~/.safe_tooling/db.json`. The CLI and API share this file.
 
 ---
 
+## Planned improvements
+
+| Area | Description |
+|------|-------------|
+| **Frontend unit tests** | Add [Vitest](https://vitest.dev/) for component and logic unit testing (currently only Playwright e2e tests exist) |
+| **Frontend mutation testing** | Add [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `frontend/src/` — equivalent to the `mutmut` setup on the Python side |
+| **Responsive design** | Make the web UI usable across screen sizes (mobile, tablet, desktop) using Tailwind's responsive breakpoints |
+| **Board drag-and-drop** | Allow features on the Program Board to be repositioned across teams/iterations via drag-and-drop (e.g. using [@dnd-kit](https://dndkit.com/)) |
+
+---
+
 ## Development notes
 
 See `CLAUDE.md` for SAFe domain vocabulary, entity relationships, technical conventions, and the phased build plan.
