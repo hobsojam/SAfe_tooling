@@ -324,30 +324,29 @@ pytest --cov=safe
 
 ```
 safe/
-  models/       Pydantic models (ART, Team, PI, Feature, Story, ...)
-  logic/        Pure business logic (WSJF, capacity, predictability)
+  models/        Pydantic models (ART, Team, PI, Feature, Story, ...)
+  logic/         Pure business logic (WSJF, capacity, predictability, board)
   cli/
-    main.py     Root Typer app; wsjf score/rank, capacity calc; --db-path global option
-    state.py    Shared CLI state (db_path)
-    art.py      safe art commands
-    team.py     safe team commands
-    pi.py       safe pi and safe pi iteration commands
-    feature.py  safe feature commands (add/show/list/rank/update/assign/delete)
-    story.py    safe story commands (add/list/update/delete)
-    backlog.py  safe backlog show
-    objective.py safe objective commands
-    risk.py     safe risk commands (add/list/show/roam/delete)
+    main.py      Root Typer app; wsjf score/rank; --db-path global option
+    state.py     Shared CLI state (db_path)
+    art.py       safe art commands
+    team.py      safe team commands
+    pi.py        safe pi and safe pi iteration commands
+    feature.py   safe feature commands (add/show/list/rank/update/assign/delete)
+    story.py     safe story commands (add/list/update/delete)
+    backlog.py   safe backlog show
+    capacity.py  safe capacity commands (calc/set/show/export)
+    objective.py safe objective commands (add/list/score/update/delete)
+    risk.py      safe risk commands (add/list/show/roam/delete)
     dependency.py safe dependency commands (add/list/show/roam/delete)
-    board.py    safe board commands (show/export)
-  logic/
-    board.py    build_board() — feature-to-iteration grid logic
+    board.py     safe board commands (show/export)
   api/
-    main.py     FastAPI app; lifespan; router registration; run() entry point
-    deps.py     get_repos_dep() Depends factory; DB lifecycle via lifespan
-    schemas.py  Create/Update/action request body schemas
-    routers/    One file per resource (arts, teams, pi, iterations, features, ...)
-  store/        TinyDB persistence (Repository[T], get_repos())
-tests/          pytest test suite (CLI + API)
+    main.py      FastAPI app; lifespan; router registration; run() entry point
+    deps.py      get_repos_dep() Depends factory; DB lifecycle via lifespan
+    schemas.py   Create/Update/action request body schemas
+    routers/     One file per resource (arts, teams, pi, iterations, features, ...)
+  store/         TinyDB persistence (Repository[T], get_repos())
+tests/           pytest test suite (464 tests — unit, CLI, API, smoke)
 Dockerfile
 docker-compose.yml
 pyproject.toml
