@@ -152,5 +152,22 @@ class TestIterationDelete:
         pi = client.get(f"/pi/{pi_id}").json()
         assert iter_id not in pi["iteration_ids"]
 
+    def test_delete_cascades_capacity_plans(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        iter_id = _create_iteration(client, pi_id).json()["id"]
+        team_id = client.post("/team", json={"name": "Alpha", "member_count": 6}).json()["id"]
+        plan_id = client.post(
+            "/capacity-plans",
+            json={
+                "iteration_id": iter_id,
+                "team_id": team_id,
+                "pi_id": pi_id,
+                "team_size": 6,
+            },
+        ).json()["id"]
+        client.delete(f"/iterations/{iter_id}")
+        assert client.get(f"/capacity-plans/{plan_id}").status_code == 404
+
     def test_unknown_returns_404(self, client):
         assert client.delete("/iterations/no-such-id").status_code == 404
