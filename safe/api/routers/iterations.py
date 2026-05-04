@@ -61,6 +61,8 @@ def update_iteration(
 @router.delete("/{iteration_id}", status_code=204)
 def delete_iteration(iteration_id: str, repos: Repos = Depends(get_repos_dep)):
     iteration = _get_or_404(repos, iteration_id)
+    for plan in repos.capacity_plans.find(iteration_id=iteration_id):
+        repos.capacity_plans.delete(plan.id)
     repos.iterations.delete(iteration_id)
 
     pi = repos.pis.get(iteration.pi_id)
