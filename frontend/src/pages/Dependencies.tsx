@@ -83,7 +83,11 @@ export function Dependencies() {
 
   function openNew() {
     setEditing(null);
-    setForm({ ...EMPTY_FORM, from_team_id: teams[0]?.id ?? '', to_team_id: teams[1]?.id ?? teams[0]?.id ?? '' });
+    setForm({
+      ...EMPTY_FORM,
+      from_team_id: teams[0]?.id ?? '',
+      to_team_id: teams[1]?.id ?? teams[0]?.id ?? '',
+    });
     setError('');
     setModalOpen(true);
   }
@@ -229,8 +233,11 @@ export function Dependencies() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Description *</label>
+            <label htmlFor="dep-description" className="mb-1 block text-sm font-medium text-slate-700">
+              Description<span aria-hidden="true"> *</span>
+            </label>
             <textarea
+              id="dep-description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
@@ -240,8 +247,11 @@ export function Dependencies() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">From Team *</label>
+              <label htmlFor="dep-from" className="mb-1 block text-sm font-medium text-slate-700">
+                From Team<span aria-hidden="true"> *</span>
+              </label>
               <select
+                id="dep-from"
                 value={form.from_team_id}
                 onChange={(e) => setForm({ ...form, from_team_id: e.target.value })}
                 disabled={!!editing}
@@ -254,8 +264,11 @@ export function Dependencies() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">To Team *</label>
+              <label htmlFor="dep-to" className="mb-1 block text-sm font-medium text-slate-700">
+                To Team<span aria-hidden="true"> *</span>
+              </label>
               <select
+                id="dep-to"
                 value={form.to_team_id}
                 onChange={(e) => setForm({ ...form, to_team_id: e.target.value })}
                 disabled={!!editing}
@@ -270,8 +283,9 @@ export function Dependencies() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
+            <label htmlFor="dep-status" className="mb-1 block text-sm font-medium text-slate-700">Status</label>
             <select
+              id="dep-status"
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value as DependencyStatus })}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -284,8 +298,9 @@ export function Dependencies() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
+              <label htmlFor="dep-owner" className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
               <input
+                id="dep-owner"
                 type="text"
                 value={form.owner ?? ''}
                 onChange={(e) => setForm({ ...form, owner: e.target.value || null })}
@@ -293,8 +308,9 @@ export function Dependencies() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Needed By</label>
+              <label htmlFor="dep-needed-by" className="mb-1 block text-sm font-medium text-slate-700">Needed By</label>
               <input
+                id="dep-needed-by"
                 type="date"
                 value={form.needed_by_date ?? ''}
                 onChange={(e) => setForm({ ...form, needed_by_date: e.target.value || null })}
@@ -305,8 +321,9 @@ export function Dependencies() {
 
           {editing && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Resolution Notes</label>
+              <label htmlFor="dep-resolution" className="mb-1 block text-sm font-medium text-slate-700">Resolution Notes</label>
               <textarea
+                id="dep-resolution"
                 value={form.resolution_notes}
                 onChange={(e) => setForm({ ...form, resolution_notes: e.target.value })}
                 rows={2}

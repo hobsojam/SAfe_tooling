@@ -207,8 +207,11 @@ export function Risks() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Description *</label>
+            <label htmlFor="risk-description" className="mb-1 block text-sm font-medium text-slate-700">
+              Description<span aria-hidden="true"> *</span>
+            </label>
             <textarea
+              id="risk-description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
@@ -217,8 +220,9 @@ export function Risks() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Team</label>
+            <label htmlFor="risk-team" className="mb-1 block text-sm font-medium text-slate-700">Team</label>
             <select
+              id="risk-team"
               value={form.team_id ?? ''}
               onChange={(e) => setForm({ ...form, team_id: e.target.value || null })}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -231,8 +235,9 @@ export function Risks() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">ROAM Status</label>
+            <label htmlFor="risk-roam-status" className="mb-1 block text-sm font-medium text-slate-700">ROAM Status</label>
             <select
+              id="risk-roam-status"
               value={form.roam_status}
               onChange={(e) => setForm({ ...form, roam_status: e.target.value as ROAMStatus })}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -244,8 +249,9 @@ export function Risks() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
+            <label htmlFor="risk-owner" className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
             <input
+              id="risk-owner"
               type="text"
               value={form.owner ?? ''}
               onChange={(e) => setForm({ ...form, owner: e.target.value || null })}
@@ -254,8 +260,9 @@ export function Risks() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Mitigation Notes</label>
+            <label htmlFor="risk-notes" className="mb-1 block text-sm font-medium text-slate-700">Mitigation Notes</label>
             <textarea
+              id="risk-notes"
               value={form.mitigation_notes}
               onChange={(e) => setForm({ ...form, mitigation_notes: e.target.value })}
               rows={3}

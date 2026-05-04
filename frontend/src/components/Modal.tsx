@@ -16,11 +16,14 @@ export function Modal({ open, title, onClose, children }: Props) {
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
         className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h2 className="text-base font-semibold text-slate-800">{title}</h2>
+          <h2 id="modal-title" className="text-base font-semibold text-slate-800">{title}</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 transition-colors"

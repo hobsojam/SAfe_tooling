@@ -32,6 +32,8 @@ const EMPTY_FORM: FeatureFormState = {
   job_size: 5,
 };
 
+type NumKey = 'user_business_value' | 'time_criticality' | 'risk_reduction_opportunity_enablement' | 'job_size';
+
 export function Backlog() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
@@ -116,10 +118,7 @@ export function Backlog() {
     e.preventDefault();
     if (!form.name.trim()) { setError('Feature name is required.'); return; }
     if (editing) {
-      updateMut.mutate({
-        id: editing.id,
-        body: { ...form, team_id: form.team_id || null },
-      });
+      updateMut.mutate({ id: editing.id, body: { ...form, team_id: form.team_id || null } });
     } else {
       createMut.mutate({ ...form, pi_id: piId!, team_id: form.team_id || null });
     }
@@ -132,19 +131,16 @@ export function Backlog() {
 
   const isPending = createMut.isPending || updateMut.isPending;
 
-  function numInput(
-    label: string,
-    key: 'user_business_value' | 'time_criticality' | 'risk_reduction_opportunity_enablement' | 'job_size',
-    min: number,
-    max: number,
-  ) {
+  function numInput(label: string, key: NumKey, min: number, max: number) {
+    const id = `feature-${key.replace(/_/g, '-')}`;
     return (
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">
-          {label}{' '}
-          <span className="font-normal text-slate-400">({min}–{max})</span>
+        <label htmlFor={id} className="mb-1 block text-sm font-medium text-slate-700">
+          {label}
+          <span aria-hidden="true" className="font-normal text-slate-400"> ({min}–{max})</span>
         </label>
         <input
+          id={id}
           type="number"
           min={min}
           max={max}
@@ -245,8 +241,11 @@ export function Backlog() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Name *</label>
+            <label htmlFor="feature-name" className="mb-1 block text-sm font-medium text-slate-700">
+              Name<span aria-hidden="true"> *</span>
+            </label>
             <input
+              id="feature-name"
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -255,8 +254,9 @@ export function Backlog() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Description</label>
+            <label htmlFor="feature-description" className="mb-1 block text-sm font-medium text-slate-700">Description</label>
             <textarea
+              id="feature-description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={2}
@@ -266,8 +266,9 @@ export function Backlog() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
+              <label htmlFor="feature-status" className="mb-1 block text-sm font-medium text-slate-700">Status</label>
               <select
+                id="feature-status"
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value as FeatureStatus })}
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -278,8 +279,9 @@ export function Backlog() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Team</label>
+              <label htmlFor="feature-team" className="mb-1 block text-sm font-medium text-slate-700">Team</label>
               <select
+                id="feature-team"
                 value={form.team_id ?? ''}
                 onChange={(e) => setForm({ ...form, team_id: e.target.value || null })}
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"

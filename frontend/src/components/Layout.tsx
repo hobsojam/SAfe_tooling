@@ -167,8 +167,11 @@ export function Layout() {
           {piError && <p className="text-sm text-red-600">{piError}</p>}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Name *</label>
+            <label htmlFor="pi-name" className="mb-1 block text-sm font-medium text-slate-700">
+              Name<span aria-hidden="true"> *</span>
+            </label>
             <input
+              id="pi-name"
               type="text"
               value={piForm.name}
               onChange={(e) => setPiForm({ ...piForm, name: e.target.value })}
@@ -178,8 +181,11 @@ export function Layout() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">ART *</label>
+            <label htmlFor="pi-art" className="mb-1 block text-sm font-medium text-slate-700">
+              ART<span aria-hidden="true"> *</span>
+            </label>
             <select
+              id="pi-art"
               value={piForm.art_id}
               onChange={(e) => setPiForm({ ...piForm, art_id: e.target.value })}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -198,8 +204,11 @@ export function Layout() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Start Date *</label>
+              <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-slate-700">
+                Start Date<span aria-hidden="true"> *</span>
+              </label>
               <input
+                id="pi-start"
                 type="date"
                 value={piForm.start_date}
                 onChange={(e) => setPiForm({ ...piForm, start_date: e.target.value })}
@@ -207,8 +216,11 @@ export function Layout() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">End Date *</label>
+              <label htmlFor="pi-end" className="mb-1 block text-sm font-medium text-slate-700">
+                End Date<span aria-hidden="true"> *</span>
+              </label>
               <input
+                id="pi-end"
                 type="date"
                 value={piForm.end_date}
                 onChange={(e) => setPiForm({ ...piForm, end_date: e.target.value })}
