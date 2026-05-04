@@ -104,13 +104,22 @@ safe/
     wsjf.py              # cost_of_delay(), wsjf(), rank_features()
     capacity.py          # available_capacity(), load_percentage(), capacity_warning()
     predictability.py    # team_predictability(), art_predictability(), predictability_rating()
+    board.py             # build_board() — feature-to-iteration grid logic
   cli/
-    main.py              # root Typer app; --db-path callback; wsjf score, capacity calc
+    main.py              # root Typer app; --db-path callback; wsjf score; registers all sub-apps
     state.py             # shared CLI state: db_path (set by --db-path, read by _repos())
     art.py               # safe art create / show / list
     team.py              # safe team create / show / list / delete
     pi.py                # safe pi create / show / list / activate / close / predictability
                          # safe pi iteration add / list / delete
+    feature.py           # safe feature add / show / list / rank / update / assign / delete
+    story.py             # safe story add / list / update / delete
+    backlog.py           # safe backlog show (WSJF-ranked view with story counts)
+    capacity.py          # safe capacity calc / set / show / export
+    objective.py         # safe objective add / list / score / update / delete
+    risk.py              # safe risk add / list / show / roam / delete
+    dependency.py        # safe dependency add / list / show / roam / delete
+    board.py             # safe board show / export
   api/
     main.py              # FastAPI app; lifespan; router registration; run() entry point
     deps.py              # get_repos_dep() Depends factory; DB lifecycle via lifespan
@@ -134,16 +143,26 @@ safe/
 docs/
   openapi.yaml           # OpenAPI 3.1 spec — authoritative API contract
 tests/
-  conftest.py            # shared db (tmp_path TinyDB) and client (TestClient) fixtures
+  conftest.py                # shared db (tmp_path TinyDB) and client (TestClient) fixtures
   test_wsjf.py
   test_capacity.py
   test_predictability.py
   test_repository.py
-  test_cli.py            # stateless wsjf / capacity / pi predictability commands
+  test_models.py
+  test_cli.py                # stateless wsjf / capacity / pi predictability commands
   test_art_commands.py
   test_team_commands.py
   test_pi_commands.py
-  test_api_arts.py       # one test file per API router
+  test_feature_commands.py
+  test_story_commands.py
+  test_backlog_commands.py
+  test_capacity_commands.py
+  test_objective_commands.py
+  test_risk_commands.py
+  test_dependency_commands.py
+  test_board_commands.py
+  test_api_smoke.py          # basic reachability smoke tests for every router
+  test_api_arts.py           # one test file per API router
   test_api_teams.py
   test_api_pi.py
   test_api_iterations.py
