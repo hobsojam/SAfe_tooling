@@ -118,6 +118,38 @@ class TestStoryPatch:
         assert body["feature_id"] == fid
         assert body["team_id"] == tid
 
+    def test_patch_iteration_id_invalid_returns_404(self, client):
+        fid, tid = _setup(client)
+        sid = _create_story(client, fid, tid).json()["id"]
+        r = client.patch(f"/stories/{sid}", json={"iteration_id": "nonexistent-iter"})
+        assert r.status_code == 404
+
+    def test_patch_iteration_id_valid_accepted(self, client):
+        fid, tid = _setup(client)
+        sid = _create_story(client, fid, tid).json()["id"]
+        art_id = client.post("/art", json={"name": "ART"}).json()["id"]
+        pi_id = client.post(
+            "/pi",
+            json={
+                "name": "PI 1",
+                "art_id": art_id,
+                "start_date": "2026-01-05",
+                "end_date": "2026-03-27",
+            },
+        ).json()["id"]
+        iter_id = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 1,
+                "start_date": "2026-01-05",
+                "end_date": "2026-01-16",
+            },
+        ).json()["id"]
+        r = client.patch(f"/stories/{sid}", json={"iteration_id": iter_id})
+        assert r.status_code == 200
+        assert r.json()["iteration_id"] == iter_id
+
     def test_unknown_returns_404(self, client):
         assert client.patch("/stories/no-such-id", json={"points": 5}).status_code == 404
 

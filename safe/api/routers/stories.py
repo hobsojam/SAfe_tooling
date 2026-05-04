@@ -47,7 +47,14 @@ def get_story(story_id: str, repos: Repos = Depends(get_repos_dep)):
 @router.patch("/{story_id}", response_model=Story)
 def update_story(story_id: str, body: StoryUpdate, repos: Repos = Depends(get_repos_dep)):
     story = _get_or_404(repos, story_id)
-    updated = story.model_copy(update=body.model_dump(exclude_unset=True))
+    update_data = body.model_dump(exclude_unset=True)
+    if "iteration_id" in update_data and update_data["iteration_id"] is not None:
+        if repos.iterations.get(update_data["iteration_id"]) is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Iteration '{update_data['iteration_id']}' not found",
+            )
+    updated = story.model_copy(update=update_data)
     return repos.stories.save(updated)
 
 
