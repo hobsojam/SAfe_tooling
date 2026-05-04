@@ -20,7 +20,7 @@ A local PI Planning platform for Scaled Agile Framework (SAFe) teams. Manage you
 
 | Interface | Best for | How to start |
 |-----------|----------|-------------|
-| **Web UI** | Browsing and reviewing PI data | `safe-api` + `cd frontend && npm run dev` |
+| **Web UI** | Browsing and reviewing PI data | `SAFE_SEED_DEV=1 safe-api` + `cd frontend && npm run dev` |
 | **REST API** | Integrations and scripting | `safe-api` → `http://127.0.0.1:8000/docs` |
 | **CLI** | Creating and updating records | `safe --help` |
 
@@ -45,9 +45,11 @@ Open **two terminal windows** in the project root.
 
 **Terminal 1 — API server:**
 ```bash
-safe-api
+SAFE_SEED_DEV=1 safe-api
 # Starts on http://127.0.0.1:8000
 # Interactive docs: http://127.0.0.1:8000/docs
+# SAFE_SEED_DEV=1 populates the database with sample data on first run
+# Windows PowerShell: $env:SAFE_SEED_DEV = "1"; safe-api
 ```
 
 **Terminal 2 — Frontend dev server:**
@@ -64,40 +66,21 @@ Open **http://localhost:5173** in your browser. Select a PI from the sidebar to 
 
 #### Seed data for manual testing
 
-If you have an empty database, run these commands to create enough data to explore the UI:
+The API includes a built-in dev seed that populates a realistic PI (two teams, four features, ten stories, risks, and dependencies). Enable it by setting `SAFE_SEED_DEV=1` when starting the API server:
 
+**Linux / macOS:**
 ```bash
-# Create an ART
-ART=$(safe art create --name "Platform ART" | grep -oP '[0-9a-f-]{36}')
-
-# Create two teams
-T1=$(safe team create --name "Alpha" --members 6 --art-id $ART | grep -oP '[0-9a-f-]{36}')
-T2=$(safe team create --name "Beta"  --members 5 --art-id $ART | grep -oP '[0-9a-f-]{36}')
-
-# Create a PI with two iterations
-PI=$(safe pi create --name "PI 2026.1" --art-id $ART --start 2026-01-05 --end 2026-03-27 | grep -oP '[0-9a-f-]{36}')
-I1=$(safe pi iteration add --pi-id $PI --number 1 --start 2026-01-05 --end 2026-01-16 | grep -oP '[0-9a-f-]{36}')
-I2=$(safe pi iteration add --pi-id $PI --number 2 --start 2026-01-19 --end 2026-01-30 | grep -oP '[0-9a-f-]{36}')
-safe pi activate $PI
-
-# Add features and assign them
-F1=$(safe feature add --name "Auth Service" --user-value 8 --time-crit 5 --risk-reduction 3 --job-size 3 --pi-id $PI | grep -oP '[0-9a-f-]{36}')
-F2=$(safe feature add --name "SSO Integration" --user-value 5 --time-crit 8 --risk-reduction 2 --job-size 5 --pi-id $PI | grep -oP '[0-9a-f-]{36}')
-safe feature assign $F1 --team-id $T1
-safe feature assign $F2 --team-id $T2
-
-# Place stories in iterations (drives the Board view)
-safe story add --name "Login flow"    --feature-id $F1 --team-id $T1 --points 3 --iteration-id $I1
-safe story add --name "Token refresh" --feature-id $F1 --team-id $T1 --points 2 --iteration-id $I1
-safe story add --name "SSO handshake" --feature-id $F2 --team-id $T2 --points 5 --iteration-id $I2
-
-# Add a risk and a dependency
-safe risk add --description "Auth service availability" --pi-id $PI --team-id $T1 --owner "Alice"
-safe dependency add --description "Auth API contract" --pi-id $PI \
-  --from-team-id $T2 --to-team-id $T1 --owner "Bob" --needed-by 2026-01-12
+SAFE_SEED_DEV=1 safe-api
 ```
 
-> On Windows PowerShell, replace `$(...)` with `$(... | Select-String -Pattern '[0-9a-f-]{36}' | ForEach-Object { $_.Matches[0].Value })` or just copy the UUIDs manually from the CLI output.
+**Windows PowerShell:**
+```powershell
+$env:SAFE_SEED_DEV = "1"; safe-api
+```
+
+The seed only runs when the database is empty, so it is safe to set on every startup. Once any ART exists the seed is skipped.
+
+> **Without this flag the database starts empty and the PI dropdown in the web UI will show no options.**
 
 ### Option B — CLI only
 
