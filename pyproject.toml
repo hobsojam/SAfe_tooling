@@ -30,6 +30,9 @@ dev = [
     "mutmut>=2,<3",
 ]
 
+[tool.setuptools.packages.find]
+include = ["safe*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
