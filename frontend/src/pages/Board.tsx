@@ -174,17 +174,24 @@ export function Board() {
     setArrows(measured);
   }, [ctDeps]);
 
-  useEffect(() => {
-    const id = requestAnimationFrame(measureArrows);
-    return () => cancelAnimationFrame(id);
-  }, [measureArrows]);
+  // boardReady is true only once the three loading-guarded queries have resolved
+  // and the board div is actually in the DOM. Adding it to both effect dep lists
+  // ensures measurement fires on the Spinner→Board transition even when
+  // measureArrows (which depends on ctDeps) happens to be stable across that render.
+  const boardReady = !loadingFeatures && !loadingTeams && !loadingPi;
 
   useEffect(() => {
-    if (!boardRef.current) return;
+    if (!boardReady) return;
+    const id = requestAnimationFrame(measureArrows);
+    return () => cancelAnimationFrame(id);
+  }, [measureArrows, boardReady]);
+
+  useEffect(() => {
+    if (!boardReady || !boardRef.current) return;
     const ro = new ResizeObserver(() => requestAnimationFrame(measureArrows));
     ro.observe(boardRef.current);
     return () => ro.disconnect();
-  }, [measureArrows]);
+  }, [measureArrows, boardReady]);
 
   const moveMutation = useMutation({
     mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string; iterationId: string | null }) =>
