@@ -4,7 +4,6 @@ import type {
   ARTUpdate,
   CapacityPlan,
   CapacityPlanCreate,
-  CapacityPlanUpdate,
   Dependency,
   DependencyCreate,
   DependencyUpdate,
@@ -92,6 +91,7 @@ export const api = {
   updateFeature: (id: string, body: FeatureUpdate) => patch<Feature>(`/features/${id}`, body),
   deleteFeature: (id: string) => del(`/features/${id}`),
 
+  listStories: () => get<Story[]>('/stories'),
   listStoriesByFeature: (featureId: string) => get<Story[]>(`/stories?feature_id=${featureId}`),
   createStory: (body: StoryCreate) => post<Story>('/stories', body),
   updateStory: (id: string, body: StoryUpdate) => patch<Story>(`/stories/${id}`, body),
