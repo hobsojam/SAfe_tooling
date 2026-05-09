@@ -23,7 +23,7 @@ const PAGE_SLUGS: Partial<Record<string, string>> = {
   'Team Setup': 'team-setup',
 };
 
-export async function goToPage(page: Page, label: 'Board' | 'Backlog' | 'Risks' | 'Dependencies' | 'PI Setup' | 'Team Setup') {
+export async function goToPage(page: Page, label: 'Board' | 'Backlog' | 'Objectives' | 'Capacity' | 'Risks' | 'Dependencies' | 'PI Setup' | 'Team Setup') {
   await page.getByRole('link', { name: label }).click();
   const slug = PAGE_SLUGS[label] ?? label.toLowerCase();
   await page.waitForURL(new RegExp(`/${slug}`));

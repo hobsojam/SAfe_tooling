@@ -61,6 +61,8 @@ export interface Feature {
   wsjf_score: number;
 }
 
+export type StoryStatus = 'not_started' | 'in_progress' | 'done' | 'accepted';
+
 export interface Story {
   id: string;
   name: string;
@@ -68,6 +70,80 @@ export interface Story {
   team_id: string;
   iteration_id: string | null;
   points: number;
+  status: StoryStatus;
+}
+
+export interface StoryCreate {
+  name: string;
+  feature_id: string;
+  team_id: string;
+  iteration_id?: string | null;
+  points: number;
+  status?: StoryStatus;
+}
+
+export interface StoryUpdate {
+  name?: string;
+  iteration_id?: string | null;
+  points?: number;
+  status?: StoryStatus;
+}
+
+export interface PIObjective {
+  id: string;
+  description: string;
+  team_id: string;
+  pi_id: string;
+  planned_business_value: number;
+  actual_business_value: number | null;
+  is_stretch: boolean;
+  feature_ids: string[];
+  is_committed: boolean;
+}
+
+export interface PIObjectiveCreate {
+  description: string;
+  team_id: string;
+  pi_id: string;
+  planned_business_value: number;
+  actual_business_value?: number | null;
+  is_stretch?: boolean;
+}
+
+export interface PIObjectiveUpdate {
+  description?: string;
+  planned_business_value?: number;
+  actual_business_value?: number | null;
+  is_stretch?: boolean;
+}
+
+export interface CapacityPlan {
+  id: string;
+  team_id: string;
+  iteration_id: string;
+  pi_id: string;
+  team_size: number;
+  iteration_days: number;
+  pto_days: number;
+  overhead_pct: number;
+  available_capacity: number;
+}
+
+export interface CapacityPlanCreate {
+  team_id: string;
+  iteration_id: string;
+  pi_id: string;
+  team_size: number;
+  iteration_days?: number;
+  pto_days?: number;
+  overhead_pct?: number;
+}
+
+export interface CapacityPlanUpdate {
+  team_size?: number;
+  iteration_days?: number;
+  pto_days?: number;
+  overhead_pct?: number;
 }
 
 export interface Risk {
