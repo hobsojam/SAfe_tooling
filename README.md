@@ -301,6 +301,43 @@ pytest
 pytest --cov=safe   # with coverage
 ```
 
+### Mutation testing
+
+#### Python (`safe/logic/`)
+
+Mutation tests run nightly on `main` via GitHub Actions using `mutmut`, scoped to `safe/logic/`. Results are published as a downloadable HTML report artifact on each run.
+
+**View in the browser:** go to [Actions → Mutation Testing](https://github.com/hobsojam/SAFe_tooling/actions/workflows/mutation.yml), open the latest run, and download the `mutation-report` artifact at the bottom of the page.
+
+**Download via CLI** (run from the repo root, not from `frontend/`):
+
+```bash
+gh run download <run-id> -R hobsojam/SAFe_tooling -n mutation-report
+# run-id: gh run list --workflow "Mutation Testing" -R hobsojam/SAFe_tooling
+```
+
+Then open `index.html` from the downloaded folder in your browser.
+
+#### Frontend (`frontend/src/`)
+
+Mutation tests run nightly on `main` via GitHub Actions using [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `src/api/` and `src/components/`.
+
+**Run locally** (from the `frontend/` directory):
+
+```bash
+npm run stryker
+# Report written to frontend/reports/mutation/index.html
+```
+
+**Download the CI report** (run from the repo root):
+
+```bash
+gh run download <run-id> -R hobsojam/SAFe_tooling -n frontend-mutation-report
+# run-id: gh run list --workflow "Frontend Mutation Testing" -R hobsojam/SAFe_tooling
+```
+
+Then open `index.html` from the downloaded folder in your browser.
+
 ---
 
 ## Project layout
@@ -352,7 +389,6 @@ Data is stored at `~/.safe_tooling/db.json`. The CLI and API share this file.
 |------|-------------|
 | **Feature CRUD in UI** | Add create, edit, assign, and status-update flows for Features in the web UI — the most impactful gap since Features are the core PI planning artefact and currently require the CLI |
 | **Story, Capacity, and Objectives UI** | Extend web UI mutation flows to Stories, Capacity Plans, and PI Objectives, so the full PI planning workflow is available without the CLI |
-| **Frontend mutation testing** | Add [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `frontend/src/` — equivalent to the `mutmut` setup on the Python side |
 | **Responsive design** | Make the web UI usable across screen sizes (mobile, tablet, desktop) using Tailwind's responsive breakpoints |
 
 ---
