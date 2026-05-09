@@ -519,8 +519,8 @@ export function Backlog() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-5 flex items-baseline justify-between">
+    <div className="p-3 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-y-2">
         <div>
           <h1 className="mb-1 text-xl font-semibold text-slate-800">
             Program Backlog — {pi?.name}
@@ -654,7 +654,7 @@ export function Backlog() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="feature-status" className="mb-1 block text-sm font-medium text-slate-700">Status</label>
               <select
@@ -687,7 +687,7 @@ export function Backlog() {
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             WSJF Inputs
           </p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {numInput('User / Business Value', 'user_business_value', 1, 10)}
             {numInput('Time Criticality', 'time_criticality', 1, 10)}
             {numInput('Risk Reduction / OE', 'risk_reduction_opportunity_enablement', 1, 10)}

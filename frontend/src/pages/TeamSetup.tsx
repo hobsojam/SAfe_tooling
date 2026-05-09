@@ -106,7 +106,7 @@ export function TeamSetup() {
   const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-3 sm:p-6 max-w-2xl">
       <h1 className="mb-1 text-xl font-semibold text-slate-800">Team Setup</h1>
       {art && (
         <p className="mb-6 text-sm text-slate-500">{art.name}</p>
@@ -236,7 +236,7 @@ export function TeamSetup() {
           <form onSubmit={submitAdd} className="border-t border-slate-100 px-5 py-4 space-y-4">
             <h3 className="text-sm font-medium text-slate-700">New Team</h3>
             {addError && <p className="text-sm text-red-600">{addError}</p>}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label htmlFor="team-name" className="mb-1 block text-xs font-medium text-slate-700">
                   Name

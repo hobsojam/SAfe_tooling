@@ -128,8 +128,8 @@ export function Risks() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   return (
-    <div className="p-6">
-      <div className="mb-5 flex items-baseline justify-between">
+    <div className="p-3 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-y-2">
         <div>
           <h1 className="mb-1 text-xl font-semibold text-slate-800">
             Risk Register — {pi?.name}

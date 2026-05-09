@@ -113,7 +113,7 @@ export function Capacity() {
   const totalCells = nonIpIterations.length * sortedTeams.length;
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
       <div className="mb-5">
         <h1 className="mb-1 text-xl font-semibold text-slate-800">Capacity — {pi?.name}</h1>
         <p className="text-sm text-slate-500">
@@ -198,7 +198,7 @@ export function Capacity() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="cap-team-size" className="mb-1 block text-sm font-medium text-slate-700">
                 Team Size

@@ -133,7 +133,7 @@ export function Setup() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-3 sm:p-6 max-w-2xl">
       <h1 className="mb-6 text-xl font-semibold text-slate-800">PI Setup</h1>
 
       {/* Details */}
@@ -163,7 +163,7 @@ export function Setup() {
                   className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-slate-700">Start Date</label>
                   <input
@@ -306,7 +306,7 @@ export function Setup() {
           <form onSubmit={submitIter} className="border-t border-slate-100 px-5 py-4 space-y-4">
             <h3 className="text-sm font-medium text-slate-700">New Iteration</h3>
             {iterError && <p className="text-sm text-red-600">{iterError}</p>}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label htmlFor="iter-number" className="mb-1 block text-xs font-medium text-slate-700">Number</label>
                 <input

@@ -137,8 +137,8 @@ export function Objectives() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   return (
-    <div className="p-6">
-      <div className="mb-5 flex items-baseline justify-between">
+    <div className="p-3 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-y-2">
         <div>
           <h1 className="mb-1 text-xl font-semibold text-slate-800">
             PI Objectives — {pi?.name}
@@ -158,7 +158,7 @@ export function Objectives() {
       {sorted.length === 0 ? (
         <EmptyState message="No PI objectives yet." />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
@@ -281,7 +281,7 @@ export function Objectives() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="obj-planned-bv" className="mb-1 block text-sm font-medium text-slate-700">
                 Planned BV (1–10)<span aria-hidden="true"> *</span>

@@ -173,8 +173,8 @@ export function Dependencies() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-5 flex items-baseline justify-between">
+    <div className="p-3 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-y-2">
         <div>
           <h1 className="mb-1 text-xl font-semibold text-slate-800">
             Dependencies — {pi?.name}
@@ -273,7 +273,7 @@ export function Dependencies() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="dep-from" className="mb-1 block text-sm font-medium text-slate-700">
                 From Feature<span aria-hidden="true"> *</span>
@@ -324,7 +324,7 @@ export function Dependencies() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="dep-owner" className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
               <input

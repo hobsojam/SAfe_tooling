@@ -81,7 +81,7 @@ export function ARTSetup() {
   const sortedArts = [...arts].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-3 sm:p-6 max-w-2xl">
       <h1 className="mb-6 text-xl font-semibold text-slate-800">ART Setup</h1>
 
       <div className="rounded-lg border border-slate-200 bg-white shadow-sm">

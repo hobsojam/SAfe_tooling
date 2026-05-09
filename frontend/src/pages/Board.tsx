@@ -247,7 +247,7 @@ export function Board() {
   const gridTemplateColumns = `8rem repeat(${numCols}, minmax(120px, 1fr))`;
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
       <h1 className="mb-1 text-xl font-semibold text-slate-800">
         Program Board — {pi?.name}
       </h1>

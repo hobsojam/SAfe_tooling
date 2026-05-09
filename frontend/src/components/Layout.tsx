@@ -30,6 +30,7 @@ export function Layout() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [piModalOpen, setPiModalOpen] = useState(false);
   const [piForm, setPiForm] = useState<PICreate>(EMPTY_PI_FORM);
   const [piError, setPiError] = useState('');
@@ -70,10 +71,26 @@ export function Layout() {
     createPIMut.mutate(piForm);
   }
 
+  function closeSidebar() {
+    setSidebarOpen(false);
+  }
+
   return (
     <div className="flex h-screen bg-slate-50">
-      {/* Sidebar */}
-      <aside className="flex w-56 flex-col bg-slate-900 text-slate-100">
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
+      {/* Sidebar — fixed drawer on mobile, static column on md+ */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-56 flex-col bg-slate-900 text-slate-100 transition-transform duration-200 ease-in-out md:relative md:z-auto md:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="px-4 py-5">
           <span className="text-sm font-semibold tracking-wide text-slate-300 uppercase">
             SAFe Tools
@@ -92,7 +109,10 @@ export function Layout() {
             id="pi-select"
             value={piId ?? ''}
             onChange={(e) => {
-              if (e.target.value) navigate(`/pi/${e.target.value}/board`);
+              if (e.target.value) {
+                navigate(`/pi/${e.target.value}/board`);
+                closeSidebar();
+              }
             }}
             className="w-full rounded bg-slate-700 px-2 py-1.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400"
           >
@@ -122,6 +142,7 @@ export function Layout() {
               <NavLink
                 key={to}
                 to={`/pi/${piId}/${to}`}
+                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `block rounded px-3 py-2 text-sm font-medium transition-colors ${
                     isActive
@@ -140,6 +161,7 @@ export function Layout() {
         <div className="mt-auto border-t border-slate-700 px-2 pt-2">
           <NavLink
             to="/art-setup"
+            onClick={closeSidebar}
             className={({ isActive }) =>
               `block rounded px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
@@ -155,7 +177,7 @@ export function Layout() {
         {/* New PI button */}
         <div className="px-3 py-2">
           <button
-            onClick={openNewPI}
+            onClick={() => { openNewPI(); closeSidebar(); }}
             className="w-full rounded bg-slate-700 px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
           >
             + New PI
@@ -168,16 +190,35 @@ export function Layout() {
         </p>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        {piId || !location.pathname.startsWith('/pi') ? (
-          <Outlet />
-        ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">
-            <p className="text-sm">Select a Program Increment to get started.</p>
-          </div>
-        )}
-      </main>
+      {/* Main area */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Mobile top bar */}
+        <header className="flex shrink-0 items-center gap-3 bg-slate-900 px-3 py-3 md:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-slate-300 hover:text-white"
+            aria-label="Open navigation"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span className="text-sm font-semibold tracking-wide text-slate-300 uppercase">
+            SAFe Tools
+          </span>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-auto">
+          {piId || !location.pathname.startsWith('/pi') ? (
+            <Outlet />
+          ) : (
+            <div className="flex h-full items-center justify-center text-slate-400">
+              <p className="text-sm">Select a Program Increment to get started.</p>
+            </div>
+          )}
+        </main>
+      </div>
 
       <Modal
         open={piModalOpen}
@@ -223,7 +264,7 @@ export function Layout() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-slate-700">
                 Start Date<span aria-hidden="true"> *</span>
