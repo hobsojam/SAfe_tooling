@@ -84,7 +84,7 @@ npm run dev
 # Starts on http://localhost:5173 by default
 ```
 
-Open **http://localhost:5173** in your browser (check the terminal output for the exact URL — if 5173 is already in use, Vite will automatically try 5174, 5175, etc.). Select a PI from the sidebar to see the Board, Backlog, Risks, Dependencies, and Setup pages.
+Open **http://localhost:5173** in your browser (check the terminal output for the exact URL — if 5173 is already in use, Vite will automatically try 5174, 5175, etc.). Select a PI from the sidebar to see the Board, Backlog, Risks, Dependencies, PI Setup, and Team Setup pages. The ART Setup page is accessible from the sidebar at any time without a PI selected.
 
 > The Vite dev server proxies `/api/*` to FastAPI on port 8000 — no CORS configuration needed.
 
@@ -132,6 +132,7 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
 | **PI Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
 | **Team Setup** | `/pi/:id/team-setup` | Create, rename, and delete ART teams |
+| **ART Setup** | `/art-setup` | Create, rename, and delete Agile Release Trains (always accessible) |
 
 Built with Vite, React 18, TypeScript, Tailwind CSS v4, TanStack Query, and React Router.
 
@@ -309,7 +310,7 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Risks, Dependencies, Setup, TeamSetup
+    pages/          Board, Backlog, Risks, Dependencies, Setup, TeamSetup, ARTSetup
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/

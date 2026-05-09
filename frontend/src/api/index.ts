@@ -1,5 +1,7 @@
 import type {
   ART,
+  ARTCreate,
+  ARTUpdate,
   Dependency,
   DependencyCreate,
   DependencyUpdate,
@@ -63,6 +65,9 @@ export const api = {
   deletePI: (id: string) => del(`/pi/${id}`),
 
   listARTs: () => get<ART[]>('/art'),
+  createART: (body: ARTCreate) => post<ART>('/art', body),
+  updateART: (id: string, body: ARTUpdate) => patch<ART>(`/art/${id}`, body),
+  deleteART: (id: string) => del(`/art/${id}`),
 
   listTeams: () => get<Team[]>('/team'),
   listTeamsByArt: (artId: string) => get<Team[]>(`/team?art_id=${artId}`),
