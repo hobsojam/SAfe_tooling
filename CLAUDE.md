@@ -292,6 +292,7 @@ safe [--db-path PATH]
 - Branch naming: `feat/<short-description>` (e.g. `feat/phase-3-backlog-manager`).
 - Every feature branch must have its own PR targeting `main` before being merged.
 - Never commit feature work directly to `main`.
+- **Before switching branches**, always commit and push all finished work on the current branch. If there are uncommitted changes that are not ready to commit (broken, incomplete, or uncertain), do not switch branch silently — instead ask the user whether to stash, discard, or fix the changes before proceeding.
 
 ## Documentation
 
