@@ -127,7 +127,9 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 | Page | Route | Description |
 |------|-------|-------------|
 | **Board** | `/pi/:id/board` | Program Board — feature cards placed in team × iteration grid with dependency arrows |
-| **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list |
+| **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list with inline story management per feature |
+| **Objectives** | `/pi/:id/objectives` | PI Objectives — committed and stretch objectives with planned/actual BV scoring |
+| **Capacity** | `/pi/:id/capacity` | Capacity grid — set team size, PTO, and overhead per iteration; shows available person-days |
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
 | **PI Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
@@ -310,7 +312,7 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Risks, Dependencies, Setup, TeamSetup, ARTSetup
+    pages/          Board, Backlog, Objectives, Capacity, Risks, Dependencies, Setup, TeamSetup, ARTSetup
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/
@@ -350,8 +352,6 @@ Data is stored at `~/.safe_tooling/db.json`. The CLI and API share this file.
 
 | Area | Description |
 |------|-------------|
-| **Feature CRUD in UI** | Add create, edit, assign, and status-update flows for Features in the web UI — the most impactful gap since Features are the core PI planning artefact and currently require the CLI |
-| **Story, Capacity, and Objectives UI** | Extend web UI mutation flows to Stories, Capacity Plans, and PI Objectives, so the full PI planning workflow is available without the CLI |
 | **Frontend mutation testing** | Add [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `frontend/src/` — equivalent to the `mutmut` setup on the Python side |
 | **Responsive design** | Make the web UI usable across screen sizes (mobile, tablet, desktop) using Tailwind's responsive breakpoints |
 
