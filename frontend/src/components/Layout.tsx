@@ -9,6 +9,8 @@ import { PIStatusBadge } from './Badge';
 const NAV = [
   { to: 'board', label: 'Board' },
   { to: 'backlog', label: 'Backlog' },
+  { to: 'objectives', label: 'Objectives' },
+  { to: 'capacity', label: 'Capacity' },
   { to: 'risks', label: 'Risks' },
   { to: 'dependencies', label: 'Dependencies' },
   { to: 'setup', label: 'PI Setup' },
