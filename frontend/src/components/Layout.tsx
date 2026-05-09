@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import type { PICreate } from '../types';
 import { Modal } from './Modal';
@@ -24,6 +24,7 @@ const EMPTY_PI_FORM: PICreate = {
 
 export function Layout() {
   const { piId } = useParams<{ piId: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -133,8 +134,24 @@ export function Layout() {
           </nav>
         )}
 
+        {/* Global nav */}
+        <div className="mt-auto border-t border-slate-700 px-2 pt-2">
+          <NavLink
+            to="/art-setup"
+            className={({ isActive }) =>
+              `block rounded px-3 py-2 text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-slate-700 text-white'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
+              }`
+            }
+          >
+            ART Setup
+          </NavLink>
+        </div>
+
         {/* New PI button */}
-        <div className="mt-auto px-3 pb-2">
+        <div className="px-3 py-2">
           <button
             onClick={openNewPI}
             className="w-full rounded bg-slate-700 px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
@@ -151,7 +168,7 @@ export function Layout() {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto">
-        {piId ? (
+        {piId || !location.pathname.startsWith('/pi') ? (
           <Outlet />
         ) : (
           <div className="flex h-full items-center justify-center text-slate-400">

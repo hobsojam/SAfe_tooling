@@ -6,6 +6,15 @@ export type DependencyStatus = 'identified' | 'owned' | 'accepted' | 'mitigated'
 export interface ART {
   id: string;
   name: string;
+  team_ids: string[];
+}
+
+export interface ARTCreate {
+  name: string;
+}
+
+export interface ARTUpdate {
+  name?: string;
 }
 
 export interface PI {
