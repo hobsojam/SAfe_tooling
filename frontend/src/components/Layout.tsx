@@ -76,7 +76,7 @@ export function Layout() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -191,7 +191,7 @@ export function Layout() {
       </aside>
 
       {/* Main area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col">
         {/* Mobile top bar */}
         <header className="flex shrink-0 items-center gap-3 bg-slate-900 px-3 py-3 md:hidden">
           <button
