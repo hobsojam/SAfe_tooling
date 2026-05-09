@@ -303,6 +303,21 @@ pytest
 pytest --cov=safe   # with coverage
 ```
 
+### Mutation testing
+
+Mutation tests run nightly on `main` via GitHub Actions, scoped to `safe/logic/`. Results are published as a downloadable HTML report artifact on each run.
+
+**View in the browser:** go to [Actions → Mutation Testing](https://github.com/hobsojam/SAFe_tooling/actions/workflows/mutation-testing.yml), open the latest run, and download the `mutation-report` artifact at the bottom of the page.
+
+**Download via CLI** (run from the repo root, not from `frontend/`):
+
+```bash
+gh run download <run-id> -R hobsojam/SAFe_tooling -n mutation-report
+# run-id is shown in the Actions UI or: gh run list --workflow "Mutation Testing" -R hobsojam/SAFe_tooling
+```
+
+Then open `index.html` from the downloaded folder in your browser.
+
 ---
 
 ## Project layout
