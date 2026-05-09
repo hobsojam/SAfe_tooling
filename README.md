@@ -128,7 +128,8 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 |------|-------|-------------|
 | **Board** | `/pi/:id/board` | Program Board — feature cards placed in team × iteration grid with dependency arrows |
 | **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list with inline story management per feature |
-| **Objectives** | `/pi/:id/objectives` | PI Objectives — committed and stretch objectives with planned/actual BV scoring |
+| **Objectives** | `/pi/:id/objectives` | PI Objectives — committed and stretch objectives with planned/actual BV scoring; predictability summary footer |
+| **Predictability** | `/pi/:id/predictability` | ART PI Predictability — per-team and ART-level actual vs planned BV with colour-coded predictability % |
 | **Capacity** | `/pi/:id/capacity` | Capacity grid — set team size, PTO, and overhead per iteration; shows available person-days |
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |

@@ -10,6 +10,7 @@ const NAV = [
   { to: 'board', label: 'Board' },
   { to: 'backlog', label: 'Backlog' },
   { to: 'objectives', label: 'Objectives' },
+  { to: 'predictability', label: 'Predictability' },
   { to: 'capacity', label: 'Capacity' },
   { to: 'risks', label: 'Risks' },
   { to: 'dependencies', label: 'Dependencies' },

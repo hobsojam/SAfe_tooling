@@ -79,6 +79,20 @@ export function Objectives() {
   const stretch = objectives.filter((o) => o.is_stretch);
   const sorted = [...committed, ...stretch];
 
+  const committedPlannedBV = committed.reduce((s, o) => s + o.planned_business_value, 0);
+  const scoredCommitted = committed.filter((o) => o.actual_business_value !== null);
+  const committedActualBV = scoredCommitted.reduce((s, o) => s + (o.actual_business_value ?? 0), 0);
+  const predictabilityPct =
+    committedPlannedBV > 0 && scoredCommitted.length > 0
+      ? Math.round((committedActualBV / committedPlannedBV) * 100)
+      : null;
+
+  function predictabilityClass(pct: number): string {
+    if (pct >= 80) return 'font-bold text-green-700';
+    if (pct >= 60) return 'font-bold text-amber-600';
+    return 'font-bold text-red-600';
+  }
+
   function openNew() {
     setEditing(null);
     setForm({ ...EMPTY_FORM, team_id: teams[0]?.id ?? '' });
@@ -237,6 +251,30 @@ export function Objectives() {
                 );
               })}
             </tbody>
+            {committed.length > 0 && (
+              <tfoot className="border-t-2 border-slate-200 bg-slate-50">
+                <tr>
+                  <td colSpan={3} className="px-4 py-2.5 text-xs text-slate-500">
+                    Committed totals · {scoredCommitted.length} of {committed.length} scored
+                  </td>
+                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                    {committedPlannedBV}
+                  </td>
+                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                    {scoredCommitted.length > 0 ? committedActualBV : '—'}
+                  </td>
+                  <td className="px-4 py-2.5 text-right">
+                    {predictabilityPct !== null ? (
+                      <span className={`text-sm ${predictabilityClass(predictabilityPct)}`}>
+                        {predictabilityPct}%
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">Not yet scored</span>
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       )}
