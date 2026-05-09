@@ -22,9 +22,9 @@ A local PI Planning platform for Scaled Agile Framework (SAFe) teams. Manage you
 
 | Interface | Best for | How to start |
 |-----------|----------|-------------|
-| **Web UI** | Browsing and reviewing PI data | `SAFE_SEED_DEV=1 safe-api` + `cd frontend && npm run dev` |
+| **Web UI** | Creating and reviewing PI data (ARTs, Teams, PIs, Board, Backlog, …) | `SAFE_SEED_DEV=1 safe-api` + `cd frontend && npm run dev` |
 | **REST API** | Integrations and scripting | `safe-api` → `http://127.0.0.1:8000/docs` |
-| **CLI** | Creating and updating records | `safe --help` |
+| **CLI** | Bulk creation and scripting | `safe --help` |
 
 ---
 
@@ -95,7 +95,7 @@ safe-api
 # or: python -m safe.api.main
 ```
 
-Use the CLI (`safe` or `python -m safe.cli.main`) to create your own ARTs, teams, PIs, and features, then use the web UI or API docs to browse them.
+Use the web UI to create ARTs and Teams via the ART Setup and Team Setup pages, and the CLI (`safe` or `python -m safe.cli.main`) to create PIs, features, stories, and other records. Browse everything via the web UI or API docs.
 
 ### Option B — CLI only
 
