@@ -14,6 +14,10 @@ build/
 .coverage
 htmlcov/
 
+# Mutation test report (downloaded from CI artifacts via gh run download)
+/index.html
+safe/**/*.html
+
 # Virtual environments
 .venv/
 venv/
