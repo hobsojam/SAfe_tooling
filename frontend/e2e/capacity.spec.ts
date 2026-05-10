@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { goToPage, resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  resetDb();
+  await resetDb();
   await selectPI(page);
   await goToPage(page, 'Capacity');
 });
@@ -74,4 +74,16 @@ test('can update an existing capacity plan', async ({ page }) => {
   // 8 * 10 * 0.8 = 64
   await expect(page.getByText('64')).toBeVisible();
   await expect(page.getByText('48')).not.toBeVisible();
+});
+
+test('shows committed story points for cells that have stories', async ({ page }) => {
+  // Fixture: Alpha team / Iteration 1 — Login flow (3 pts) + Token refresh (2 pts) = 5 pts
+  await expect(page.getByText('5 pts committed')).toBeVisible();
+});
+
+test('shows correct totals for multiple iterations', async ({ page }) => {
+  // Alpha/I2: Password reset (2) + SAML handshake (5) = 7 pts
+  await expect(page.getByText('7 pts committed')).toBeVisible();
+  // Beta/I1: Metrics pipeline (4 pts)
+  await expect(page.getByText('4 pts committed')).toBeVisible();
 });

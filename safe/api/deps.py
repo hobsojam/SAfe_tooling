@@ -32,3 +32,9 @@ def get_repos_dep() -> Repos:
     if _db is None:
         raise RuntimeError("Database not initialised — lifespan not running")
     return Repos(_db)
+
+
+def clear_cache() -> None:
+    if _db is not None:
+        for table_name in _db.tables():
+            _db.table(table_name).clear_cache()

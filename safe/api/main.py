@@ -8,6 +8,7 @@ from safe.api.routers import (
     capacity_plans,
     compute,
     dependencies,
+    dev,
     features,
     iterations,
     objectives,
@@ -42,6 +43,7 @@ app.include_router(risks.router)
 app.include_router(dependencies.router)
 app.include_router(capacity_plans.router)
 app.include_router(compute.router)
+app.include_router(dev.router)
 
 
 def run() -> None:

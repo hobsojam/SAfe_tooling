@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  resetDb();
+  await resetDb();
   await selectPI(page);
 });
 
@@ -71,4 +71,13 @@ test('same-team dependencies do not produce board arrows', async ({ page }) => {
   // Confirm the two same-team dep descriptions are visible in the table but not as arrows
   await expect(page.getByText('Auth API contract', { exact: false })).toBeVisible();
   await expect(page.getByText('Observability metrics endpoint', { exact: false })).toBeVisible();
+});
+
+test('shows Unassigned section when features have no team', async ({ page }) => {
+  // Fixture includes "Reporting Module" with no team_id
+  await expect(page.getByText(/Unassigned \(1\)/)).toBeVisible();
+});
+
+test('unassigned feature appears in the Unassigned section as a draggable card', async ({ page }) => {
+  await expect(page.getByText('Reporting Module', { exact: true })).toBeVisible();
 });
