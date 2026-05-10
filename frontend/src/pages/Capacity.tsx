@@ -175,7 +175,6 @@ export function Capacity() {
                       <td key={team.id} className="px-3 py-2">
                         <button
                           onClick={() => openCell(team.id, iter.id)}
-                          aria-label={`Set capacity for ${team.name}, Iteration ${iter.number}`}
                           className={`w-full rounded-md px-3 py-2 text-left text-xs transition-colors ${
                             plan
                               ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'

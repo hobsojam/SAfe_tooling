@@ -304,6 +304,16 @@ pytest
 pytest --cov=safe   # with coverage
 ```
 
+### End-to-end (Playwright)
+
+```bash
+cd frontend
+npx playwright test        # runs all 154 e2e tests against a local API + UI
+npx playwright test --ui   # interactive UI mode
+```
+
+The e2e suite starts a dedicated API server on port 8001 and a Vite server on port 5180 automatically. It uses a static fixture database (`tests/e2e_fixture.clean.json`) that is restored before each test.
+
 ### Mutation testing
 
 #### Python (`safe/logic/`)
@@ -350,7 +360,8 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Objectives, Capacity, Risks, Dependencies, Setup, TeamSetup, ARTSetup
+    pages/          Board, Backlog, Objectives, Predictability, Capacity, Risks, Dependencies, Setup, TeamSetup, ARTSetup
+  e2e/              Playwright end-to-end tests (154 tests)
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/
@@ -376,7 +387,7 @@ safe/
     schemas.py      Create/Update/action request body schemas
     routers/        One file per resource (arts, teams, pi, iterations, features, ...)
   store/            TinyDB persistence (Repository[T], get_repos())
-tests/              pytest test suite (464 tests — unit, CLI, API, smoke)
+tests/              pytest test suite (486 tests — unit, CLI, API, smoke)
 Dockerfile          Python API image
 docker-compose.yml  API (port 8000) + frontend/nginx (port 3000)
 pyproject.toml
@@ -391,7 +402,10 @@ Data is stored at `~/.safe_tooling/db.json`. The CLI and API share this file.
 | Area | Description |
 |------|-------------|
 | **Feature CRUD in UI** | Add create, edit, assign, and status-update flows for Features in the web UI — the most impactful gap since Features are the core PI planning artefact and currently require the CLI |
+| **Feature-to-PI assignment in UI** | Allow features to be assigned to a PI directly from the web UI; currently requires the CLI (`safe feature assign`) |
 | **Story, Capacity, and Objectives UI** | Extend web UI mutation flows to Stories, Capacity Plans, and PI Objectives, so the full PI planning workflow is available without the CLI |
+| **Inspect & Adapt page** | Add an I&A ceremony page covering the PI System Demo, quantitative measurement (predictability, quality metrics), and a structured problem-solving workshop view |
+| **Better API error messages** | Surface actionable error details in the web UI — e.g. which field failed validation, what state-machine constraint was violated — rather than showing raw HTTP status codes |
 | **Responsive design** | Make the web UI usable across screen sizes (mobile, tablet, desktop) using Tailwind's responsive breakpoints |
 
 ---

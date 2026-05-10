@@ -149,6 +149,22 @@
       "time_criticality": 2,
       "risk_reduction_opportunity_enablement": 5,
       "job_size": 2
+    },
+    "5": {
+      "id": "eeeeeeee-0005-0005-0005-eeeeeeeeeeee",
+      "name": "Reporting Module",
+      "description": "",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "team_id": null,
+      "iteration_id": null,
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 5,
+      "time_criticality": 3,
+      "risk_reduction_opportunity_enablement": 2,
+      "job_size": 3
     }
   },
   "stories": {
@@ -261,6 +277,38 @@
       "points": 2,
       "status": "not_started",
       "acceptance_criteria": ""
+    }
+  },
+  "objectives": {
+    "1": {
+      "id": "aaaaaaaa-0001-0001-0001-aaaaaaaaaaaa",
+      "description": "Deliver Auth Service v2",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 10,
+      "actual_business_value": 10,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "2": {
+      "id": "aaaaaaaa-0002-0002-0002-aaaaaaaaaaaa",
+      "description": "Observability Dashboard rollout",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 10,
+      "actual_business_value": 8,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "3": {
+      "id": "aaaaaaaa-0003-0003-0003-aaaaaaaaaaaa",
+      "description": "Exploratory SSO stretch goal",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 5,
+      "actual_business_value": null,
+      "is_stretch": true,
+      "feature_ids": []
     }
   },
   "risks": {

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { goToPage, resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  resetDb();
+  await resetDb();
   await selectPI(page);
   await goToPage(page, 'Objectives');
 });
@@ -37,7 +37,8 @@ test('can create a committed objective', async ({ page }) => {
   await page.getByRole('button', { name: 'Add Objective' }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.getByText('Deliver auth service v2')).toBeVisible();
-  await expect(page.getByText('Committed')).toBeVisible();
+  const newRow = page.getByRole('row', { name: /Deliver auth service v2/ });
+  await expect(newRow.getByText('Committed')).toBeVisible();
 });
 
 test('can create a stretch objective', async ({ page }) => {
@@ -47,7 +48,8 @@ test('can create a stretch objective', async ({ page }) => {
   await page.getByRole('button', { name: 'Add Objective' }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.getByText('Nice-to-have SSO feature')).toBeVisible();
-  await expect(page.getByText('Stretch')).toBeVisible();
+  const newRow = page.getByRole('row', { name: /Nice-to-have SSO feature/ });
+  await expect(newRow.getByText('Stretch')).toBeVisible();
 });
 
 test('can edit an objective description', async ({ page }) => {
@@ -82,7 +84,7 @@ test('delete shows inline confirmation', async ({ page }) => {
   await page.getByRole('button', { name: 'Add Objective' }).click();
 
   const row = page.getByRole('row', { name: /Objective to delete/ });
-  await row.getByRole('button', { name: 'Delete' }).click();
+  await row.getByRole('button', { name: 'Delete', exact: true }).click();
   await expect(page.getByText(/Delete.*Objective to delete/)).toBeVisible();
 });
 
@@ -92,7 +94,7 @@ test('cancel delete dismisses confirmation', async ({ page }) => {
   await page.getByRole('button', { name: 'Add Objective' }).click();
 
   const row = page.getByRole('row', { name: /Keep this objective/ });
-  await row.getByRole('button', { name: 'Delete' }).click();
+  await row.getByRole('button', { name: 'Delete', exact: true }).click();
   await page.getByRole('button', { name: 'Cancel' }).click();
   await expect(page.getByText('Keep this objective')).toBeVisible();
 });
@@ -103,7 +105,7 @@ test('can delete an objective', async ({ page }) => {
   await page.getByRole('button', { name: 'Add Objective' }).click();
 
   const row = page.getByRole('row', { name: /To be deleted/ });
-  await row.getByRole('button', { name: 'Delete' }).click();
+  await row.getByRole('button', { name: 'Delete', exact: true }).click();
   await page.getByRole('button', { name: 'Yes, delete' }).click();
   await expect(page.getByText('To be deleted')).not.toBeVisible();
 });
