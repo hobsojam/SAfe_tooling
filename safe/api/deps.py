@@ -47,8 +47,15 @@ async def lifespan(app):
             # Fresh server start: wipe the dev DB so data never persists across
             # restarts. Safe here because SAFE_SEED_DEV=1 only applies to the
             # dev database, never to the real user database.
-            for table_name in _db.tables():
-                _db.table(table_name).truncate()
+            try:
+                for table_name in _db.tables():
+                    _db.table(table_name).truncate()
+            except ValueError:
+                # DB file is corrupt (e.g. JSONDecodeError) — close, delete,
+                # and reopen. We were about to wipe it anyway.
+                _db.close()
+                path.unlink(missing_ok=True)
+                _db = TinyDB(path)
             _write_dev_session(path)
 
         seed(Repos(_db))
