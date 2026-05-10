@@ -51,8 +51,6 @@ def dependency_add(
 ):
     """Add a cross-feature dependency for a PI."""
     repos = _repos()
-    
-    # Validate prerequisites first using repository lookups
     if repos.pis.get(pi_id) is None:
         console.print(f"[red]Error: PI '{pi_id}' not found[/red]")
         raise typer.Exit(1)
@@ -62,8 +60,6 @@ def dependency_add(
     if repos.features.get(to_feature_id) is None:
         console.print(f"[red]Error: Feature '{to_feature_id}' not found[/red]")
         raise typer.Exit(1)
-    
-    # Handle date validation outside the transaction context
     parsed_needed_by: date | None = None
     if needed_by_date is not None:
         try:
@@ -71,24 +67,16 @@ def dependency_add(
         except ValueError:
             console.print(f"[red]Error: Invalid date '{needed_by_date}' — use YYYY-MM-DD[/red]")
             raise typer.Exit(1) from None
-
-    try:
-        with TransactionManager(repos):
-            # 1. Create the dependency object (this is the 'save' action)
-            dep = Dependency(
-                description=description,
-                pi_id=pi_id,
-                from_feature_id=from_feature_id,
-                to_feature_id=to_feature_id,
-                owner=owner,
-                needed_by_date=parsed_needed_by,
-            )
-            repos.dependencies.save(dep)
-
-        console.print(f"Added dependency (status: identified, id: {dep.id})")
-    except SafeToolingError as e:
-        console.print(f"[red]Error adding dependency: {e}[/red]")
-        raise typer.Exit(1)
+    dep = Dependency(
+        description=description,
+        pi_id=pi_id,
+        from_feature_id=from_feature_id,
+        to_feature_id=to_feature_id,
+        owner=owner,
+        needed_by_date=parsed_needed_by,
+    )
+    repos.dependencies.save(dep)
+    console.print(f"Added dependency (status: identified, id: {dep.id})")
 
 
 @dependency_app.command("list")
