@@ -143,11 +143,13 @@ def seed(repos: Repos) -> None:
         repos.risks.save(r)
 
     # --- Dependencies ---
+    # from_feature_id = consumer (the feature that HAS the dependency)
+    # to_feature_id   = provider (the feature that must FULFIL the dependency first)
     d1 = Dependency(
         description="Auth API contract must be finalised before SSO integration begins",
         pi_id=pi.id,
-        from_feature_id=auth.id,
-        to_feature_id=sso.id,
+        from_feature_id=sso.id,
+        to_feature_id=auth.id,
         owner="Alice",
         needed_by_date=date(2026, 1, 16),
         status=DependencyStatus.RESOLVED,
@@ -156,8 +158,8 @@ def seed(repos: Repos) -> None:
     d2 = Dependency(
         description="Observability metrics endpoint needed by CI/CD pipeline health checks",
         pi_id=pi.id,
-        from_feature_id=observability.id,
-        to_feature_id=pipeline.id,
+        from_feature_id=pipeline.id,
+        to_feature_id=observability.id,
         owner="Carol",
         needed_by_date=date(2026, 2, 13),
         status=DependencyStatus.IDENTIFIED,
@@ -165,8 +167,8 @@ def seed(repos: Repos) -> None:
     d3 = Dependency(
         description="Auth service token validation endpoint needed by Observability team",
         pi_id=pi.id,
-        from_feature_id=auth.id,
-        to_feature_id=observability.id,
+        from_feature_id=observability.id,
+        to_feature_id=auth.id,
         owner="Bob",
         needed_by_date=date(2026, 1, 30),
         status=DependencyStatus.MITIGATED,
