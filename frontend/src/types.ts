@@ -27,11 +27,14 @@ export interface PI {
   status: PIStatus;
 }
 
+export type TeamTopologyType = 'stream_aligned' | 'enabling' | 'complicated_subsystem' | 'platform';
+
 export interface Team {
   id: string;
   name: string;
   member_count: number;
   art_id: string | null;
+  topology_type: TeamTopologyType | null;
 }
 
 export interface Iteration {
@@ -197,11 +200,13 @@ export interface TeamCreate {
   name: string;
   member_count: number;
   art_id: string;
+  topology_type?: TeamTopologyType | null;
 }
 
 export interface TeamUpdate {
   name?: string;
   member_count?: number;
+  topology_type?: TeamTopologyType | null;
 }
 
 export interface RiskCreate {

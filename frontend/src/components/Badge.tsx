@@ -72,3 +72,21 @@ export function StoryStatusBadge({ status }: { status: string }) {
   };
   return <Badge label={status.replace(/_/g, ' ')} variant={map[status] ?? 'gray'} />;
 }
+
+export const TOPOLOGY_LABELS: Record<string, string> = {
+  stream_aligned: 'Stream-aligned',
+  enabling: 'Enabling',
+  complicated_subsystem: 'Complicated-subsystem',
+  platform: 'Platform',
+};
+
+export function TopologyBadge({ type }: { type: string | null }) {
+  if (!type) return null;
+  const map: Record<string, Variant> = {
+    stream_aligned: 'blue',
+    enabling: 'green',
+    complicated_subsystem: 'purple',
+    platform: 'amber',
+  };
+  return <Badge label={TOPOLOGY_LABELS[type] ?? type} variant={map[type] ?? 'gray'} />;
+}
