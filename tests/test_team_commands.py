@@ -97,6 +97,42 @@ class TestTeamCreate:
         result = invoke(db_path, "team", "create", "--name", "Alpha")
         assert result.exit_code != 0
 
+    def test_create_with_topology_type(self, db_path, patch_console):
+        result = invoke(
+            db_path,
+            "team",
+            "create",
+            "--name",
+            "Platform Team",
+            "--members",
+            "7",
+            "--topology-type",
+            "platform",
+        )
+        assert result.exit_code == 0
+        team = repos_for(db_path).teams.get_all()[0]
+        assert team.topology_type is not None
+        assert team.topology_type.value == "platform"
+
+    def test_create_without_topology_type_defaults_none(self, db_path, patch_console):
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        team = repos_for(db_path).teams.get_all()[0]
+        assert team.topology_type is None
+
+    def test_invalid_topology_type_exits_nonzero(self, db_path, patch_console):
+        result = invoke(
+            db_path,
+            "team",
+            "create",
+            "--name",
+            "Alpha",
+            "--members",
+            "6",
+            "--topology-type",
+            "not_a_type",
+        )
+        assert result.exit_code != 0
+
 
 # ---------------------------------------------------------------------------
 # team show
@@ -117,6 +153,31 @@ class TestTeamShow:
         team = self._create_team(db_path)
         invoke(db_path, "team", "show", team.id)
         assert "6" in patch_console.getvalue()
+
+    def test_shows_topology_type_when_set(self, db_path, patch_console):
+        invoke(
+            db_path,
+            "team",
+            "create",
+            "--name",
+            "SA Team",
+            "--members",
+            "6",
+            "--topology-type",
+            "stream_aligned",
+        )
+        team = repos_for(db_path).teams.get_all()[0]
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "team", "show", team.id)
+        assert "stream_aligned" in patch_console.getvalue()
+
+    def test_shows_dash_when_topology_type_not_set(self, db_path, patch_console):
+        team = self._create_team(db_path)
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "team", "show", team.id)
+        assert "Topology Type" in patch_console.getvalue()
 
     def test_exit_code_success(self, db_path, patch_console):
         team = self._create_team(db_path)
