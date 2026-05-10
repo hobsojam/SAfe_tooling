@@ -41,8 +41,9 @@ def pick_pi() -> str:
     pis = get("/pi")
     if not pis:
         raise SystemExit("No PIs found. Run the app and create a PI first.")
-    pi = pis[0]
-    print(f"Using PI: {pi['name']} ({pi['id']})")
+    active = [p for p in pis if p.get("status") == "active"]
+    pi = active[0] if active else pis[0]
+    print(f"Using PI: {pi['name']} ({pi['id']})  ← navigate to this PI in the UI")
     return pi["id"]
 
 
