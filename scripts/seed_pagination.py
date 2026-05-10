@@ -265,9 +265,58 @@ def main() -> None:
         )
     print(f"  ✓ {len(dep_descriptions)} dependencies created")
 
+    # ── 30 stories (distributed across seeded features) ─────────────────────
+    stories_spec = [
+        ("Implement search indexing pipeline", 3, "not_started"),
+        ("Add full-text query API endpoint", 5, "not_started"),
+        ("Build search relevance tuning UI", 3, "not_started"),
+        ("Set up push notification topic routing", 2, "not_started"),
+        ("Implement delivery retry logic", 3, "not_started"),
+        ("Write audit event schema", 2, "not_started"),
+        ("Persist audit events to object storage", 3, "not_started"),
+        ("Build audit log query API", 4, "not_started"),
+        ("Migrate user profile schema to v2", 5, "in_progress"),
+        ("Add bulk user import endpoint", 3, "not_started"),
+        ("Define mobile auth token format", 2, "not_started"),
+        ("Implement mobile API rate limiting", 3, "not_started"),
+        ("Build GraphQL schema stitching layer", 5, "not_started"),
+        ("Add federation gateway health checks", 2, "not_started"),
+        ("Publish event bus message envelope spec", 2, "not_started"),
+        ("Implement at-least-once delivery guarantee", 4, "not_started"),
+        ("Build config service REST API", 3, "not_started"),
+        ("Add config change audit trail", 2, "not_started"),
+        ("Implement flag evaluation SDK", 4, "not_started"),
+        ("Build flag management UI", 3, "not_started"),
+        ("Add per-route rate limit configuration", 3, "in_progress"),
+        ("Implement sliding window rate limit algorithm", 4, "not_started"),
+        ("Write canary routing rules engine", 5, "not_started"),
+        ("Implement traffic split percentage controls", 3, "not_started"),
+        ("Automate blue-green DNS switchover", 4, "not_started"),
+        ("Add rollback trigger on error budget breach", 3, "not_started"),
+        ("Deploy Envoy sidecar to all namespaces", 5, "not_started"),
+        ("Configure mutual TLS across mesh", 3, "not_started"),
+        ("Instrument all services with OTel spans", 4, "not_started"),
+        ("Build trace search UI", 3, "not_started"),
+    ]
+    print(f"Creating {len(stories_spec)} stories…")
+    for i, (name, points, status) in enumerate(stories_spec):
+        feature_id = feature_ids[i % len(feature_ids)]
+        post(
+            "/stories",
+            {
+                "name": name,
+                "feature_id": feature_id,
+                "team_id": team(i),
+                "iteration_id": None,
+                "points": points,
+                "status": status,
+            },
+        )
+    print(f"  ✓ {len(stories_spec)} stories created")
+
     print(
-        "\nDone! Refresh the app and navigate to Backlog, Risks, Objectives, or "
-        "Dependencies to see pagination in action (25 items per page)."
+        "\nDone! Refresh the app and navigate to Backlog, Risks, Objectives, "
+        "Dependencies, or Stories to see pagination in action (25 items per page)."
     )
 
 
