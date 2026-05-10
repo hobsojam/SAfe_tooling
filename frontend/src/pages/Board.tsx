@@ -98,6 +98,18 @@ function DroppableCell({ id, children }: { id: string; children: React.ReactNode
   );
 }
 
+function UnassignedDropZone({ children }: { children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'unassigned' });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`min-h-[3rem] rounded-md transition-colors ${isOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 function crossTeamOnly(deps: Dependency[], features: Feature[]): Dependency[] {
   return deps.filter((d) => {
     const from = features.find((f) => f.id === d.from_feature_id);
@@ -194,7 +206,7 @@ export function Board() {
   }, [measureArrows, boardReady]);
 
   const moveMutation = useMutation({
-    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string; iterationId: string | null }) =>
+    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string | null; iterationId: string | null }) =>
       api.updateFeature(featureId, { team_id: teamId, iteration_id: iterationId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['features', piId] });
@@ -211,9 +223,15 @@ export function Board() {
     if (!event.over) return;
 
     const overId = event.over.id as string;
-    const [newTeamId, newIterColId] = overId.split('|');
     const feature = (event.active.data.current as { feature: Feature }).feature;
 
+    if (overId === 'unassigned') {
+      if (!feature.team_id) return;
+      moveMutation.mutate({ featureId: feature.id, teamId: null, iterationId: null });
+      return;
+    }
+
+    const [newTeamId, newIterColId] = overId.split('|');
     const newIterationId = newIterColId === 'unplanned' ? null : newIterColId;
     const currentIterKey = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
     const currentIterColId = currentIterKey === null ? 'unplanned' : currentIterKey;
@@ -317,19 +335,23 @@ export function Board() {
 
           <div className="border-t border-slate-200 p-3">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Unassigned ({unassignedFeatures.length}) — drag onto a team cell to assign
+              Unassigned ({unassignedFeatures.length})
             </p>
-            {unassignedFeatures.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {unassignedFeatures.map((f) => (
-                  <div key={f.id} className="w-44">
-                    <DraggableFeatureCard feature={f} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs italic text-slate-400">No unassigned features</p>
-            )}
+            <UnassignedDropZone>
+              {unassignedFeatures.length > 0 ? (
+                <div className="flex flex-wrap gap-2 p-1">
+                  {unassignedFeatures.map((f) => (
+                    <div key={f.id} className="w-44">
+                      <DraggableFeatureCard feature={f} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="p-1 text-xs italic text-slate-400">
+                  No unassigned features — drop a feature here to remove its team assignment
+                </p>
+              )}
+            </UnassignedDropZone>
           </div>
 
           <DragOverlay>

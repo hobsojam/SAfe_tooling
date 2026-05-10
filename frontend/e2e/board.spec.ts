@@ -73,11 +73,25 @@ test('same-team dependencies do not produce board arrows', async ({ page }) => {
   await expect(page.getByText('Observability metrics endpoint', { exact: false })).toBeVisible();
 });
 
-test('shows Unassigned section when features have no team', async ({ page }) => {
+test('Unassigned section is always visible', async ({ page }) => {
+  await expect(page.getByText(/Unassigned \(/)).toBeVisible();
+});
+
+test('shows Unassigned section with correct count when features have no team', async ({ page }) => {
   // Fixture includes "Reporting Module" with no team_id
   await expect(page.getByText(/Unassigned \(1\)/)).toBeVisible();
 });
 
 test('unassigned feature appears in the Unassigned section as a draggable card', async ({ page }) => {
   await expect(page.getByText('Reporting Module', { exact: true })).toBeVisible();
+});
+
+test('dragging an assigned feature to the Unassigned section removes its team', async ({ page }) => {
+  // Auth Service starts assigned to Alpha. Drag it onto Reporting Module which is
+  // already in the unassigned drop zone — the zone covers the whole area.
+  await page.getByText('Auth Service', { exact: true }).dragTo(
+    page.getByText('Reporting Module', { exact: true }),
+  );
+  // Count increases from 1 to 2 and Auth Service appears in the unassigned list
+  await expect(page.getByText(/Unassigned \(2\)/)).toBeVisible();
 });
