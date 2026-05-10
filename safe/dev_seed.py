@@ -391,21 +391,6 @@ def seed(repos: Repos) -> None:
         "Blue-green switchover depends on load balancer API contract",
         "Service mesh TLS config needed before secret manager ships",
         "Tracing spans need event bus event IDs standardised",
-        "SLO alerting depends on metrics pipeline contract",
-        "Cost dashboards require billing API from data lake team",
-        "Multi-region failover needs DNS automation API from platform team",
-        "Dark launch toggle depends on feature flag SDK v2",
-        "Schema migration tooling needs database proxy interface",
-        "Bulk export API needs schema registry contract from data team",
-        "Webhook delivery depends on event bus reliability guarantees",
-        "Tenant isolation depends on identity service group API",
-        "Self-service portal requires RBAC API from auth service",
-        "Developer hub depends on SDK generation output format",
-        "Load testing harness needs production traffic mirror API",
-        "Error budget dashboards need SLO definition schema agreed",
-        "Certificate rotation depends on secret manager vault API",
-        "Chaos engineering depends on health-check endpoint spec",
-        "Mobile push notifications depend on notification engine contract",
     ]
     n = len(bulk_features)
     owners = ["Alice", "Bob", "Carol", "Dave"]
