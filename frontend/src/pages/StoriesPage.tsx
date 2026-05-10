@@ -134,6 +134,7 @@ export function StoriesPage() {
         id: editing.id,
         body: {
           name: form.name,
+          feature_id: form.feature_id,
           iteration_id: form.iteration_id,
           points: form.points,
           status: form.status,
@@ -291,42 +292,40 @@ export function StoriesPage() {
             />
           </div>
 
-          {!editing && (
-            <>
-              <div>
-                <label htmlFor="story-feature" className="mb-1 block text-sm font-medium text-slate-700">
-                  Feature<span aria-hidden="true"> *</span>
-                </label>
-                <select
-                  id="story-feature"
-                  value={form.feature_id}
-                  onChange={(e) => setForm({ ...form, feature_id: e.target.value })}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
-                >
-                  <option value="">— select feature —</option>
-                  {features.map((f) => (
-                    <option key={f.id} value={f.id}>{f.name}</option>
-                  ))}
-                </select>
-              </div>
+          <div>
+            <label htmlFor="story-feature" className="mb-1 block text-sm font-medium text-slate-700">
+              Feature<span aria-hidden="true"> *</span>
+            </label>
+            <select
+              id="story-feature"
+              value={form.feature_id}
+              onChange={(e) => setForm({ ...form, feature_id: e.target.value })}
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+            >
+              <option value="">— select feature —</option>
+              {features.map((f) => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </select>
+          </div>
 
-              <div>
-                <label htmlFor="story-team" className="mb-1 block text-sm font-medium text-slate-700">
-                  Team<span aria-hidden="true"> *</span>
-                </label>
-                <select
-                  id="story-team"
-                  value={form.team_id}
-                  onChange={(e) => setForm({ ...form, team_id: e.target.value })}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
-                >
-                  <option value="">— select team —</option>
-                  {teams.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
-            </>
+          {!editing && (
+            <div>
+              <label htmlFor="story-team" className="mb-1 block text-sm font-medium text-slate-700">
+                Team<span aria-hidden="true"> *</span>
+              </label>
+              <select
+                id="story-team"
+                value={form.team_id}
+                onChange={(e) => setForm({ ...form, team_id: e.target.value })}
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              >
+                <option value="">— select team —</option>
+                {teams.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
           )}
 
           <div>
