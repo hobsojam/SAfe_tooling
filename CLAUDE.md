@@ -222,6 +222,12 @@ pyproject.toml
 - The root callback in `main.py` sets `state.db_path` when `--db-path` is passed; all sub-apps pick it up via `safe.cli.state`.
 - Tests that patch Rich output must monkeypatch the specific module's `console`, not just `main.console`.
 
+**TinyDB threading — critical**
+- TinyDB is **not thread-safe**. FastAPI runs each request handler in a worker thread via `anyio.to_thread.run_sync`, so concurrent requests (e.g. multiple `useQuery` hooks firing simultaneously from the React frontend) will interleave file reads and writes, corrupting `db.json` with a `JSONDecodeError`.
+- All DB access is serialised through a module-level `threading.Lock` in `safe/api/deps.py`. `get_repos_dep` is a **generator** dependency that holds `_db_lock` for the full duration of each request.
+- **Never** call `TinyDB` or `Repos` outside of `get_repos_dep` in an async/threaded context. Never add a second code path that bypasses `get_repos_dep` (e.g. a background task that calls `Repos(_db)` directly) — it will race with the lock.
+- Never fire multiple concurrent write requests from the frontend to work around this (e.g. `Promise.all` over N upserts). If N writes are needed, implement a single bulk endpoint that does them sequentially inside one lock acquisition.
+
 **API structure**
 - All API route prefixes use **singular resource names**: `/art`, `/team`, `/pi`, `/iterations`, `/features`, `/stories`, `/objectives`, `/risks`, `/dependencies`, `/capacity-plans`. Never use plurals like `/arts` or `/teams`.
 - Domain models are used directly as `response_model`. Request bodies always use separate `*Create` / `*Update` schemas from `schemas.py` — never expose `id`, computed fields, or relationship ID lists (`team_ids`, `story_ids`, etc.) in request bodies.
