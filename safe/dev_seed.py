@@ -195,7 +195,7 @@ def seed(repos: Repos) -> None:
         to_feature_id=auth.id,
         owner="Bob",
         needed_by_date=date(2026, 1, 30),
-        status=DependencyStatus.MITIGATED,
+        status=DependencyStatus.IN_PROGRESS,
         resolution_notes="Interface agreed; implementation tracked via story",
     )
     d4 = Dependency(
@@ -214,7 +214,7 @@ def seed(repos: Repos) -> None:
         to_feature_id=pipeline.id,
         owner="Carol",
         needed_by_date=date(2026, 2, 13),
-        status=DependencyStatus.OWNED,
+        status=DependencyStatus.ACKNOWLEDGED,
     )
     for d in [d1, d2, d3, d4, d5]:
         repos.dependencies.save(d)

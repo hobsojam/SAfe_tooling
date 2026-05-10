@@ -201,7 +201,7 @@ class DependencyUpdate(BaseModel):
     needed_by_date: date | None = None
 
 
-class DependencyROAM(BaseModel):
+class DependencyStatusUpdate(BaseModel):
     status: DependencyStatus
     owner: str | None = None
     resolution_notes: str | None = None

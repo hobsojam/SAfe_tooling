@@ -467,7 +467,7 @@
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
       "from_feature_id": "0633dac9-2bfa-4958-b959-53d2faf44124",
       "to_feature_id": "be64b200-598f-4143-b5a2-a17722e6dd15",
-      "status": "mitigated",
+      "status": "in_progress",
       "owner": "Bob",
       "resolution_notes": "",
       "raised_date": "2026-05-04",
