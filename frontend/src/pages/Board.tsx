@@ -315,11 +315,11 @@ export function Board() {
             })}
           </div>
 
-          {unassignedFeatures.length > 0 && (
-            <div className="border-t border-slate-200 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Unassigned ({unassignedFeatures.length}) — drag onto a team cell to assign
-              </p>
+          <div className="border-t border-slate-200 p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Unassigned ({unassignedFeatures.length}) — drag onto a team cell to assign
+            </p>
+            {unassignedFeatures.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {unassignedFeatures.map((f) => (
                   <div key={f.id} className="w-44">
@@ -327,8 +327,10 @@ export function Board() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-xs italic text-slate-400">No unassigned features</p>
+            )}
+          </div>
 
           <DragOverlay>
             {activeFeature ? (
