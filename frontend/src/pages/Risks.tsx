@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import type { Risk, RiskCreate, RiskUpdate, ROAMStatus } from '../types';
 import { ROAMBadge } from '../components/Badge';
@@ -135,7 +135,12 @@ export function Risks() {
           <p className="text-sm text-slate-500">
             {risks.length} risk{risks.length !== 1 ? 's' : ''}
             {unroamed > 0 && (
-              <span className="ml-2 font-medium text-red-600">{unroamed} unroamed</span>
+              <Link
+                to={`/pi/${piId}/risks/roam`}
+                className="ml-2 font-medium text-red-600 hover:text-red-800 underline"
+              >
+                {unroamed} unroamed
+              </Link>
             )}
           </p>
         </div>
