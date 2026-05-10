@@ -116,3 +116,29 @@ def test_delete_with_feature_returns_409(client):
 def test_delete_unknown_returns_404(client):
     r = client.delete("/team/no-such-id")
     assert r.status_code == 404
+
+
+def test_create_with_topology_type(client):
+    r = client.post(
+        "/team", json={"name": "Platform", "member_count": 6, "topology_type": "platform"}
+    )
+    assert r.status_code == 201
+    assert r.json()["topology_type"] == "platform"
+
+
+def test_create_without_topology_type_is_null(client):
+    r = client.post("/team", json={"name": "Alpha", "member_count": 6})
+    assert r.status_code == 201
+    assert r.json()["topology_type"] is None
+
+
+def test_create_invalid_topology_type_returns_422(client):
+    r = client.post("/team", json={"name": "Bad", "member_count": 5, "topology_type": "not_a_type"})
+    assert r.status_code == 422
+
+
+def test_patch_topology_type(client):
+    team_id = client.post("/team", json={"name": "Untyped", "member_count": 5}).json()["id"]
+    r = client.patch(f"/team/{team_id}", json={"topology_type": "enabling"})
+    assert r.status_code == 200
+    assert r.json()["topology_type"] == "enabling"

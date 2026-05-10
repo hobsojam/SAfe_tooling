@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { goToPage, selectPI } from './helpers';
+import { goToPage, resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
+  await resetDb();
   await selectPI(page);
   await goToPage(page, 'Risks');
 });

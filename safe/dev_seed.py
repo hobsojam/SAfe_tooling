@@ -25,9 +25,11 @@ def seed(repos: Repos) -> None:
     # --- Teams ---
     alpha = Team(name="Alpha", member_count=6, art_id=art.id)
     beta = Team(name="Beta", member_count=5, art_id=art.id)
-    repos.teams.save(alpha)
-    repos.teams.save(beta)
-    art = art.model_copy(update={"team_ids": [alpha.id, beta.id]})
+    gamma = Team(name="Gamma", member_count=7, art_id=art.id)
+    delta = Team(name="Delta", member_count=4, art_id=art.id)
+    for t in [alpha, beta, gamma, delta]:
+        repos.teams.save(t)
+    art = art.model_copy(update={"team_ids": [alpha.id, beta.id, gamma.id, delta.id]})
     repos.arts.save(art)
 
     # --- Iterations ---
@@ -89,7 +91,25 @@ def seed(repos: Repos) -> None:
         risk_reduction_opportunity_enablement=5,
         job_size=2,
     )
-    for f in [auth, sso, observability, pipeline]:
+    data_lake = Feature(
+        name="Data Lake Integration",
+        pi_id=pi.id,
+        team_id=gamma.id,
+        user_business_value=7,
+        time_criticality=4,
+        risk_reduction_opportunity_enablement=6,
+        job_size=5,
+    )
+    api_gateway = Feature(
+        name="API Gateway",
+        pi_id=pi.id,
+        team_id=delta.id,
+        user_business_value=9,
+        time_criticality=7,
+        risk_reduction_opportunity_enablement=4,
+        job_size=3,
+    )
+    for f in [auth, sso, observability, pipeline, data_lake, api_gateway]:
         repos.features.save(f)
 
     # --- Stories (drives Board placement) ---
@@ -113,6 +133,10 @@ def seed(repos: Repos) -> None:
         story("Alerting rules", observability.id, beta.id, 2, i3.id),
         story("Runner upgrade", pipeline.id, beta.id, 3, i3.id),
         story("Cache layer", pipeline.id, beta.id, 2, i4.id),
+        story("Schema registry", data_lake.id, gamma.id, 3, i2.id),
+        story("Ingestion pipeline", data_lake.id, gamma.id, 4, i3.id),
+        story("Rate limiting", api_gateway.id, delta.id, 3, i1.id),
+        story("Auth middleware", api_gateway.id, delta.id, 4, i2.id),
     ]
     for s in stories:
         repos.stories.save(s)
@@ -143,11 +167,13 @@ def seed(repos: Repos) -> None:
         repos.risks.save(r)
 
     # --- Dependencies ---
+    # from_feature_id = consumer (the feature that HAS the dependency)
+    # to_feature_id   = provider (the feature that must FULFIL the dependency first)
     d1 = Dependency(
         description="Auth API contract must be finalised before SSO integration begins",
         pi_id=pi.id,
-        from_feature_id=auth.id,
-        to_feature_id=sso.id,
+        from_feature_id=sso.id,
+        to_feature_id=auth.id,
         owner="Alice",
         needed_by_date=date(2026, 1, 16),
         status=DependencyStatus.RESOLVED,
@@ -156,8 +182,8 @@ def seed(repos: Repos) -> None:
     d2 = Dependency(
         description="Observability metrics endpoint needed by CI/CD pipeline health checks",
         pi_id=pi.id,
-        from_feature_id=observability.id,
-        to_feature_id=pipeline.id,
+        from_feature_id=pipeline.id,
+        to_feature_id=observability.id,
         owner="Carol",
         needed_by_date=date(2026, 2, 13),
         status=DependencyStatus.IDENTIFIED,
@@ -165,12 +191,30 @@ def seed(repos: Repos) -> None:
     d3 = Dependency(
         description="Auth service token validation endpoint needed by Observability team",
         pi_id=pi.id,
-        from_feature_id=auth.id,
-        to_feature_id=observability.id,
+        from_feature_id=observability.id,
+        to_feature_id=auth.id,
         owner="Bob",
         needed_by_date=date(2026, 1, 30),
-        status=DependencyStatus.MITIGATED,
+        status=DependencyStatus.IN_PROGRESS,
         resolution_notes="Interface agreed; implementation tracked via story",
     )
-    for d in [d1, d2, d3]:
+    d4 = Dependency(
+        description="API Gateway auth middleware requires Auth Service token endpoint",
+        pi_id=pi.id,
+        from_feature_id=api_gateway.id,
+        to_feature_id=auth.id,
+        owner="Alice",
+        needed_by_date=date(2026, 1, 30),
+        status=DependencyStatus.IDENTIFIED,
+    )
+    d5 = Dependency(
+        description="Data Lake ingestion pipeline needs CI/CD deployment pipeline",
+        pi_id=pi.id,
+        from_feature_id=data_lake.id,
+        to_feature_id=pipeline.id,
+        owner="Carol",
+        needed_by_date=date(2026, 2, 13),
+        status=DependencyStatus.ACKNOWLEDGED,
+    )
+    for d in [d1, d2, d3, d4, d5]:
         repos.dependencies.save(d)

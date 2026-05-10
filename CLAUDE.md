@@ -2,6 +2,14 @@
 
 @CLAUDE_SECURITY.md
 
+## Accessibility
+
+Before writing any interactive UI component — button with state, dialog, combobox, tabs, menu, disclosure, tooltip, switch, alert/status, listbox, radio group — call the `check_pattern` MCP tool to get the full ARIA spec. Do this before writing any markup.
+
+Example: building a modal → `check_pattern({ component_type: "dialog" })` first.
+
+---
+
 ## Purpose
 
 This project builds tooling to support planning, tracking, and execution activities within the **Scaled Agile Framework (SAFe)**. The primary focus is on Program Increment (PI) Planning and related ceremonies/artifacts.
@@ -213,6 +221,12 @@ pyproject.toml
 - Each CLI module (`art.py`, `team.py`, `pi.py`) owns its own `console = Console()` and a `_repos()` helper that reads `state.db_path`.
 - The root callback in `main.py` sets `state.db_path` when `--db-path` is passed; all sub-apps pick it up via `safe.cli.state`.
 - Tests that patch Rich output must monkeypatch the specific module's `console`, not just `main.console`.
+
+**TinyDB threading — critical**
+- TinyDB is **not thread-safe**. FastAPI runs each request handler in a worker thread via `anyio.to_thread.run_sync`, so concurrent requests (e.g. multiple `useQuery` hooks firing simultaneously from the React frontend) will interleave file reads and writes, corrupting `db.json` with a `JSONDecodeError`.
+- All DB access is serialised through a module-level `threading.Lock` in `safe/api/deps.py`. `get_repos_dep` is a **generator** dependency that holds `_db_lock` for the full duration of each request.
+- **Never** call `TinyDB` or `Repos` outside of `get_repos_dep` in an async/threaded context. Never add a second code path that bypasses `get_repos_dep` (e.g. a background task that calls `Repos(_db)` directly) — it will race with the lock.
+- Never fire multiple concurrent write requests from the frontend to work around this (e.g. `Promise.all` over N upserts). If N writes are needed, implement a single bulk endpoint that does them sequentially inside one lock acquisition.
 
 **API structure**
 - All API route prefixes use **singular resource names**: `/art`, `/team`, `/pi`, `/iterations`, `/features`, `/stories`, `/objectives`, `/risks`, `/dependencies`, `/capacity-plans`. Never use plurals like `/arts` or `/teams`.

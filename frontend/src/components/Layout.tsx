@@ -219,7 +219,10 @@ export function Layout() {
             </select>
             {arts.length === 0 && (
               <p className="mt-1 text-xs text-slate-400">
-                No ARTs found. Create one with the CLI first.
+                No ARTs found.{' '}
+                <a href="/art-setup" className="underline hover:text-slate-300">
+                  Create one in ART Setup.
+                </a>
               </p>
             )}
           </div>
