@@ -104,6 +104,7 @@ export const api = {
 
   listCapacityPlans: (piId: string) => get<CapacityPlan[]>(`/capacity-plans?pi_id=${piId}`),
   upsertCapacityPlan: (body: CapacityPlanCreate) => post<CapacityPlan>('/capacity-plans', body),
+  seedCapacityPlans: (piId: string) => post<CapacityPlan[]>('/capacity-plans/seed', { pi_id: piId }),
 
   listRisks: (piId: string) => get<Risk[]>(`/risks?pi_id=${piId}`),
   createRisk: (body: RiskCreate) => post<Risk>('/risks', body),

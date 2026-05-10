@@ -90,38 +90,14 @@ export function Capacity() {
     }
   }
 
-  // Auto-seed missing cells with smart defaults once per PI load.
+  // Auto-seed missing cells once per PI — single request so TinyDB writes are sequential.
   const autoSeededRef = useRef<string | null>(null);
   useEffect(() => {
     if (isLoading || !piId || autoSeededRef.current === piId) return;
-    if (sortedTeams.length === 0 || nonIpIterations.length === 0) return;
-
     autoSeededRef.current = piId;
-
-    const missing = sortedTeams.flatMap((team) =>
-      nonIpIterations
-        .filter((iter) => !planMap[`${team.id}:${iter.id}`])
-        .map((iter) => ({ team, iter }))
+    api.seedCapacityPlans(piId).then(() =>
+      qc.invalidateQueries({ queryKey: ['capacity-plans', piId] })
     );
-
-    if (missing.length === 0) return;
-
-    Promise.all(
-      missing.map(({ team, iter }) =>
-        api.upsertCapacityPlan({
-          team_id: team.id,
-          iteration_id: iter.id,
-          pi_id: piId,
-          team_size: team.member_count,
-          iteration_days: countWeekdays(iter.start_date, iter.end_date),
-          pto_days: 0,
-          overhead_pct: 0.2,
-        })
-      )
-    ).then(() => qc.invalidateQueries({ queryKey: ['capacity-plans', piId] }));
-  // planMap/sortedTeams/nonIpIterations are stable snapshots when isLoading flips;
-  // intentionally omitted from deps to avoid re-running on every render.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, piId, qc]);
 
   function openCell(teamId: string, iterationId: string) {

@@ -227,6 +227,10 @@ class CapacityPlanUpdate(BaseModel):
     overhead_pct: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
+class CapacityPlanSeed(BaseModel):
+    pi_id: str
+
+
 # --- Compute ---
 
 

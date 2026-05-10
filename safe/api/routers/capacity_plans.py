@@ -1,9 +1,21 @@
+from datetime import date, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from safe.api.deps import get_repos_dep
-from safe.api.schemas import CapacityPlanCreate, CapacityPlanUpdate
+from safe.api.schemas import CapacityPlanCreate, CapacityPlanSeed, CapacityPlanUpdate
 from safe.models.capacity_plan import CapacityPlan
 from safe.store.repos import Repos
+
+
+def _weekdays(start: date, end: date) -> int:
+    count, cur = 0, start
+    while cur <= end:
+        if cur.weekday() < 5:
+            count += 1
+        cur += timedelta(days=1)
+    return count
+
 
 router = APIRouter(prefix="/capacity-plans", tags=["Capacity Plans"])
 
@@ -28,6 +40,33 @@ def list_capacity_plans(
         if v is not None
     }
     return repos.capacity_plans.find(**filters) if filters else repos.capacity_plans.get_all()
+
+
+@router.post("/seed", response_model=list[CapacityPlan], status_code=201)
+def seed_capacity_plans(body: CapacityPlanSeed, repos: Repos = Depends(get_repos_dep)):
+    """Create default capacity plans for every team×iteration cell that has no plan yet."""
+    pi = repos.pis.get(body.pi_id)
+    if pi is None:
+        raise HTTPException(status_code=404, detail=f"PI '{body.pi_id}' not found")
+    teams = repos.teams.find(art_id=pi.art_id)
+    iterations = [it for it in repos.iterations.find(pi_id=body.pi_id) if not it.is_ip]
+    created = []
+    for team in teams:
+        for iter_ in iterations:
+            if repos.capacity_plans.find(pi_id=body.pi_id, team_id=team.id, iteration_id=iter_.id):
+                continue
+            plan = CapacityPlan(
+                team_id=team.id,
+                iteration_id=iter_.id,
+                pi_id=body.pi_id,
+                team_size=team.member_count,
+                iteration_days=_weekdays(iter_.start_date, iter_.end_date),
+                pto_days=0,
+                overhead_pct=0.2,
+            )
+            repos.capacity_plans.save(plan)
+            created.append(plan)
+    return created
 
 
 @router.post("", response_model=CapacityPlan, status_code=201)
