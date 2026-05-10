@@ -409,13 +409,21 @@ def seed(repos: Repos) -> None:
     ]
     n = len(bulk_features)
     owners = ["Alice", "Bob", "Carol", "Dave"]
+    # Only 4 bulk features act as dependency targets so that, combined with the
+    # 3 original targets (auth, observability, pipeline), exactly 7 distinct
+    # features have dependencies pointing to them across the full dataset.
+    _dep_targets = bulk_features[:4]
     for idx, desc in enumerate(bulk_dep_descriptions):
+        from_f = bulk_features[idx % n]
+        to_f = _dep_targets[idx % len(_dep_targets)]
+        if to_f.id == from_f.id:
+            to_f = _dep_targets[(idx + 1) % len(_dep_targets)]
         repos.dependencies.save(
             Dependency(
                 description=desc,
                 pi_id=pi.id,
-                from_feature_id=bulk_features[idx % n].id,
-                to_feature_id=bulk_features[(idx + 1) % n].id,
+                from_feature_id=from_f.id,
+                to_feature_id=to_f.id,
                 owner=owners[idx % len(owners)],
                 status=DependencyStatus.IDENTIFIED,
             )
