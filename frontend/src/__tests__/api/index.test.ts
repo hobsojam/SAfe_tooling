@@ -69,10 +69,10 @@ describe('GET methods', () => {
     expect(mockFetch).toHaveBeenCalledWith('/api/features?pi_id=pi1');
   });
 
-  it('listStories calls GET /api/stories', async () => {
+  it('listStoriesByFeature calls GET /api/stories?feature_id=...', async () => {
     resolveOk([]);
-    await api.listStories();
-    expect(mockFetch).toHaveBeenCalledWith('/api/stories');
+    await api.listStoriesByFeature('feat1');
+    expect(mockFetch).toHaveBeenCalledWith('/api/stories?feature_id=feat1');
   });
 
   it('listRisks calls GET /api/risks?pi_id=...', async () => {

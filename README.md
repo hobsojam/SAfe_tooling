@@ -2,6 +2,8 @@
 
 > **Disclaimer:** This is an independent, open-source project and is not an official Scaled Agile product. It is not affiliated with, endorsed by, or sponsored by Scaled Agile, Inc. SAFe® and Scaled Agile Framework® are registered trademarks of Scaled Agile, Inc.
 
+> **Not for production use:** This tool has no authentication or authorisation. Anyone with network access to the API can read and modify all data. It is intended for local, single-user use only — do not expose the API or web UI on a shared or public network.
+
 A local PI Planning platform for Scaled Agile Framework (SAFe) teams. Manage your ART's Program Increments through a web interface, a REST API, or a terminal CLI — all backed by a single JSON store at `~/.safe_tooling/db.json`.
 
 ## What it does
@@ -125,7 +127,10 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 | Page | Route | Description |
 |------|-------|-------------|
 | **Board** | `/pi/:id/board` | Program Board — feature cards placed in team × iteration grid with dependency arrows |
-| **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list |
+| **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list with inline story management per feature |
+| **Objectives** | `/pi/:id/objectives` | PI Objectives — committed and stretch objectives with planned/actual BV scoring; predictability summary footer |
+| **Predictability** | `/pi/:id/predictability` | ART PI Predictability — per-team and ART-level actual vs planned BV with colour-coded predictability % |
+| **Capacity** | `/pi/:id/capacity` | Capacity grid — set team size, PTO, and overhead per iteration; shows available person-days |
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
 | **PI Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
@@ -299,6 +304,43 @@ pytest
 pytest --cov=safe   # with coverage
 ```
 
+### Mutation testing
+
+#### Python (`safe/logic/`)
+
+Mutation tests run nightly on `main` via GitHub Actions using `mutmut`, scoped to `safe/logic/`. Results are published as a downloadable HTML report artifact on each run.
+
+**View in the browser:** go to [Actions → Mutation Testing](https://github.com/hobsojam/SAFe_tooling/actions/workflows/mutation.yml), open the latest run, and download the `mutation-report` artifact at the bottom of the page.
+
+**Download via CLI** (run from the repo root, not from `frontend/`):
+
+```bash
+gh run download <run-id> -R hobsojam/SAFe_tooling -n mutation-report
+# run-id: gh run list --workflow "Mutation Testing" -R hobsojam/SAFe_tooling
+```
+
+Then open `index.html` from the downloaded folder in your browser.
+
+#### Frontend (`frontend/src/`)
+
+Mutation tests run nightly on `main` via GitHub Actions using [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `src/api/` and `src/components/`.
+
+**Run locally** (from the `frontend/` directory):
+
+```bash
+npm run stryker
+# Report written to frontend/reports/mutation/index.html
+```
+
+**Download the CI report** (run from the repo root):
+
+```bash
+gh run download <run-id> -R hobsojam/SAFe_tooling -n frontend-mutation-report
+# run-id: gh run list --workflow "Frontend Mutation Testing" -R hobsojam/SAFe_tooling
+```
+
+Then open `index.html` from the downloaded folder in your browser.
+
 ---
 
 ## Project layout
@@ -308,7 +350,7 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Risks, Dependencies, Setup, TeamSetup, ARTSetup
+    pages/          Board, Backlog, Objectives, Capacity, Risks, Dependencies, Setup, TeamSetup, ARTSetup
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/
@@ -348,7 +390,8 @@ Data is stored at `~/.safe_tooling/db.json`. The CLI and API share this file.
 
 | Area | Description |
 |------|-------------|
-| **Frontend mutation testing** | Add [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `frontend/src/` — equivalent to the `mutmut` setup on the Python side |
+| **Feature CRUD in UI** | Add create, edit, assign, and status-update flows for Features in the web UI — the most impactful gap since Features are the core PI planning artefact and currently require the CLI |
+| **Story, Capacity, and Objectives UI** | Extend web UI mutation flows to Stories, Capacity Plans, and PI Objectives, so the full PI planning workflow is available without the CLI |
 | **Responsive design** | Make the web UI usable across screen sizes (mobile, tablet, desktop) using Tailwind's responsive breakpoints |
 
 ---

@@ -14,6 +14,10 @@ build/
 .coverage
 htmlcov/
 
+# Mutation test report (downloaded from CI artifacts via gh run download)
+/index.html
+safe/**/*.html
+
 # Virtual environments
 .venv/
 venv/
@@ -36,6 +40,9 @@ frontend/.env.local
 frontend/.env
 frontend/.vite/
 frontend/test-results/
+frontend/reports/
+frontend/stryker.log
+frontend/.stryker-tmp/
 
 # E2e working DB — generated from tests/e2e_fixture.clean.json at test time
 tests/e2e_fixture.db.json

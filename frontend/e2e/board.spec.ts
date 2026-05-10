@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { selectPI } from './helpers';
+import { resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
+  resetDb();
   await selectPI(page);
 });
 
@@ -52,6 +53,15 @@ test('cross-team dependency shown as red arrow on the board grid', async ({ page
   // The fixture has exactly 1 cross-team dependency (Observability Dashboard → Auth Service)
   // and 2 same-team dependencies; only the cross-team one should produce an SVG arrow.
   await expect(page.locator('[data-dep-id]')).toHaveCount(1);
+});
+
+test('dependency arrow visible on first load without user interaction', async ({ page }) => {
+  // Regression: arrows were only appearing after a feature was dragged because the
+  // measurement effect depended solely on measureArrows (derived from ctDeps), which
+  // could be stable across the Spinner→Board transition leaving boardRef unmeasured.
+  await expect(page.locator('[data-dep-id]')).toHaveCount(1);
+  // Verify the SVG is actually in the DOM (not just a count of 0 being wrong)
+  await expect(page.locator('svg[aria-hidden="true"]')).toBeVisible();
 });
 
 test('same-team dependencies do not produce board arrows', async ({ page }) => {

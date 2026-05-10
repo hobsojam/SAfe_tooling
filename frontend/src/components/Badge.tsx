@@ -62,3 +62,13 @@ export function FeatureStatusBadge({ status }: { status: string }) {
   };
   return <Badge label={status} variant={map[status] ?? 'gray'} />;
 }
+
+export function StoryStatusBadge({ status }: { status: string }) {
+  const map: Record<string, Variant> = {
+    not_started: 'gray',
+    in_progress: 'blue',
+    done: 'cyan',
+    accepted: 'green',
+  };
+  return <Badge label={status.replace(/_/g, ' ')} variant={map[status] ?? 'gray'} />;
+}
