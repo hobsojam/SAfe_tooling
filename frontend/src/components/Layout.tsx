@@ -14,6 +14,7 @@ const NAV = [
   { to: 'capacity', label: 'Capacity' },
   { to: 'risks', label: 'Risks' },
   { to: 'dependencies', label: 'Dependencies' },
+  { to: 'stories', label: 'Stories' },
   { to: 'setup', label: 'PI Setup' },
   { to: 'team-setup', label: 'Team Setup' },
 ];
