@@ -234,6 +234,7 @@ export function Board() {
     return <EmptyState message="No teams configured for this PI's ART." />;
   }
 
+  const unassignedFeatures = features.filter((f) => !f.team_id);
   const grid = buildBoard(assignedFeatures, stories);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const teamIds = artTeams.map((t) => t.id);
@@ -313,6 +314,21 @@ export function Board() {
               );
             })}
           </div>
+
+          {unassignedFeatures.length > 0 && (
+            <div className="border-t border-slate-200 p-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Unassigned ({unassignedFeatures.length}) — drag onto a team cell to assign
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {unassignedFeatures.map((f) => (
+                  <div key={f.id} className="w-44">
+                    <DraggableFeatureCard feature={f} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <DragOverlay>
             {activeFeature ? (

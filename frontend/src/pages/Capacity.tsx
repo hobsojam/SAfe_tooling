@@ -53,6 +53,11 @@ export function Capacity() {
     enabled: !!piId,
   });
 
+  const { data: stories = [] } = useQuery({
+    queryKey: ['stories'],
+    queryFn: api.listStories,
+  });
+
   const upsertMut = useMutation({
     mutationFn: (body: CapacityPlanCreate) => api.upsertCapacityPlan(body),
     onSuccess: () => {
@@ -70,6 +75,15 @@ export function Capacity() {
 
   const planMap: Record<string, CapacityPlan> = {};
   plans.forEach((p) => { planMap[`${p.team_id}:${p.iteration_id}`] = p; });
+
+  const iterIds = new Set(nonIpIterations.map((it) => it.id));
+  const storyPts: Record<string, number> = {};
+  for (const s of stories) {
+    if (s.iteration_id && iterIds.has(s.iteration_id)) {
+      const key = `${s.team_id}:${s.iteration_id}`;
+      storyPts[key] = (storyPts[key] ?? 0) + s.points;
+    }
+  }
 
   function openCell(teamId: string, iterationId: string) {
     const existing = planMap[`${teamId}:${iterationId}`];
@@ -177,7 +191,12 @@ export function Capacity() {
                               </div>
                             </>
                           ) : (
-                            'Not set'
+                            <span>Not set</span>
+                          )}
+                          {(storyPts[`${team.id}:${iter.id}`] ?? 0) > 0 && (
+                            <div className={`mt-0.5 text-xs ${plan ? 'text-slate-500' : 'font-medium text-slate-600'}`}>
+                              {storyPts[`${team.id}:${iter.id}`]} pts committed
+                            </div>
                           )}
                         </button>
                       </td>
