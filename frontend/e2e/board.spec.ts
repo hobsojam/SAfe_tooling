@@ -19,10 +19,12 @@ test('shows iteration column headers', async ({ page }) => {
   await expect(page.getByRole('columnheader', { name: 'Unplanned' })).toBeVisible();
 });
 
-test('shows both team names in the board rows', async ({ page }) => {
+test('shows all team names in the board rows', async ({ page }) => {
   // All ART teams appear as rows, regardless of whether they have assigned features
   await expect(page.getByText('Alpha', { exact: true })).toBeVisible();
   await expect(page.getByText('Beta', { exact: true })).toBeVisible();
+  await expect(page.getByText('Gamma', { exact: true })).toBeVisible();
+  await expect(page.getByText('Delta', { exact: true })).toBeVisible();
 });
 
 test('shows all four features', async ({ page }) => {
