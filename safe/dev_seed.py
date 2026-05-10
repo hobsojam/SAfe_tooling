@@ -238,16 +238,6 @@ def seed(repos: Repos) -> None:
         ("Blue-Green Switchover", 7, 6, 6, 5),
         ("Service Mesh", 8, 4, 7, 6),
         ("Distributed Tracing", 7, 5, 8, 4),
-        ("Secret Manager", 9, 8, 5, 3),
-        ("Certificate Rotation", 6, 7, 7, 2),
-        ("Chaos Engineering", 5, 3, 9, 3),
-        ("Load Testing Framework", 6, 4, 7, 3),
-        ("Error Budget Dashboards", 7, 5, 6, 3),
-        ("SLO Alerting", 8, 6, 5, 4),
-        ("Cost Optimisation", 7, 4, 7, 5),
-        ("Multi-Region Failover", 9, 8, 6, 7),
-        ("Dark Launch Infrastructure", 6, 5, 6, 4),
-        ("Schema Migration Tooling", 7, 3, 8, 3),
     ]
     bulk_features = []
     for idx, (name, ubv, tc, rroe, js) in enumerate(bulk_feature_specs):
