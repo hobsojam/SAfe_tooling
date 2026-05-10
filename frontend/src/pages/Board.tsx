@@ -12,7 +12,7 @@ import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
-import { DepBadge, FeatureStatusBadge } from '../components/Badge';
+import { DepBadge, FeatureStatusBadge, TopologyBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Spinner } from '../components/Spinner';
 import type { Dependency, Feature, Story } from '../types';
@@ -291,7 +291,7 @@ export function Board() {
 
   const unassignedFeatures = features.filter((f) => !f.team_id);
   const grid = buildBoard(assignedFeatures, stories);
-  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
+  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
   const teamIds = artTeams.map((t) => t.id);
 
   const iterCols = sortedIters.map((i) => ({
@@ -343,11 +343,12 @@ export function Board() {
                 <>
                   <div
                     key={`${teamId}-name`}
-                    className={`border-b border-r border-slate-100 px-3 py-2 flex items-start ${rowBg}`}
+                    className={`border-b border-r border-slate-100 px-3 py-2 flex flex-col gap-1 ${rowBg}`}
                   >
                     <span className="font-medium text-sm text-slate-700">
-                      {teamMap[teamId] ?? teamId}
+                      {teamMap[teamId]?.name ?? teamId}
                     </span>
+                    <TopologyBadge type={teamMap[teamId]?.topology_type ?? null} />
                   </div>
                   {iterCols.map((c) => (
                     <div key={`${teamId}-${c.id}`} className={`border-b border-slate-100 ${rowBg}`}>
@@ -455,10 +456,10 @@ export function Board() {
                   const fromFeature = features.find((f) => f.id === d.from_feature_id);
                   const toFeature = features.find((f) => f.id === d.to_feature_id);
                   const fromLabel = fromFeature
-                    ? `${fromFeature.name}${fromFeature.team_id ? ` (${teamMap[fromFeature.team_id] ?? ''})` : ''}`
+                    ? `${fromFeature.name}${fromFeature.team_id ? ` (${teamMap[fromFeature.team_id]?.name ?? ''})` : ''}`
                     : d.from_feature_id;
                   const toLabel = toFeature
-                    ? `${toFeature.name}${toFeature.team_id ? ` (${teamMap[toFeature.team_id] ?? ''})` : ''}`
+                    ? `${toFeature.name}${toFeature.team_id ? ` (${teamMap[toFeature.team_id]?.name ?? ''})` : ''}`
                     : d.to_feature_id;
                   return (
                     <tr key={d.id}>

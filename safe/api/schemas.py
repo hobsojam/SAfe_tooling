@@ -2,6 +2,7 @@ from datetime import date
 
 from pydantic import BaseModel, Field
 
+from safe.models.art import TeamTopologyType
 from safe.models.backlog import FeatureStatus, StoryStatus
 from safe.models.dependency import DependencyStatus
 from safe.models.risk import ROAMStatus
@@ -25,12 +26,14 @@ class TeamCreate(BaseModel):
     member_count: int = Field(ge=1)
     art_id: str | None = None
     velocity_history: list[int] = []
+    topology_type: TeamTopologyType | None = None
 
 
 class TeamUpdate(BaseModel):
     name: str | None = None
     member_count: int | None = Field(default=None, ge=1)
     velocity_history: list[int] | None = None
+    topology_type: TeamTopologyType | None = None
 
 
 # --- PI ---
