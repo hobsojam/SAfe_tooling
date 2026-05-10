@@ -1,5 +1,6 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { ToastProvider } from './components/Toaster';
 import { Backlog } from './pages/Backlog';
 import { Board } from './pages/Board';
 import { Capacity } from './pages/Capacity';
@@ -13,6 +14,7 @@ import { TeamSetup } from './pages/TeamSetup';
 
 export default function App() {
   return (
+    <ToastProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -31,5 +33,6 @@ export default function App() {
         </Route>
       </Routes>
     </Router>
+    </ToastProvider>
   );
 }
