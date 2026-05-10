@@ -94,19 +94,14 @@ def pi_activate(pi_id: str = typer.Argument(..., help="PI id")):
     if pi is None:
         console.print(f"[red]Error: PI '{pi_id}' not found[/red]")
         raise typer.Exit(1)
-    if pi.status != PIStatus.PLANNING:
-        console.print(
-            f"[red]Error: PI is {pi.status.value}, only planning PIs can be activated[/red]"
-        )
+    try:
+        safe.logic.pi.validate_pi_transition(pi) # Uses the new business validator
+        pi.status = PIStatus.ACTIVE
+        repos.pis.save(pi)
+        console.print(f"PI [bold]{pi.name}[/bold] is now active.")
+    except IllegalPITransitionError as e:
+        console.print(f"[red]Error: {e}[/red]")
         raise typer.Exit(1)
-    active = [p for p in repos.pis.find(art_id=pi.art_id) if p.status == PIStatus.ACTIVE]
-    if active:
-        console.print(f"[red]Error: PI '{active[0].name}' is already active for this ART[/red]")
-        raise typer.Exit(1)
-    pi.status = PIStatus.ACTIVE
-    repos.pis.save(pi)
-    console.print(f"PI [bold]{pi.name}[/bold] is now active.")
-
 
 @pi_app.command("close")
 def pi_close(pi_id: str = typer.Argument(..., help="PI id")):
@@ -116,12 +111,14 @@ def pi_close(pi_id: str = typer.Argument(..., help="PI id")):
     if pi is None:
         console.print(f"[red]Error: PI '{pi_id}' not found[/red]")
         raise typer.Exit(1)
-    if pi.status != PIStatus.ACTIVE:
-        console.print(f"[red]Error: PI is {pi.status.value}, only active PIs can be closed[/red]")
+    try:
+        safe.logic.pi.validate_pi_transition(pi, target_status=PIStatus.CLOSED) # Uses the new business validator
+        pi.status = PIStatus.CLOSED
+        repos.pis.save(pi)
+        console.print(f"PI [bold]{pi.name}[/bold] is now closed.")
+    except IllegalPITransitionError as e:
+        console.print(f"[red]Error: {e}[/red]")
         raise typer.Exit(1)
-    pi.status = PIStatus.CLOSED
-    repos.pis.save(pi)
-    console.print(f"PI [bold]{pi.name}[/bold] is now closed.")
 
 
 @pi_app.command("predictability")

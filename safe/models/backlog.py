@@ -37,10 +37,15 @@ class Feature(SAFeBaseModel):
             + self.risk_reduction_opportunity_enablement
         )
 
+    # Pydantic V2 style for making fields optional.
+    # Note: For related objects, a dedicated API/Service method should handle the actual write.
+
     @computed_field
     @property
     def wsjf_score(self) -> float:
         return round(self.cost_of_delay / self.job_size, 2)
+
+# ... (rest of the file)
 
 
 class StoryStatus(StrEnum):
