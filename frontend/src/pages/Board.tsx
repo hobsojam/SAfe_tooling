@@ -213,10 +213,10 @@ export function Board() {
       const tr = toEl.getBoundingClientRect();
       measured.push({
         depId: dep.id,
-        x1: fr.right - cr.left,
-        y1: fr.top + fr.height / 2 - cr.top,
-        x2: tr.left - cr.left,
-        y2: tr.top + tr.height / 2 - cr.top,
+        x1: tr.right - cr.left,
+        y1: tr.top + tr.height / 2 - cr.top,
+        x2: fr.left - cr.left,
+        y2: fr.top + fr.height / 2 - cr.top,
         resolved: dep.status === 'resolved',
       });
     }
