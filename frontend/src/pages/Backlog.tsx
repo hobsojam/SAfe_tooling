@@ -421,7 +421,16 @@ export function Backlog() {
     enabled: !!piId,
   });
 
+  const { data: allStories = [] } = useQuery({
+    queryKey: ['stories'],
+    queryFn: api.listStories,
+  });
+
   const nonIpIterations = iterations.filter((it) => !it.is_ip).sort((a, b) => a.number - b.number);
+
+  const storyCountByFeature = Object.fromEntries(
+    features.map((f) => [f.id, allStories.filter((s) => s.feature_id === f.id).length])
+  );
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['features', piId] });
 
@@ -588,7 +597,7 @@ export function Backlog() {
                         aria-expanded={expandedFeatureId === f.id}
                       >
                         <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
-                        <span>{f.story_ids.length > 0 ? f.story_ids.length : 'Stories'}</span>
+                        <span>Stories{storyCountByFeature[f.id] > 0 ? ` (${storyCountByFeature[f.id]})` : ''}</span>
                       </button>
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">

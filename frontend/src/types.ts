@@ -87,6 +87,7 @@ export interface StoryCreate {
 
 export interface StoryUpdate {
   name?: string;
+  feature_id?: string;
   iteration_id?: string | null;
   points?: number;
   status?: StoryStatus;
