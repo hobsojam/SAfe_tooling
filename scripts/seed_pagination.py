@@ -8,6 +8,7 @@ Usage:
     python scripts/seed_pagination.py
     python scripts/seed_pagination.py http://localhost:8000
 """
+
 import json
 import sys
 import urllib.error
