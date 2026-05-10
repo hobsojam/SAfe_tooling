@@ -168,17 +168,37 @@ export function Board() {
 
   const atRiskFeatureIds = useMemo(() => {
     const ids = new Set<string>();
+
     for (const f of features) {
       if (!f.team_id) ids.add(f.id);
     }
+
+    const iterNum: Record<string, number> = {};
+    for (const iter of iterations) {
+      iterNum[iter.id] = iter.number;
+    }
+
+    const featureIterKey: Record<string, string> = {};
+    for (const f of features) {
+      featureIterKey[f.id] = f.iteration_id ?? featurePrimaryIteration(f.id, stories);
+    }
+
     for (const d of deps) {
-      if (d.status !== 'resolved') {
+      if (d.status === 'resolved') continue;
+      // from = consumer (has the dependency), to = provider (must fulfil it first)
+      const fromKey = featureIterKey[d.from_feature_id];
+      const toKey = featureIterKey[d.to_feature_id];
+      const fromNum = fromKey && fromKey !== 'unplanned' ? iterNum[fromKey] : null;
+      const toNum = toKey && toKey !== 'unplanned' ? iterNum[toKey] : null;
+      // Consumer is at-risk when provider is not planned in a strictly earlier iteration.
+      // Skip the check when consumer has no iteration (unsequenced features aren't a board concern).
+      if (fromNum !== null && (toNum === null || toNum >= fromNum)) {
         ids.add(d.from_feature_id);
-        ids.add(d.to_feature_id);
       }
     }
+
     return ids;
-  }, [features, deps]);
+  }, [features, deps, iterations, stories]);
 
   const measureArrows = useCallback(() => {
     if (!boardRef.current) return;
@@ -193,10 +213,10 @@ export function Board() {
       const tr = toEl.getBoundingClientRect();
       measured.push({
         depId: dep.id,
-        x1: fr.right - cr.left,
-        y1: fr.top + fr.height / 2 - cr.top,
-        x2: tr.left - cr.left,
-        y2: tr.top + tr.height / 2 - cr.top,
+        x1: tr.right - cr.left,
+        y1: tr.top + tr.height / 2 - cr.top,
+        x2: fr.left - cr.left,
+        y2: fr.top + fr.height / 2 - cr.top,
         resolved: dep.status === 'resolved',
       });
     }
