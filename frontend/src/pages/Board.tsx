@@ -52,9 +52,12 @@ function buildBoard(features: Feature[], stories: Story[]): BoardGrid {
   return grid;
 }
 
-function FeatureCard({ feature }: { feature: Feature }) {
+function FeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
+  const cardCls = atRisk
+    ? 'rounded border border-red-300 bg-red-50 px-2 py-1.5 shadow-sm'
+    : 'rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm';
   return (
-    <div className="rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm">
+    <div className={cardCls} data-at-risk={atRisk ? 'true' : undefined}>
       <p className="text-xs font-medium text-slate-800 leading-snug">{feature.name}</p>
       <div className="mt-1 flex items-center gap-1.5">
         <FeatureStatusBadge status={feature.status} />
@@ -64,7 +67,7 @@ function FeatureCard({ feature }: { feature: Feature }) {
   );
 }
 
-function DraggableFeatureCard({ feature }: { feature: Feature }) {
+function DraggableFeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: feature.id,
     data: { feature },
@@ -81,7 +84,7 @@ function DraggableFeatureCard({ feature }: { feature: Feature }) {
       {...listeners}
       className={isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
     >
-      <FeatureCard feature={feature} />
+      <FeatureCard feature={feature} atRisk={atRisk} />
     </div>
   );
 }
@@ -162,6 +165,20 @@ export function Board() {
   });
 
   const ctDeps = useMemo(() => crossTeamOnly(deps, features), [deps, features]);
+
+  const atRiskFeatureIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const f of features) {
+      if (!f.team_id) ids.add(f.id);
+    }
+    for (const d of deps) {
+      if (d.status !== 'resolved') {
+        ids.add(d.from_feature_id);
+        ids.add(d.to_feature_id);
+      }
+    }
+    return ids;
+  }, [features, deps]);
 
   const measureArrows = useCallback(() => {
     if (!boardRef.current) return;
@@ -316,7 +333,7 @@ export function Board() {
                     <div key={`${teamId}-${c.id}`} className={`border-b border-slate-100 ${rowBg}`}>
                       <DroppableCell id={`${teamId}|${c.id}`}>
                         {(teamGrid[c.id] ?? []).map((f) => (
-                          <DraggableFeatureCard key={f.id} feature={f} />
+                          <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                         ))}
                       </DroppableCell>
                     </div>
@@ -324,7 +341,7 @@ export function Board() {
                   <div key={`${teamId}-unplanned`} className={`border-b border-slate-100 ${rowBg}`}>
                     <DroppableCell id={`${teamId}|unplanned`}>
                       {(teamGrid['unplanned'] ?? []).map((f) => (
-                        <DraggableFeatureCard key={f.id} feature={f} />
+                        <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                       ))}
                     </DroppableCell>
                   </div>
@@ -342,7 +359,7 @@ export function Board() {
                 <div className="flex flex-wrap gap-2 p-1">
                   {unassignedFeatures.map((f) => (
                     <div key={f.id} className="w-44">
-                      <DraggableFeatureCard feature={f} />
+                      <DraggableFeatureCard feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                     </div>
                   ))}
                 </div>

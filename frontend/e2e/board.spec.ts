@@ -95,3 +95,23 @@ test('dragging an assigned feature to the Unassigned section removes its team', 
   // Count increases from 1 to 2 and Auth Service appears in the unassigned list
   await expect(page.getByText(/Unassigned \(2\)/)).toBeVisible();
 });
+
+test('features with unresolved dependencies are marked at-risk', async ({ page }) => {
+  // Dep 2 (identified): CI/CD Pipeline Upgrade → Observability Dashboard
+  // Dep 3 (mitigated): Observability Dashboard → Auth Service
+  // All three features involved in unresolved deps should be red (data-at-risk)
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'CI/CD Pipeline Upgrade' })).toBeVisible();
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Observability Dashboard' })).toBeVisible();
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Auth Service' })).toBeVisible();
+});
+
+test('unassigned feature is marked at-risk', async ({ page }) => {
+  // Reporting Module has no team — always at-risk regardless of dependencies
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Reporting Module' })).toBeVisible();
+});
+
+test('feature only in a resolved dependency is not marked at-risk', async ({ page }) => {
+  // SSO Integration only appears in the resolved dep (Auth Service → SSO Integration)
+  // It is assigned to a team, so it should not be red
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'SSO Integration' })).not.toBeVisible();
+});
