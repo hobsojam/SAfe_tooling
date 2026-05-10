@@ -8,10 +8,9 @@ from safe.models.base import SAFeBaseModel
 
 class DependencyStatus(StrEnum):
     IDENTIFIED = "identified"
+    ACKNOWLEDGED = "acknowledged"
+    IN_PROGRESS = "in_progress"
     RESOLVED = "resolved"
-    OWNED = "owned"
-    ACCEPTED = "accepted"
-    MITIGATED = "mitigated"
 
 
 class Dependency(SAFeBaseModel):

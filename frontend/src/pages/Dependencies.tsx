@@ -8,7 +8,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 
-const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'owned', 'accepted', 'mitigated', 'resolved'];
+const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'acknowledged', 'in_progress', 'resolved'];
 
 interface DepFormState {
   description: string;

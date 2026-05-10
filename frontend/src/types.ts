@@ -1,7 +1,7 @@
 export type PIStatus = 'planning' | 'active' | 'closed';
 export type FeatureStatus = 'funnel' | 'analyzing' | 'backlog' | 'implementing' | 'done';
 export type ROAMStatus = 'unroamed' | 'owned' | 'accepted' | 'mitigated' | 'resolved';
-export type DependencyStatus = 'identified' | 'owned' | 'accepted' | 'mitigated' | 'resolved';
+export type DependencyStatus = 'identified' | 'acknowledged' | 'in_progress' | 'resolved';
 
 export interface ART {
   id: string;

@@ -17,9 +17,8 @@ console = Console()
 
 _DEP_STATUS_COLOUR = {
     DependencyStatus.IDENTIFIED: "red",
-    DependencyStatus.OWNED: "yellow",
-    DependencyStatus.ACCEPTED: "bright_yellow",
-    DependencyStatus.MITIGATED: "cyan",
+    DependencyStatus.ACKNOWLEDGED: "yellow",
+    DependencyStatus.IN_PROGRESS: "cyan",
     DependencyStatus.RESOLVED: "green",
 }
 

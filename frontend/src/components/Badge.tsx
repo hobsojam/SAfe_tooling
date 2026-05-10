@@ -35,12 +35,11 @@ export function ROAMBadge({ status }: { status: string }) {
 export function DepBadge({ status }: { status: string }) {
   const map: Record<string, Variant> = {
     identified: 'red',
-    owned: 'yellow',
-    accepted: 'amber',
-    mitigated: 'cyan',
+    acknowledged: 'yellow',
+    in_progress: 'cyan',
     resolved: 'green',
   };
-  return <Badge label={status} variant={map[status] ?? 'gray'} />;
+  return <Badge label={status.replace(/_/g, ' ')} variant={map[status] ?? 'gray'} />;
 }
 
 export function PIStatusBadge({ status }: { status: string }) {
