@@ -134,7 +134,7 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
 | **PI Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
-| **Team Setup** | `/pi/:id/team-setup` | Create, rename, and delete ART teams |
+| **Team Setup** | `/pi/:id/team-setup` | Create, rename, and delete ART teams; set Team Topologies type (stream-aligned, enabling, complicated-subsystem, platform) |
 | **ART Setup** | `/art-setup` | Create, rename, and delete Agile Release Trains (always accessible) |
 
 Built with Vite, React 18, TypeScript, Tailwind CSS v4, TanStack Query, and React Router.
@@ -187,6 +187,8 @@ safe art list
 safe art show <id>
 
 safe team create --name "Alpha" --members 6 --art-id <art-id>
+safe team create --name "Platform Team" --members 7 --art-id <art-id> \
+  --topology-type platform          # stream_aligned | enabling | complicated_subsystem | platform
 safe team list
 safe team list --art-id <art-id>
 safe team show <id>
@@ -387,7 +389,7 @@ safe/
     schemas.py      Create/Update/action request body schemas
     routers/        One file per resource (arts, teams, pi, iterations, features, ...)
   store/            TinyDB persistence (Repository[T], get_repos())
-tests/              pytest test suite (486 tests — unit, CLI, API, smoke)
+tests/              pytest test suite (495 tests — unit, CLI, API, smoke)
 Dockerfile          Python API image
 docker-compose.yml  API (port 8000) + frontend/nginx (port 3000)
 pyproject.toml
