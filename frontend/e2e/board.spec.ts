@@ -96,13 +96,21 @@ test('dragging an assigned feature to the Unassigned section removes its team', 
   await expect(page.getByText(/Unassigned \(2\)/)).toBeVisible();
 });
 
-test('features with unresolved dependencies are marked at-risk', async ({ page }) => {
-  // Dep 2 (identified): CI/CD Pipeline Upgrade → Observability Dashboard
-  // Dep 3 (mitigated): Observability Dashboard → Auth Service
-  // All three features involved in unresolved deps should be red (data-at-risk)
-  await expect(page.locator('[data-at-risk="true"]', { hasText: 'CI/CD Pipeline Upgrade' })).toBeVisible();
+test('feature whose dependency provider is in the same iteration is marked at-risk', async ({ page }) => {
+  // Dep 3 (mitigated): Observability Dashboard (consumer, I1) needs Auth Service (provider, I1).
+  // Provider is in the same iteration as consumer, so it can't be done first → consumer is at-risk.
   await expect(page.locator('[data-at-risk="true"]', { hasText: 'Observability Dashboard' })).toBeVisible();
-  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Auth Service' })).toBeVisible();
+});
+
+test('feature whose dependency provider is in an earlier iteration is not at-risk', async ({ page }) => {
+  // Dep 2 (identified): CI/CD Pipeline Upgrade (consumer, I3) needs Observability Dashboard (provider, I1).
+  // Provider (I1) is strictly before consumer (I3) → dependency will be satisfied → consumer is not at-risk.
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'CI/CD Pipeline Upgrade' })).not.toBeVisible();
+});
+
+test('feature that only provides dependencies is not marked at-risk', async ({ page }) => {
+  // Auth Service is the provider in dep 3 but never the consumer of an unresolved dep.
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Auth Service' })).not.toBeVisible();
 });
 
 test('unassigned feature is marked at-risk', async ({ page }) => {
