@@ -588,7 +588,7 @@ export function Backlog() {
                         aria-expanded={expandedFeatureId === f.id}
                       >
                         <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
-                        <span>{f.story_ids.length > 0 ? f.story_ids.length : 'Stories'}</span>
+                        <span>Stories{f.story_ids.length > 0 ? ` (${f.story_ids.length})` : ''}</span>
                       </button>
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">
