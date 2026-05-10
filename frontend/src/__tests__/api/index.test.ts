@@ -175,7 +175,7 @@ describe('PATCH methods', () => {
 
   it('updateDependency calls PATCH /api/dependencies/:id', async () => {
     resolveOk({});
-    const body: DependencyUpdate = { status: 'mitigated' };
+    const body: DependencyUpdate = { status: 'in_progress' };
     await api.updateDependency('d1', body);
     expect(mockFetch).toHaveBeenCalledWith('/api/dependencies/d1', patchOpts(body));
   });
