@@ -7,6 +7,7 @@ import { Capacity } from './pages/Capacity';
 import { Dependencies } from './pages/Dependencies';
 import { Objectives } from './pages/Objectives';
 import { Risks } from './pages/Risks';
+import { RoamUnroamed } from './pages/RoamUnroamed';
 import { ARTSetup } from './pages/ARTSetup';
 import { Predictability } from './pages/Predictability';
 import { Setup } from './pages/Setup';
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="pi/:piId/objectives" element={<Objectives />} />
           <Route path="pi/:piId/predictability" element={<Predictability />} />
           <Route path="pi/:piId/capacity" element={<Capacity />} />
+          <Route path="pi/:piId/risks/roam" element={<RoamUnroamed />} />
           <Route path="pi/:piId/risks" element={<Risks />} />
           <Route path="pi/:piId/dependencies" element={<Dependencies />} />
           <Route path="pi/:piId/setup" element={<Setup />} />
