@@ -6,7 +6,9 @@ import type { Story, StoryCreate, StoryStatus, StoryUpdate } from '../types';
 import { StoryStatusBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { usePagination } from '../hooks/usePagination';
 
 const STATUS_OPTIONS: StoryStatus[] = ['not_started', 'in_progress', 'done', 'accepted'];
 
@@ -69,6 +71,7 @@ export function StoriesPage() {
 
   const featureIds = new Set(features.map((f) => f.id));
   const stories = allStories.filter((s) => featureIds.has(s.feature_id));
+  const { page, totalPages, pageItems: pageStories, goTo } = usePagination(stories, 25, piId);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['stories'] });
 
@@ -195,7 +198,7 @@ export function StoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {stories.map((s) => {
+              {pageStories.map((s) => {
                 if (deleteId === s.id) {
                   return (
                     <tr key={s.id} className="bg-red-50">
@@ -272,6 +275,7 @@ export function StoriesPage() {
               })}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 
