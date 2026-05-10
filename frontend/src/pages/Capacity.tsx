@@ -14,12 +14,17 @@ interface CapacityFormState {
   overhead_pct: number;
 }
 
-const DEFAULT_FORM: CapacityFormState = {
-  team_size: 6,
-  iteration_days: 10,
-  pto_days: 0,
-  overhead_pct: 20,
-};
+function countWeekdays(startDate: string, endDate: string): number {
+  const end = new Date(endDate);
+  let count = 0;
+  const cur = new Date(startDate);
+  while (cur <= end) {
+    const d = cur.getDay();
+    if (d !== 0 && d !== 6) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
 
 export function Capacity() {
   const { piId } = useParams<{ piId: string }>();
@@ -27,7 +32,7 @@ export function Capacity() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{ teamId: string; iterationId: string } | null>(null);
-  const [form, setForm] = useState<CapacityFormState>(DEFAULT_FORM);
+  const [form, setForm] = useState<CapacityFormState>({ team_size: 0, iteration_days: 0, pto_days: 0, overhead_pct: 20 });
   const [error, setError] = useState('');
 
   const { data: pi } = useQuery({
@@ -87,10 +92,12 @@ export function Capacity() {
 
   function openCell(teamId: string, iterationId: string) {
     const existing = planMap[`${teamId}:${iterationId}`];
+    const team = sortedTeams.find((t) => t.id === teamId);
+    const iter = nonIpIterations.find((it) => it.id === iterationId);
     setSelectedCell({ teamId, iterationId });
     setForm({
-      team_size: existing?.team_size ?? 6,
-      iteration_days: existing?.iteration_days ?? 10,
+      team_size: existing?.team_size ?? team?.member_count ?? 6,
+      iteration_days: existing?.iteration_days ?? (iter ? countWeekdays(iter.start_date, iter.end_date) : 10),
       pto_days: existing?.pto_days ?? 0,
       overhead_pct: existing ? Math.round(existing.overhead_pct * 100) : 20,
     });
