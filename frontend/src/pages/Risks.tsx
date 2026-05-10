@@ -6,7 +6,9 @@ import type { Risk, RiskCreate, RiskUpdate, ROAMStatus } from '../types';
 import { ROAMBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { usePagination } from '../hooks/usePagination';
 
 const ROAM_OPTIONS: ROAMStatus[] = ['unroamed', 'owned', 'accepted', 'mitigated', 'resolved'];
 
@@ -73,6 +75,8 @@ export function Risks() {
     onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
     onError: (e: Error) => setDeleteError(e.message),
   });
+
+  const { page, totalPages, pageItems: pageRisks, goTo } = usePagination(risks, 25, piId);
 
   if (isLoading) return <Spinner />;
 
@@ -170,7 +174,7 @@ export function Risks() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {risks.map((r) => {
+              {pageRisks.map((r) => {
                 if (deleteId === r.id) {
                   return (
                     <tr key={r.id} className="bg-red-50">
@@ -238,6 +242,7 @@ export function Risks() {
               })}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 
