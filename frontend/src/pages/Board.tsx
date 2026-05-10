@@ -52,9 +52,12 @@ function buildBoard(features: Feature[], stories: Story[]): BoardGrid {
   return grid;
 }
 
-function FeatureCard({ feature }: { feature: Feature }) {
+function FeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
+  const cardCls = atRisk
+    ? 'rounded border border-red-300 bg-red-50 px-2 py-1.5 shadow-sm'
+    : 'rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm';
   return (
-    <div className="rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm">
+    <div className={cardCls} data-at-risk={atRisk ? 'true' : undefined}>
       <p className="text-xs font-medium text-slate-800 leading-snug">{feature.name}</p>
       <div className="mt-1 flex items-center gap-1.5">
         <FeatureStatusBadge status={feature.status} />
@@ -64,7 +67,7 @@ function FeatureCard({ feature }: { feature: Feature }) {
   );
 }
 
-function DraggableFeatureCard({ feature }: { feature: Feature }) {
+function DraggableFeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: feature.id,
     data: { feature },
@@ -81,7 +84,7 @@ function DraggableFeatureCard({ feature }: { feature: Feature }) {
       {...listeners}
       className={isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
     >
-      <FeatureCard feature={feature} />
+      <FeatureCard feature={feature} atRisk={atRisk} />
     </div>
   );
 }
@@ -92,6 +95,18 @@ function DroppableCell({ id, children }: { id: string; children: React.ReactNode
     <div
       ref={setNodeRef}
       className={`min-h-[4rem] p-2 space-y-1.5 border-r border-slate-100 transition-colors ${isOver ? 'bg-blue-50' : ''}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function UnassignedDropZone({ children }: { children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'unassigned' });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`min-h-[3rem] rounded-md transition-colors ${isOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''}`}
     >
       {children}
     </div>
@@ -151,6 +166,40 @@ export function Board() {
 
   const ctDeps = useMemo(() => crossTeamOnly(deps, features), [deps, features]);
 
+  const atRiskFeatureIds = useMemo(() => {
+    const ids = new Set<string>();
+
+    for (const f of features) {
+      if (!f.team_id) ids.add(f.id);
+    }
+
+    const iterNum: Record<string, number> = {};
+    for (const iter of iterations) {
+      iterNum[iter.id] = iter.number;
+    }
+
+    const featureIterKey: Record<string, string> = {};
+    for (const f of features) {
+      featureIterKey[f.id] = f.iteration_id ?? featurePrimaryIteration(f.id, stories);
+    }
+
+    for (const d of deps) {
+      if (d.status === 'resolved') continue;
+      // from = consumer (has the dependency), to = provider (must fulfil it first)
+      const fromKey = featureIterKey[d.from_feature_id];
+      const toKey = featureIterKey[d.to_feature_id];
+      const fromNum = fromKey && fromKey !== 'unplanned' ? iterNum[fromKey] : null;
+      const toNum = toKey && toKey !== 'unplanned' ? iterNum[toKey] : null;
+      // Consumer is at-risk when provider is not planned in a strictly earlier iteration.
+      // Skip the check when consumer has no iteration (unsequenced features aren't a board concern).
+      if (fromNum !== null && (toNum === null || toNum >= fromNum)) {
+        ids.add(d.from_feature_id);
+      }
+    }
+
+    return ids;
+  }, [features, deps, iterations, stories]);
+
   const measureArrows = useCallback(() => {
     if (!boardRef.current) return;
     const container = boardRef.current;
@@ -194,7 +243,7 @@ export function Board() {
   }, [measureArrows, boardReady]);
 
   const moveMutation = useMutation({
-    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string; iterationId: string | null }) =>
+    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string | null; iterationId: string | null }) =>
       api.updateFeature(featureId, { team_id: teamId, iteration_id: iterationId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['features', piId] });
@@ -211,9 +260,15 @@ export function Board() {
     if (!event.over) return;
 
     const overId = event.over.id as string;
-    const [newTeamId, newIterColId] = overId.split('|');
     const feature = (event.active.data.current as { feature: Feature }).feature;
 
+    if (overId === 'unassigned') {
+      if (!feature.team_id) return;
+      moveMutation.mutate({ featureId: feature.id, teamId: null, iterationId: null });
+      return;
+    }
+
+    const [newTeamId, newIterColId] = overId.split('|');
     const newIterationId = newIterColId === 'unplanned' ? null : newIterColId;
     const currentIterKey = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
     const currentIterColId = currentIterKey === null ? 'unplanned' : currentIterKey;
@@ -298,7 +353,7 @@ export function Board() {
                     <div key={`${teamId}-${c.id}`} className={`border-b border-slate-100 ${rowBg}`}>
                       <DroppableCell id={`${teamId}|${c.id}`}>
                         {(teamGrid[c.id] ?? []).map((f) => (
-                          <DraggableFeatureCard key={f.id} feature={f} />
+                          <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                         ))}
                       </DroppableCell>
                     </div>
@@ -306,7 +361,7 @@ export function Board() {
                   <div key={`${teamId}-unplanned`} className={`border-b border-slate-100 ${rowBg}`}>
                     <DroppableCell id={`${teamId}|unplanned`}>
                       {(teamGrid['unplanned'] ?? []).map((f) => (
-                        <DraggableFeatureCard key={f.id} feature={f} />
+                        <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                       ))}
                     </DroppableCell>
                   </div>
@@ -317,19 +372,23 @@ export function Board() {
 
           <div className="border-t border-slate-200 p-3">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Unassigned ({unassignedFeatures.length}) — drag onto a team cell to assign
+              Unassigned ({unassignedFeatures.length})
             </p>
-            {unassignedFeatures.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {unassignedFeatures.map((f) => (
-                  <div key={f.id} className="w-44">
-                    <DraggableFeatureCard feature={f} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs italic text-slate-400">No unassigned features</p>
-            )}
+            <UnassignedDropZone>
+              {unassignedFeatures.length > 0 ? (
+                <div className="flex flex-wrap gap-2 p-1">
+                  {unassignedFeatures.map((f) => (
+                    <div key={f.id} className="w-44">
+                      <DraggableFeatureCard feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="p-1 text-xs italic text-slate-400">
+                  No unassigned features — drop a feature here to remove its team assignment
+                </p>
+              )}
+            </UnassignedDropZone>
           </div>
 
           <DragOverlay>
