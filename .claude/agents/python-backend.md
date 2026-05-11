@@ -42,6 +42,22 @@ mutmut html     # generates html/ report
 
 **Implication for new logic:** Any new pure function added to `safe/logic/` will be mutated nightly. Write tests that assert specific return values and edge cases — tests that only check "no exception raised" will not kill mutants. Every branch and operator in `safe/logic/` should be covered by at least one assertion in the three test files above.
 
+## Shell usage
+
+The host machine is Windows. Use **PowerShell** for all local commands — git, pip, pytest, ruff, file operations. Use **Bash** only when writing scripts that must run in CI (Ubuntu) or that are explicitly cross-platform (e.g. shell scripts committed to the repo).
+
+```powershell
+# PowerShell — local dev
+python -m pytest tests/
+python -m ruff check .
+git status
+```
+
+```bash
+# Bash — CI scripts or committed shell scripts only
+pip install -e ".[dev]"
+```
+
 ## CI — always run all three before committing
 
 ```bash

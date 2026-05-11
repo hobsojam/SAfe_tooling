@@ -47,6 +47,24 @@ npm run stryker
 
 **Implication for new components/API methods:** Any new code added to `src/api/index.ts` or `src/components/` will be mutated nightly. Write assertions that check specific rendered output or return values — snapshot tests and "renders without crashing" tests will not kill mutants. Cover conditional branches, status mappings, and computed values in `Badge.tsx` and `api/index.ts` with explicit `expect` assertions.
 
+## Shell usage
+
+The host machine is Windows. Use **PowerShell** for all local commands — git, npm, file operations. Use **Bash** only when writing scripts that must run in CI (Ubuntu) or that are explicitly cross-platform (e.g. shell scripts committed to the repo).
+
+```powershell
+# PowerShell — local dev
+cd frontend
+npm run build
+npm run test:run
+git status
+```
+
+```bash
+# Bash — CI scripts or committed shell scripts only
+npm ci
+npx playwright test
+```
+
 ## CI — run before every commit
 
 ```bash
