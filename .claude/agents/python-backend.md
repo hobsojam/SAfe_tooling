@@ -42,6 +42,19 @@ mutmut html     # generates html/ report
 
 **Implication for new logic:** Any new pure function added to `safe/logic/` will be mutated nightly. Write tests that assert specific return values and edge cases — tests that only check "no exception raised" will not kill mutants. Every branch and operator in `safe/logic/` should be covered by at least one assertion in the three test files above.
 
+## Git workflow
+
+- **Never commit directly to `main`**. All work goes on a feature or fix branch with a PR.
+- **Before creating a new branch**, always pull main first so the branch starts up to date:
+  ```powershell
+  git checkout main
+  git pull origin main
+  git checkout -b feat/<short-description>   # or fix/<short-description>
+  ```
+- **Before switching branches**, commit and push all finished work on the current branch. If changes aren't ready to commit, ask the user whether to stash or continue on the current branch — never silently discard work.
+- Each logical change (new feature, bug fix, refactor) gets its own branch and PR.
+- Never force-push to `main`. Never amend published commits on shared branches without user confirmation.
+
 ## Shell usage
 
 The host machine is Windows. Use **PowerShell** for all local commands — git, pip, pytest, ruff, file operations. Use **Bash** only when writing scripts that must run in CI (Ubuntu) or that are explicitly cross-platform (e.g. shell scripts committed to the repo).
