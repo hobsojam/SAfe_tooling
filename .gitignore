@@ -27,9 +27,10 @@ env/
 .vscode/
 .idea/
 
-# Claude Code — ignore local settings but track shared project commands
+# Claude Code — ignore local settings but track shared project commands and agents
 .claude/*
 !.claude/commands
+!.claude/agents
 
 # Tool data (stored outside repo at ~/.safe_tooling/)
 
