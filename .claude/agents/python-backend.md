@@ -87,6 +87,14 @@ safe/
   exceptions.py  # SafeToolingError hierarchy
 ```
 
+## OpenAPI spec
+
+`docs/openapi.yaml` is the **authoritative API contract**. The FastAPI implementation must match it exactly — the spec is not generated from code, it is the source of truth.
+
+- **Before adding or changing any endpoint**, check the spec first to understand the intended shape.
+- **After implementing any endpoint change**, update `docs/openapi.yaml` to match. This includes: route path, method, request body schema, response schema, status codes, and query parameters.
+- For cross-cutting changes (backend + frontend), updating the spec is the handoff signal to the frontend agent — it reads `docs/openapi.yaml` to know what the new API looks like.
+
 ## Critical conventions
 
 ### Models

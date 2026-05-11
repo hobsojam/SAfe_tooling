@@ -105,6 +105,14 @@ frontend/
   tsconfig.json / tsconfig.app.json / tsconfig.node.json
 ```
 
+## OpenAPI spec
+
+`docs/openapi.yaml` is the **authoritative API contract**. When the backend changes, the spec is updated first — always read it before assuming what an endpoint looks like.
+
+- **Before adding or changing any API call**, check `docs/openapi.yaml` for the correct path, method, request body shape, response schema, and status codes.
+- **`src/types.ts` must stay in sync with the spec.** Field names, optional/required, and status literal values in the frontend types should match the spec exactly.
+- For cross-cutting changes, the backend agent updates the spec as its final step — that is your signal to proceed with frontend wiring.
+
 ## Types (`src/types.ts`)
 
 All domain types live here. Field names match backend **snake_case** exactly.
