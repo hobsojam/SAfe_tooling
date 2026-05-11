@@ -136,7 +136,6 @@ safe/
 
 **When to update `dev_seed.py`:** If you add a new entity type or field that should be represented in the dev environment, add it to the seed. Keep the data realistic and coherent — it is also used as the basis for the e2e fixture. Never change existing IDs or remove existing entities without checking whether the e2e fixture (`tests/e2e_fixture.clean.json`) needs to be regenerated.
 
-**Pagination seed script:** `scripts/seed_pagination.py` bulk-loads additional features and stories via the live API for pagination testing. Run it after `safe-api` is up: `python scripts/seed_pagination.py`.
 
 ## OpenAPI spec
 
