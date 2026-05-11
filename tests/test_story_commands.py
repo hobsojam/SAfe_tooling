@@ -94,13 +94,6 @@ class TestStoryAdd:
         assert stories[0].name == "Login flow"
         assert stories[0].points == 3
 
-    def test_added_to_feature_story_ids(self, db_path, patch_console):
-        fid, tid = _setup(db_path)
-        _add_story(db_path, fid, tid)
-        story = repos_for(db_path).stories.get_all()[0]
-        feature = repos_for(db_path).features.get(fid)
-        assert story.id in feature.story_ids
-
     def test_unknown_feature_exits_1(self, db_path, patch_console):
         _, tid = _setup(db_path)
         result = invoke(
@@ -211,14 +204,6 @@ class TestStoryDelete:
         story = repos_for(db_path).stories.get_all()[0]
         invoke(db_path, "story", "delete", story.id)
         assert repos_for(db_path).stories.get(story.id) is None
-
-    def test_removes_from_feature_story_ids(self, db_path, patch_console):
-        fid, tid = _setup(db_path)
-        _add_story(db_path, fid, tid)
-        story = repos_for(db_path).stories.get_all()[0]
-        invoke(db_path, "story", "delete", story.id)
-        feature = repos_for(db_path).features.get(fid)
-        assert story.id not in feature.story_ids
 
     def test_unknown_exits_1(self, db_path, patch_console):
         result = invoke(db_path, "story", "delete", "no-such-id")

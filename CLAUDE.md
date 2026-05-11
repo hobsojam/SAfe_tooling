@@ -303,6 +303,7 @@ safe [--db-path PATH]
 ## Git Workflow
 
 - Each new feature or phase must be developed on its own branch, branched from `main`.
+- **Before creating a new branch**, always `git pull origin main` first so the branch starts from the latest main. Never branch from a stale local main.
 - Branch naming: `feat/<short-description>` (e.g. `feat/phase-3-backlog-manager`).
 - Every feature branch must have its own PR targeting `main` before being merged.
 - Never commit feature work directly to `main`.

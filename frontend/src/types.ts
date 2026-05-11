@@ -55,7 +55,6 @@ export interface Feature {
   team_id: string | null;
   iteration_id: string | null;
   status: FeatureStatus;
-  story_ids: string[];
   user_business_value: number;
   time_criticality: number;
   risk_reduction_opportunity_enablement: number;
