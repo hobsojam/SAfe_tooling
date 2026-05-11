@@ -78,7 +78,7 @@ class TestIteration:
     def test_basic(self):
         it = self._make()
         assert it.is_ip is False
-        assert it.name == ""
+        assert it.name == "Iteration 1"
 
     def test_number_zero_invalid(self):
         with pytest.raises(ValidationError):
