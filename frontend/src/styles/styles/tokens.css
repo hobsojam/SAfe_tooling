@@ -1,0 +1,287 @@
+/* ============================================================
+   SAFe Tooling — Design Tokens
+   colors_and_type.css
+
+   A warm, accessible adaptation of the source SAFe Tooling
+   palette (Tailwind slate) to brown + green, meeting WCAG 2.1 AA
+   (the standard enforced by Germany's BFSG / the EU EAA).
+
+   All token names use the *_bark_ + _moss_* family so that they
+   read clearly in source and don't collide with any existing
+   `slate-*` Tailwind class.
+   ============================================================ */
+
+/* ---------- 1. Base palette ---------------------------------- */
+:root {
+  /* Bark — primary warm-neutral (replaces slate)
+     Reads brown but desaturated enough to function as a UI gray. */
+  --bark-50:  #f7f3ec;   /* page bg, table-zebra */
+  --bark-100: #ece4d4;   /* card hover, soft fills */
+  --bark-200: #d8c9ad;   /* borders, dividers */
+  --bark-300: #bda988;   /* muted text on dark */
+  --bark-400: #998269;   /* subdued labels */
+  --bark-500: #74604c;   /* secondary text */
+  --bark-600: #5a4a39;   /* body text on light */
+  --bark-700: #43372a;   /* heading text */
+  --bark-800: #322a20;   /* sidebar bg (active row) */
+  --bark-900: #221d16;   /* sidebar bg (rest) */
+  --bark-950: #15110c;   /* deepest — page foot, headers */
+
+  /* Moss — primary brand green (replaces blue/teal accents) */
+  --moss-50:  #eef3e8;
+  --moss-100: #d9e5cb;
+  --moss-200: #b6cea0;
+  --moss-300: #8db176;
+  --moss-400: #6d9558;
+  --moss-500: #4f7a3e;   /* AA on white */
+  --moss-600: #3e6230;   /* primary brand action */
+  --moss-700: #2f4a26;
+  --moss-800: #243a1f;
+  --moss-900: #1a2a17;
+
+  /* Pure surfaces */
+  --paper:    #fdfaf4;   /* warm white, page bg */
+  --ink:      #1a1410;   /* warm black, body text */
+  --white:    #ffffff;
+
+  /* ---------- 2. Semantic / state palette --------------------
+     Recalibrated to sit harmoniously next to bark + moss, while
+     keeping the original 8-hue badge system from the codebase
+     (red / yellow / amber / cyan / green / blue / gray / purple).
+     Each pair (bg + fg) passes 4.5:1 contrast.
+  */
+  --status-red-bg:    #fbe5e0;   --status-red-fg:    #842413;
+  --status-amber-bg:  #f9ebcf;   --status-amber-fg:  #784a07;
+  --status-yellow-bg: #fbf2c4;   --status-yellow-fg: #6b5300;
+  --status-green-bg:  #d9e5cb;   --status-green-fg:  #2f4a26;  /* = moss */
+  --status-cyan-bg:   #d3e7ea;   --status-cyan-fg:   #144852;
+  --status-blue-bg:   #dde6f4;   --status-blue-fg:   #1f3a6b;
+  --status-purple-bg: #e8dff2;   --status-purple-fg: #4a2772;
+  --status-gray-bg:   #ece4d4;   --status-gray-fg:   #43372a;  /* = bark */
+
+  /* ---------- 3. Functional aliases ---------------------------
+     Use these in components — never hard-code a numbered token.
+  */
+  --bg-page:           var(--paper);
+  --bg-surface:        var(--white);
+  --bg-surface-alt:    var(--bark-50);     /* table header, zebra */
+  --bg-sidebar:        var(--bark-900);
+  --bg-sidebar-active: var(--bark-800);
+  --bg-sidebar-hover:  var(--bark-800);
+  --bg-overlay:        rgb(34 26 16 / 0.55);
+
+  --fg-default:        var(--bark-700);
+  --fg-strong:         var(--bark-950);    /* H1 / numeric */
+  --fg-muted:          var(--bark-500);
+  --fg-subtle:         var(--bark-400);
+  --fg-on-dark:        #f5ede0;            /* sidebar text */
+  --fg-on-dark-muted:  #bda988;
+
+  --border-default:    var(--bark-200);
+  --border-strong:     var(--bark-300);
+  --border-divider:    #ece4d4;            /* row dividers */
+
+  --accent:            var(--moss-600);
+  --accent-hover:      var(--moss-700);
+  --accent-fg:         #ffffff;
+  --accent-soft-bg:    var(--moss-50);
+  --accent-soft-fg:    var(--moss-700);
+
+  --focus-ring:        var(--moss-500);    /* 3px outer ring */
+  --focus-ring-offset: var(--paper);
+
+  /* ---------- 4. Spacing scale (4px base) -------------------- */
+  --space-0:  0;
+  --space-1:  0.25rem;   /*  4 */
+  --space-2:  0.5rem;    /*  8 */
+  --space-3:  0.75rem;   /* 12 */
+  --space-4:  1rem;      /* 16 */
+  --space-5:  1.25rem;   /* 20 */
+  --space-6:  1.5rem;    /* 24 */
+  --space-8:  2rem;      /* 32 */
+  --space-10: 2.5rem;    /* 40 */
+  --space-12: 3rem;      /* 48 */
+  --space-16: 4rem;      /* 64 */
+
+  /* ---------- 5. Radii ---------------------------------------- */
+  --radius-xs: 3px;      /* tight chips */
+  --radius-sm: 4px;      /* form fields, buttons */
+  --radius-md: 6px;      /* default */
+  --radius-lg: 10px;     /* cards, modals */
+  --radius-xl: 16px;
+  --radius-pill: 999px;  /* badges */
+
+  /* ---------- 6. Shadows -------------------------------------
+     Warm shadows — slight brown tint — sit better on cream paper.
+  */
+  --shadow-xs: 0 1px 0    rgb(50 42 32 / 0.04);
+  --shadow-sm: 0 1px 2    rgb(50 42 32 / 0.06), 0 1px 1 rgb(50 42 32 / 0.04);
+  --shadow-md: 0 4px 10   rgb(50 42 32 / 0.08), 0 2px 4 rgb(50 42 32 / 0.05);
+  --shadow-lg: 0 12px 28  rgb(50 42 32 / 0.14), 0 6px 12 rgb(50 42 32 / 0.06);
+  --shadow-xl: 0 24px 48  rgb(50 42 32 / 0.18), 0 10px 20 rgb(50 42 32 / 0.08);
+
+  /* Inner shadow for inset elements (capacity bars, etc.) */
+  --shadow-inset: inset 0 1px 2 rgb(50 42 32 / 0.06);
+
+  /* ---------- 7. Motion -------------------------------------- */
+  --ease-out:  cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:  120ms;
+  --dur-base:  180ms;
+  --dur-slow:  280ms;
+
+  /* ---------- 8. Type scale --------------------------------- */
+  --font-sans:    'Geist', 'Inter Tight', ui-sans-serif, system-ui,
+                  -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif:   'Instrument Serif', 'Source Serif Pro', Georgia, serif;
+  --font-mono:    'Geist Mono', 'JetBrains Mono', ui-monospace,
+                  SFMono-Regular, Menlo, monospace;
+
+  /* Step (px) */
+  --fs-2xs: 11px;
+  --fs-xs:  12px;
+  --fs-sm:  13px;
+  --fs-base:14px;        /* app body — dense product UI */
+  --fs-md:  16px;        /* marketing body */
+  --fs-lg:  18px;
+  --fs-xl:  20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 30px;
+  --fs-4xl: 38px;
+  --fs-5xl: 48px;
+  --fs-6xl: 64px;
+
+  /* Line heights */
+  --lh-tight:  1.15;
+  --lh-snug:   1.3;
+  --lh-base:   1.5;
+  --lh-loose:  1.7;
+
+  /* Weights */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* Tracking */
+  --tr-tight:   -0.02em;
+  --tr-normal:  0;
+  --tr-wide:    0.04em;
+  --tr-caps:    0.08em;   /* small uppercase labels */
+}
+
+/* ============================================================
+   9. Semantic typography classes
+   ============================================================ */
+.t-display {
+  font-family: var(--font-serif);
+  font-size: var(--fs-6xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--fw-regular);
+  font-style: italic;     /* the "fun" hook */
+  color: var(--fg-strong);
+}
+.t-h1 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--fw-semibold);
+  color: var(--fg-strong);
+}
+.t-h2 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--fw-semibold);
+  color: var(--fg-strong);
+}
+.t-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  font-weight: var(--fw-semibold);
+  color: var(--fg-default);
+}
+.t-h4, .t-page-title {
+  font-family: var(--font-sans);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--fg-default);
+}
+
+.t-body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  color: var(--fg-default);
+}
+.t-body-sm {
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  color: var(--fg-default);
+}
+.t-meta {
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-base);
+  color: var(--fg-muted);
+}
+.t-label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-muted);
+}
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-feature-settings: 'tnum' 1;
+}
+.t-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+.t-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.t-link:hover { color: var(--accent-hover); text-decoration-thickness: 2px; }
+
+/* ============================================================
+   10. Focus & accessibility primitives
+   BFSG / WCAG 2.1 AA — focus visible, contrast 3:1 on the ring,
+   color is never the only signal (badges always carry text).
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================
+   11. Base reset — opt-in via `body.ds` so this file is safe
+   to import anywhere without clobbering host styles.
+   ============================================================ */
+body.ds {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--fg-default);
+  font: var(--fw-regular) var(--fs-base)/var(--lh-base) var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body.ds *, body.ds *::before, body.ds *::after { box-sizing: border-box; }

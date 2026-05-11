@@ -161,10 +161,10 @@ export function StoriesPage() {
     <div className="p-6">
       <div className="mb-5 flex items-baseline justify-between">
         <div>
-          <h1 className="mb-1 text-xl font-semibold text-slate-800">
+          <h1 className="mb-1 text-xl font-semibold text-bark-800">
             Stories — {pi?.name}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-bark-500">
             {stories.length} stor{stories.length !== 1 ? 'ies' : 'y'}
           </p>
         </div>
@@ -172,7 +172,7 @@ export function StoriesPage() {
           onClick={openNew}
           disabled={features.length === 0}
           title={features.length === 0 ? 'Add a feature first' : undefined}
-          className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+          className="rounded-md bg-moss-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
         >
           + New Story
         </button>
@@ -183,21 +183,21 @@ export function StoriesPage() {
           message={features.length === 0 ? 'No features in this PI yet.' : 'No stories for this PI.'}
         />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto overflow-hidden rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
                 {['Name', 'Feature', 'Team', 'Iteration', 'Points', 'Status', ''].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {pageStories.map((s) => {
                 if (deleteId === s.id) {
                   return (
@@ -207,7 +207,7 @@ export function StoriesPage() {
                           {deleteError && (
                             <span className="text-xs text-red-600">{deleteError}</span>
                           )}
-                          <span className="text-sm text-slate-700">
+                          <span className="text-sm text-bark-700">
                             Delete{' '}
                             <strong>
                               {s.name.slice(0, 60)}
@@ -224,7 +224,7 @@ export function StoriesPage() {
                           </button>
                           <button
                             onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                           >
                             Cancel
                           </button>
@@ -234,32 +234,32 @@ export function StoriesPage() {
                   );
                 }
                 return (
-                  <tr key={s.id} className="hover:bg-slate-50/60">
+                  <tr key={s.id} className="hover:bg-bark-50/60">
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => openEdit(s)}
-                        className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                        className="font-medium text-bark-800 hover:text-bark-600 hover:underline text-left"
                       >
                         {s.name}
                       </button>
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-bark-600">
                       {featureMap[s.feature_id] ?? s.feature_id}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-bark-600">
                       {teamMap[s.team_id] ?? s.team_id}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-500">
+                    <td className="px-4 py-2.5 text-bark-500">
                       {s.iteration_id ? (iterationMap[s.iteration_id] ?? s.iteration_id) : '—'}
                     </td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-500">{s.points}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-bark-500">{s.points}</td>
                     <td className="px-4 py-2.5">
                       <StoryStatusBadge status={s.status} />
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">
                       <button
                         onClick={() => openEdit(s)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        className="mr-3 text-xs text-bark-500 hover:text-bark-800 underline"
                       >
                         Edit
                       </button>
@@ -284,7 +284,7 @@ export function StoriesPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label htmlFor="story-name" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="story-name" className="mb-1 block text-sm font-medium text-bark-700">
               Name<span aria-hidden="true"> *</span>
             </label>
             <input
@@ -292,19 +292,19 @@ export function StoriesPage() {
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div>
-            <label htmlFor="story-feature" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="story-feature" className="mb-1 block text-sm font-medium text-bark-700">
               Feature<span aria-hidden="true"> *</span>
             </label>
             <select
               id="story-feature"
               value={form.feature_id}
               onChange={(e) => setForm({ ...form, feature_id: e.target.value })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               <option value="">— select feature —</option>
               {features.map((f) => (
@@ -315,14 +315,14 @@ export function StoriesPage() {
 
           {!editing && (
             <div>
-              <label htmlFor="story-team" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="story-team" className="mb-1 block text-sm font-medium text-bark-700">
                 Team<span aria-hidden="true"> *</span>
               </label>
               <select
                 id="story-team"
                 value={form.team_id}
                 onChange={(e) => setForm({ ...form, team_id: e.target.value })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               >
                 <option value="">— select team —</option>
                 {teams.map((t) => (
@@ -333,14 +333,14 @@ export function StoriesPage() {
           )}
 
           <div>
-            <label htmlFor="story-iteration" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="story-iteration" className="mb-1 block text-sm font-medium text-bark-700">
               Iteration
             </label>
             <select
               id="story-iteration"
               value={form.iteration_id ?? ''}
               onChange={(e) => setForm({ ...form, iteration_id: e.target.value || null })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               <option value="">— unplanned —</option>
               {iterations.map((i) => (
@@ -350,7 +350,7 @@ export function StoriesPage() {
           </div>
 
           <div>
-            <label htmlFor="story-points" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="story-points" className="mb-1 block text-sm font-medium text-bark-700">
               Points
             </label>
             <input
@@ -359,19 +359,19 @@ export function StoriesPage() {
               min={0}
               value={form.points}
               onChange={(e) => setForm({ ...form, points: Number(e.target.value) })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div>
-            <label htmlFor="story-status" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="story-status" className="mb-1 block text-sm font-medium text-bark-700">
               Status
             </label>
             <select
               id="story-status"
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value as StoryStatus })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -383,14 +383,14 @@ export function StoriesPage() {
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {isPending ? 'Saving…' : editing ? 'Save Changes' : 'Add Story'}
             </button>

@@ -1,0 +1,13 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" role="img" aria-label="SAFe Tooling">
+  <g fill="none">
+    <rect x="6" y="38" width="8" height="16" rx="1.5" fill="#ece4d4"></rect>
+    <rect x="18" y="28" width="8" height="26" rx="1.5" fill="#ece4d4"></rect>
+    <rect x="30" y="18" width="8" height="36" rx="1.5" fill="#ece4d4"></rect>
+    <circle cx="40" cy="14" r="6" fill="#8db176"></circle>
+    <path d="M40 8 C 43 11, 43 14, 40 14 C 37 14, 37 11, 40 8 Z" fill="#eef3e8"></path>
+  </g>
+  <text x="56" y="40" font-family="&#39;Instrument Serif&#39;, Georgia, serif" font-style="italic" font-size="30" fill="#f7f3ec" letter-spacing="-0.5">
+    SAFe<tspan font-family="&#39;Geist&#39;,&#39;Inter Tight&#39;,sans-serif" font-style="normal" font-weight="600" letter-spacing="-0.4" dx="6" fill="#ffffff">Tooling</tspan>
+  </text>
+</svg>

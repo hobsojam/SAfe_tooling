@@ -5,7 +5,7 @@ export function Spinner() {
       role="status"
       aria-label="Loading"
     >
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-600" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-bark-200 border-t-bark-600" />
     </div>
   );
 }

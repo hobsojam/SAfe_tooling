@@ -145,16 +145,16 @@ function StoryPanel({
 
   return (
     <tr>
-      <td colSpan={9} className="bg-slate-50/60 px-6 pb-4 pt-0">
-        <div className="rounded-md border border-slate-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <td colSpan={9} className="bg-bark-50/60 px-6 pb-4 pt-0">
+        <div className="rounded-md border border-bark-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-bark-100 px-4 py-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-bark-500">
               Stories {isLoading ? '…' : `(${stories.length})`}
             </span>
             {!addOpen && (
               <button
                 onClick={() => setAddOpen(true)}
-                className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
               >
                 + Add Story
               </button>
@@ -163,14 +163,14 @@ function StoryPanel({
 
           {stories.length > 0 && (
             <table className="w-full text-sm">
-              <thead className="border-b border-slate-100 bg-slate-50">
+              <thead className="border-b border-bark-100 bg-bark-50">
                 <tr>
                   {['Name', 'Team', 'Iteration', 'Pts', 'Status', ''].map((h) => (
-                    <th key={h} className="px-3 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{h}</th>
+                    <th key={h} className="px-3 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-bark-500">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-bark-100">
                 {stories.map((story) => {
                   if (editId === story.id) {
                     return (
@@ -183,13 +183,13 @@ function StoryPanel({
                               value={editForm.name}
                               onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                               aria-label="Story name"
-                              className="w-44 rounded border border-slate-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                              className="w-44 rounded border border-bark-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                             />
                             <select
                               value={editForm.iteration_id}
                               onChange={(e) => setEditForm({ ...editForm, iteration_id: e.target.value })}
                               aria-label="Iteration"
-                              className="rounded border border-slate-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                              className="rounded border border-bark-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                             >
                               <option value="">No iteration</option>
                               {nonIpIterations.map((it) => (
@@ -202,13 +202,13 @@ function StoryPanel({
                               value={editForm.points}
                               onChange={(e) => setEditForm({ ...editForm, points: Number(e.target.value) })}
                               aria-label="Points"
-                              className="w-14 rounded border border-slate-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                              className="w-14 rounded border border-bark-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                             />
                             <select
                               value={editForm.status}
                               onChange={(e) => setEditForm({ ...editForm, status: e.target.value as StoryStatus })}
                               aria-label="Status"
-                              className="rounded border border-slate-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                              className="rounded border border-bark-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                             >
                               {STORY_STATUS_OPTIONS.map((s) => (
                                 <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -217,14 +217,14 @@ function StoryPanel({
                             <button
                               type="submit"
                               disabled={updateMut.isPending}
-                              className="rounded bg-slate-800 px-2 py-1 text-xs text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                              className="rounded bg-bark-800 px-2 py-1 text-xs text-white hover:bg-bark-700 disabled:opacity-50 transition-colors"
                             >
                               {updateMut.isPending ? '…' : 'Save'}
                             </button>
                             <button
                               type="button"
                               onClick={() => { setEditId(null); setEditError(''); }}
-                              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                              className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                             >
                               Cancel
                             </button>
@@ -240,7 +240,7 @@ function StoryPanel({
                         <td colSpan={6} className="px-3 py-2">
                           <div className="flex items-center gap-2">
                             {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                            <span className="text-xs text-slate-700">Delete <strong>{story.name}</strong>?</span>
+                            <span className="text-xs text-bark-700">Delete <strong>{story.name}</strong>?</span>
                             <button
                               onClick={() => deleteMut.mutate(story.id)}
                               disabled={deleteMut.isPending}
@@ -250,7 +250,7 @@ function StoryPanel({
                             </button>
                             <button
                               onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                              className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                             >
                               Cancel
                             </button>
@@ -261,22 +261,22 @@ function StoryPanel({
                   }
 
                   return (
-                    <tr key={story.id} className="hover:bg-slate-50/60">
-                      <td className="px-3 py-2 text-slate-800">{story.name}</td>
-                      <td className="px-3 py-2 text-xs text-slate-500">{teamMap[story.team_id] ?? '—'}</td>
-                      <td className="px-3 py-2 text-xs text-slate-500">
+                    <tr key={story.id} className="hover:bg-bark-50/60">
+                      <td className="px-3 py-2 text-bark-800">{story.name}</td>
+                      <td className="px-3 py-2 text-xs text-bark-500">{teamMap[story.team_id] ?? '—'}</td>
+                      <td className="px-3 py-2 text-xs text-bark-500">
                         {story.iteration_id
                           ? (nonIpIterations.find((i) => i.id === story.iteration_id)?.number != null
                             ? `Iter ${nonIpIterations.find((i) => i.id === story.iteration_id)!.number}`
                             : '—')
                           : '—'}
                       </td>
-                      <td className="px-3 py-2 tabular-nums text-slate-700">{story.points}</td>
+                      <td className="px-3 py-2 tabular-nums text-bark-700">{story.points}</td>
                       <td className="px-3 py-2"><StoryStatusBadge status={story.status} /></td>
                       <td className="px-3 py-2 whitespace-nowrap text-right">
                         <button
                           onClick={() => startEdit(story)}
-                          className="mr-2 text-xs text-slate-500 hover:text-slate-800 underline"
+                          className="mr-2 text-xs text-bark-500 hover:text-bark-800 underline"
                         >
                           Edit
                         </button>
@@ -295,8 +295,8 @@ function StoryPanel({
           )}
 
           {addOpen && (
-            <form onSubmit={submitAdd} className="border-t border-slate-100 px-4 py-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">New Story</p>
+            <form onSubmit={submitAdd} className="border-t border-bark-100 px-4 py-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-bark-500">New Story</p>
               {addError && <p className="mb-1 text-xs text-red-600">{addError}</p>}
               <div className="flex flex-wrap items-center gap-2">
                 <input
@@ -305,13 +305,13 @@ function StoryPanel({
                   value={addForm.name}
                   onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
                   aria-label="Story name"
-                  className="w-44 rounded border border-slate-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                  className="w-44 rounded border border-bark-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                 />
                 <select
                   value={addForm.team_id}
                   onChange={(e) => setAddForm({ ...addForm, team_id: e.target.value })}
                   aria-label="Team"
-                  className="rounded border border-slate-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                  className="rounded border border-bark-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                 >
                   <option value="">Team *</option>
                   {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -320,7 +320,7 @@ function StoryPanel({
                   value={addForm.iteration_id}
                   onChange={(e) => setAddForm({ ...addForm, iteration_id: e.target.value })}
                   aria-label="Iteration"
-                  className="rounded border border-slate-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                  className="rounded border border-bark-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                 >
                   <option value="">Iteration</option>
                   {nonIpIterations.map((it) => (
@@ -333,19 +333,19 @@ function StoryPanel({
                   value={addForm.points}
                   onChange={(e) => setAddForm({ ...addForm, points: Number(e.target.value) })}
                   aria-label="Points"
-                  className="w-14 rounded border border-slate-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
+                  className="w-14 rounded border border-bark-300 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-moss-500"
                 />
                 <button
                   type="submit"
                   disabled={createMut.isPending}
-                  className="rounded bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                  className="rounded bg-bark-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-bark-700 disabled:opacity-50 transition-colors"
                 >
                   {createMut.isPending ? 'Adding…' : 'Add'}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setAddOpen(false); setAddError(''); }}
-                  className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                  className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                 >
                   Cancel
                 </button>
@@ -354,7 +354,7 @@ function StoryPanel({
           )}
 
           {stories.length === 0 && !addOpen && !isLoading && (
-            <p className="px-4 py-3 text-xs text-slate-400">No stories yet.</p>
+            <p className="px-4 py-3 text-xs text-bark-400">No stories yet.</p>
           )}
         </div>
       </td>
@@ -514,9 +514,9 @@ export function Backlog() {
     const id = `feature-${key.replace(/_/g, '-')}`;
     return (
       <div>
-        <label htmlFor={id} className="mb-1 block text-sm font-medium text-slate-700">
+        <label htmlFor={id} className="mb-1 block text-sm font-medium text-bark-700">
           {label}
-          <span aria-hidden="true" className="font-normal text-slate-400"> ({min}–{max})</span>
+          <span aria-hidden="true" className="font-normal text-bark-400"> ({min}–{max})</span>
         </label>
         <input
           id={id}
@@ -525,7 +525,7 @@ export function Backlog() {
           max={max}
           value={form[key]}
           onChange={(e) => setForm({ ...form, [key]: Number(e.target.value) })}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+          className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
         />
       </div>
     );
@@ -535,14 +535,14 @@ export function Backlog() {
     <div className="p-6">
       <div className="mb-5 flex items-baseline justify-between">
         <div>
-          <h1 className="mb-1 text-xl font-semibold text-slate-800">
+          <h1 className="mb-1 text-xl font-semibold text-bark-800">
             Program Backlog — {pi?.name}
           </h1>
-          <p className="text-sm text-slate-500">Features ranked by WSJF score (highest first)</p>
+          <p className="text-sm text-bark-500">Features ranked by WSJF score (highest first)</p>
         </div>
         <button
           onClick={openNew}
-          className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+          className="rounded-md bg-moss-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-moss-700 transition-colors"
         >
           + New Feature
         </button>
@@ -551,34 +551,34 @@ export function Backlog() {
       {sorted.length === 0 ? (
         <EmptyState message="No features in this PI." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto overflow-hidden rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
                 {['#', 'Feature', 'Status', 'Team', 'CoD', 'Size', 'WSJF', 'Stories', ''].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {pageSorted.map((f, i) => (
                 <Fragment key={f.id}>
-                  <tr className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
+                  <tr className="hover:bg-bark-50/60">
+                    <td className="px-4 py-2.5 text-bark-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => openEdit(f)}
-                        className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                        className="font-medium text-bark-800 hover:text-bark-600 hover:underline text-left"
                       >
                         {f.name}
                       </button>
                       {f.description && (
-                        <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                        <p className="mt-0.5 text-xs text-bark-400 line-clamp-1">
                           {f.description}
                         </p>
                       )}
@@ -586,18 +586,18 @@ export function Backlog() {
                     <td className="px-4 py-2.5">
                       <FeatureStatusBadge status={f.status} />
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-bark-600">
                       {f.team_id ? (teamMap[f.team_id] ?? f.team_id) : '—'}
                     </td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.cost_of_delay}</td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.job_size}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-bark-700">{f.cost_of_delay}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-bark-700">{f.job_size}</td>
                     <td className="px-4 py-2.5">
-                      <span className="font-semibold text-slate-800 tabular-nums">{f.wsjf_score}</span>
+                      <span className="font-semibold text-bark-800 tabular-nums">{f.wsjf_score}</span>
                     </td>
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => toggleExpand(f.id)}
-                        className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                        className="flex items-center gap-1 text-xs text-bark-500 hover:text-bark-800 transition-colors"
                         aria-expanded={expandedFeatureId === f.id}
                       >
                         <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
@@ -607,7 +607,7 @@ export function Backlog() {
                     <td className="px-4 py-2.5 whitespace-nowrap">
                       <button
                         onClick={() => openEdit(f)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        className="mr-3 text-xs text-bark-500 hover:text-bark-800 underline"
                       >
                         Edit
                       </button>
@@ -645,7 +645,7 @@ export function Backlog() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label htmlFor="feature-name" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="feature-name" className="mb-1 block text-sm font-medium text-bark-700">
               Name<span aria-hidden="true"> *</span>
             </label>
             <input
@@ -653,29 +653,29 @@ export function Backlog() {
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div>
-            <label htmlFor="feature-description" className="mb-1 block text-sm font-medium text-slate-700">Description</label>
+            <label htmlFor="feature-description" className="mb-1 block text-sm font-medium text-bark-700">Description</label>
             <textarea
               id="feature-description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={2}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="feature-status" className="mb-1 block text-sm font-medium text-slate-700">Status</label>
+              <label htmlFor="feature-status" className="mb-1 block text-sm font-medium text-bark-700">Status</label>
               <select
                 id="feature-status"
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value as FeatureStatus })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               >
                 {FEATURE_STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>{s}</option>
@@ -683,12 +683,12 @@ export function Backlog() {
               </select>
             </div>
             <div>
-              <label htmlFor="feature-team" className="mb-1 block text-sm font-medium text-slate-700">Team</label>
+              <label htmlFor="feature-team" className="mb-1 block text-sm font-medium text-bark-700">Team</label>
               <select
                 id="feature-team"
                 value={form.team_id ?? ''}
                 onChange={(e) => setForm({ ...form, team_id: e.target.value || null })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               >
                 <option value="">— none —</option>
                 {teams.map((t) => (
@@ -698,7 +698,7 @@ export function Backlog() {
             </div>
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-wide text-bark-500">
             WSJF Inputs
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -712,14 +712,14 @@ export function Backlog() {
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {isPending ? 'Saving…' : editing ? 'Save Changes' : 'Add Feature'}
             </button>

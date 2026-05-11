@@ -71,10 +71,10 @@ export function Predictability() {
   return (
     <div className="p-6">
       <div className="mb-5">
-        <h1 className="mb-1 text-xl font-semibold text-slate-800">
+        <h1 className="mb-1 text-xl font-semibold text-bark-800">
           ART Predictability — {pi?.name}
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-bark-500">
           Committed objectives only · SAFe target: 80–100%
         </p>
       </div>
@@ -82,15 +82,15 @@ export function Predictability() {
       {committed.length === 0 ? (
         <EmptyState message="No committed objectives for this PI. Add objectives on the Objectives page." />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
                 {['Team', 'Objectives', 'Planned BV', 'Actual BV', 'Scored', 'Predictability'].map(
                   (h) => (
                     <th
                       key={h}
-                      className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                      className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide"
                     >
                       {h}
                     </th>
@@ -98,10 +98,10 @@ export function Predictability() {
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {rows.map(({ team, objectives: objs, plannedBV, actualBV, scored, predictability }) =>
                 objs.length === 0 ? (
-                  <tr key={team.id} className="text-slate-400">
+                  <tr key={team.id} className="text-bark-400">
                     <td className="px-4 py-3 font-medium">{team.name}</td>
                     <td className="px-4 py-3">0</td>
                     <td className="px-4 py-3">—</td>
@@ -110,14 +110,14 @@ export function Predictability() {
                     <td className="px-4 py-3 text-xs">No committed objectives</td>
                   </tr>
                 ) : (
-                  <tr key={team.id} className="hover:bg-slate-50/60">
-                    <td className="px-4 py-3 font-medium text-slate-800">{team.name}</td>
-                    <td className="px-4 py-3 text-slate-600">{objs.length}</td>
-                    <td className="px-4 py-3 tabular-nums text-slate-700">{plannedBV}</td>
-                    <td className="px-4 py-3 tabular-nums text-slate-700">
-                      {scored > 0 ? actualBV : <span className="text-slate-400">—</span>}
+                  <tr key={team.id} className="hover:bg-bark-50/60">
+                    <td className="px-4 py-3 font-medium text-bark-800">{team.name}</td>
+                    <td className="px-4 py-3 text-bark-600">{objs.length}</td>
+                    <td className="px-4 py-3 tabular-nums text-bark-700">{plannedBV}</td>
+                    <td className="px-4 py-3 tabular-nums text-bark-700">
+                      {scored > 0 ? actualBV : <span className="text-bark-400">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-4 py-3 text-bark-500">
                       {scored} / {objs.length}
                     </td>
                     <td className="px-4 py-3">
@@ -128,30 +128,30 @@ export function Predictability() {
                           {predictability}%
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-400">Not yet scored</span>
+                        <span className="text-xs text-bark-400">Not yet scored</span>
                       )}
                     </td>
                   </tr>
                 ),
               )}
             </tbody>
-            <tfoot className="border-t-2 border-slate-300 bg-slate-50">
+            <tfoot className="border-t-2 border-bark-300 bg-bark-50">
               <tr>
-                <td className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <td className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-bark-500">
                   ART Total
                 </td>
-                <td className="px-4 py-3 font-semibold text-slate-800">{committed.length}</td>
-                <td className="px-4 py-3 tabular-nums font-semibold text-slate-800">
+                <td className="px-4 py-3 font-semibold text-bark-800">{committed.length}</td>
+                <td className="px-4 py-3 tabular-nums font-semibold text-bark-800">
                   {artPlannedBV}
                 </td>
-                <td className="px-4 py-3 tabular-nums font-semibold text-slate-800">
+                <td className="px-4 py-3 tabular-nums font-semibold text-bark-800">
                   {artScoredObjs.length > 0 ? (
                     artActualBV
                   ) : (
-                    <span className="font-normal text-slate-400">—</span>
+                    <span className="font-normal text-bark-400">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3 font-semibold text-slate-800">
+                <td className="px-4 py-3 font-semibold text-bark-800">
                   {artScoredObjs.length} / {committed.length}
                 </td>
                 <td className="px-4 py-3">
@@ -162,7 +162,7 @@ export function Predictability() {
                       {artPredictability}%
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-400">Not yet scored</span>
+                    <span className="text-xs text-bark-400">Not yet scored</span>
                   )}
                 </td>
               </tr>
@@ -171,7 +171,7 @@ export function Predictability() {
         </div>
       )}
 
-      <p className="mt-4 text-xs text-slate-400">
+      <p className="mt-4 text-xs text-bark-400">
         Predictability = Actual BV ÷ Planned BV × 100. Stretch objectives are excluded. Unscored
         objectives are not counted toward actual BV.
       </p>

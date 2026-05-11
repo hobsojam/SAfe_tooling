@@ -55,13 +55,13 @@ function buildBoard(features: Feature[], stories: Story[]): BoardGrid {
 function FeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
   const cardCls = atRisk
     ? 'rounded border border-red-300 bg-red-50 px-2 py-1.5 shadow-sm'
-    : 'rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm';
+    : 'rounded border border-bark-200 bg-white px-2 py-1.5 shadow-sm';
   return (
     <div className={cardCls} data-at-risk={atRisk ? 'true' : undefined}>
-      <p className="text-xs font-medium text-slate-800 leading-snug">{feature.name}</p>
+      <p className="text-xs font-medium text-bark-800 leading-snug">{feature.name}</p>
       <div className="mt-1 flex items-center gap-1.5">
         <FeatureStatusBadge status={feature.status} />
-        <span className="text-xs text-slate-400">WSJF {feature.wsjf_score}</span>
+        <span className="text-xs text-bark-400">WSJF {feature.wsjf_score}</span>
       </div>
     </div>
   );
@@ -94,7 +94,7 @@ function DroppableCell({ id, children }: { id: string; children: React.ReactNode
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[4rem] p-2 space-y-1.5 border-r border-slate-100 transition-colors ${isOver ? 'bg-blue-50' : ''}`}
+      className={`min-h-[4rem] p-2 space-y-1.5 border-r border-bark-100 transition-colors ${isOver ? 'bg-blue-50' : ''}`}
     >
       {children}
     </div>
@@ -303,33 +303,33 @@ export function Board() {
 
   return (
     <div className="p-6">
-      <h1 className="mb-1 text-xl font-semibold text-slate-800">
+      <h1 className="mb-1 text-xl font-semibold text-bark-800">
         Program Board — {pi?.name}
       </h1>
-      <p className="mb-5 text-sm text-slate-500">
+      <p className="mb-5 text-sm text-bark-500">
         Drag features between cells to reassign team and iteration
       </p>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-lg border border-bark-200 bg-white shadow-sm">
         <div ref={boardRef} style={{ position: 'relative' }}>
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div style={{ display: 'grid', gridTemplateColumns }}>
             {/* Header row */}
-            <div className="border-b border-r border-slate-200 bg-slate-50 px-3 py-2.5">
-              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Team</span>
+            <div className="border-b border-r border-bark-200 bg-bark-50 px-3 py-2.5">
+              <span className="text-xs font-semibold text-bark-600 uppercase tracking-wide">Team</span>
             </div>
             {iterCols.map((c) => (
               <div
                 key={c.id}
-                className="border-b border-r border-slate-200 bg-slate-50 px-3 py-2.5"
+                className="border-b border-r border-bark-200 bg-bark-50 px-3 py-2.5"
               >
-                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                <span className="text-xs font-semibold text-bark-600 uppercase tracking-wide">
                   {c.label}
                 </span>
               </div>
             ))}
-            <div className="border-b border-slate-200 bg-slate-50 px-3 py-2.5">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            <div className="border-b border-bark-200 bg-bark-50 px-3 py-2.5">
+              <span className="text-xs font-semibold text-bark-500 uppercase tracking-wide">
                 Unplanned
               </span>
             </div>
@@ -337,20 +337,20 @@ export function Board() {
             {/* Team rows */}
             {teamIds.map((teamId, rowIdx) => {
               const teamGrid = grid[teamId] ?? {};
-              const rowBg = rowIdx % 2 === 0 ? '' : 'bg-slate-50/60';
+              const rowBg = rowIdx % 2 === 0 ? '' : 'bg-bark-50/60';
               return (
                 <Fragment key={teamId}>
                   <div
                     key={`${teamId}-name`}
-                    className={`border-b border-r border-slate-100 px-3 py-2 flex flex-col gap-1 ${rowBg}`}
+                    className={`border-b border-r border-bark-100 px-3 py-2 flex flex-col gap-1 ${rowBg}`}
                   >
-                    <span className="font-medium text-sm text-slate-700">
+                    <span className="font-medium text-sm text-bark-700">
                       {teamMap[teamId]?.name ?? teamId}
                     </span>
                     <TopologyBadge type={teamMap[teamId]?.topology_type ?? null} />
                   </div>
                   {iterCols.map((c) => (
-                    <div key={`${teamId}-${c.id}`} className={`border-b border-slate-100 ${rowBg}`}>
+                    <div key={`${teamId}-${c.id}`} className={`border-b border-bark-100 ${rowBg}`}>
                       <DroppableCell id={`${teamId}|${c.id}`}>
                         {(teamGrid[c.id] ?? []).map((f) => (
                           <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
@@ -358,7 +358,7 @@ export function Board() {
                       </DroppableCell>
                     </div>
                   ))}
-                  <div key={`${teamId}-unplanned`} className={`border-b border-slate-100 ${rowBg}`}>
+                  <div key={`${teamId}-unplanned`} className={`border-b border-bark-100 ${rowBg}`}>
                     <DroppableCell id={`${teamId}|unplanned`}>
                       {(teamGrid['unplanned'] ?? []).map((f) => (
                         <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
@@ -370,8 +370,8 @@ export function Board() {
             })}
           </div>
 
-          <div className="border-t border-slate-200 p-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <div className="border-t border-bark-200 p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-bark-500">
               Unassigned ({unassignedFeatures.length})
             </p>
             <UnassignedDropZone>
@@ -384,7 +384,7 @@ export function Board() {
                   ))}
                 </div>
               ) : (
-                <p className="p-1 text-xs italic text-slate-400">
+                <p className="p-1 text-xs italic text-bark-400">
                   No unassigned features — drop a feature here to remove its team assignment
                 </p>
               )}
@@ -433,24 +433,24 @@ export function Board() {
       {/* Dependencies */}
       {deps.length > 0 && (
         <div className="mt-8">
-          <h2 className="mb-3 text-base font-semibold text-slate-700">
+          <h2 className="mb-3 text-base font-semibold text-bark-700">
             Dependencies ({deps.length})
           </h2>
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-lg border border-bark-200 bg-white shadow-sm">
             <table className="w-full text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50">
+              <thead className="border-b border-bark-200 bg-bark-50">
                 <tr>
                   {['From', 'To', 'Description', 'Status', 'Owner'].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                      className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-bark-100">
                 {deps.map((d) => {
                   const fromFeature = features.find((f) => f.id === d.from_feature_id);
                   const toFeature = features.find((f) => f.id === d.to_feature_id);
@@ -462,13 +462,13 @@ export function Board() {
                     : d.to_feature_id;
                   return (
                     <tr key={d.id}>
-                      <td className="px-4 py-2.5 text-slate-700">{fromLabel}</td>
-                      <td className="px-4 py-2.5 text-slate-700">{toLabel}</td>
-                      <td className="px-4 py-2.5 text-slate-600">{d.description}</td>
+                      <td className="px-4 py-2.5 text-bark-700">{fromLabel}</td>
+                      <td className="px-4 py-2.5 text-bark-700">{toLabel}</td>
+                      <td className="px-4 py-2.5 text-bark-600">{d.description}</td>
                       <td className="px-4 py-2.5">
                         <DepBadge status={d.status} />
                       </td>
-                      <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
+                      <td className="px-4 py-2.5 text-bark-500">{d.owner ?? '—'}</td>
                     </tr>
                   );
                 })}

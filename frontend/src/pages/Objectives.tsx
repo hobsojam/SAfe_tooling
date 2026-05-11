@@ -158,16 +158,16 @@ export function Objectives() {
     <div className="p-6">
       <div className="mb-5 flex items-baseline justify-between">
         <div>
-          <h1 className="mb-1 text-xl font-semibold text-slate-800">
+          <h1 className="mb-1 text-xl font-semibold text-bark-800">
             PI Objectives — {pi?.name}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-bark-500">
             Committed: {committed.length} · Stretch: {stretch.length}
           </p>
         </div>
         <button
           onClick={openNew}
-          className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+          className="rounded-md bg-moss-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-moss-700 transition-colors"
         >
           + New Objective
         </button>
@@ -176,16 +176,16 @@ export function Objectives() {
       {sorted.length === 0 ? (
         <EmptyState message="No PI objectives yet." />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
                 {['Description', 'Team', 'Type', 'Planned BV', 'Actual BV', ''].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">{h}</th>
+                  <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {pageSorted.map((obj) => {
                 if (deleteId === obj.id) {
                   return (
@@ -193,7 +193,7 @@ export function Objectives() {
                       <td colSpan={6} className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                          <span className="text-sm text-slate-700">
+                          <span className="text-sm text-bark-700">
                             Delete <strong>{obj.description.slice(0, 50)}{obj.description.length > 50 ? '…' : ''}</strong>?
                           </span>
                           <button
@@ -205,7 +205,7 @@ export function Objectives() {
                           </button>
                           <button
                             onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                           >
                             Cancel
                           </button>
@@ -216,31 +216,31 @@ export function Objectives() {
                 }
 
                 return (
-                  <tr key={obj.id} className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-800 max-w-xs">
+                  <tr key={obj.id} className="hover:bg-bark-50/60">
+                    <td className="px-4 py-2.5 text-bark-800 max-w-xs">
                       <button
                         onClick={() => openEdit(obj)}
-                        className="text-left hover:text-slate-600 hover:underline"
+                        className="text-left hover:text-bark-600 hover:underline"
                       >
                         {obj.description}
                       </button>
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">{teamMap[obj.team_id] ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-bark-600">{teamMap[obj.team_id] ?? '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${obj.is_stretch ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
                         {obj.is_stretch ? 'Stretch' : 'Committed'}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{obj.planned_business_value}</td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">
+                    <td className="px-4 py-2.5 tabular-nums text-bark-700">{obj.planned_business_value}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-bark-700">
                       {obj.actual_business_value !== null
                         ? obj.actual_business_value
-                        : <span className="text-slate-400">—</span>}
+                        : <span className="text-bark-400">—</span>}
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap text-right">
                       <button
                         onClick={() => openEdit(obj)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        className="mr-3 text-xs text-bark-500 hover:text-bark-800 underline"
                       >
                         Edit
                       </button>
@@ -256,15 +256,15 @@ export function Objectives() {
               })}
             </tbody>
             {committed.length > 0 && (
-              <tfoot className="border-t-2 border-slate-200 bg-slate-50">
+              <tfoot className="border-t-2 border-bark-200 bg-bark-50">
                 <tr>
-                  <td colSpan={3} className="px-4 py-2.5 text-xs text-slate-500">
+                  <td colSpan={3} className="px-4 py-2.5 text-xs text-bark-500">
                     Committed totals · {scoredCommitted.length} of {committed.length} scored
                   </td>
-                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-bark-700">
                     {committedPlannedBV}
                   </td>
-                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-bark-700">
                     {scoredCommitted.length > 0 ? committedActualBV : '—'}
                   </td>
                   <td className="px-4 py-2.5 text-right">
@@ -273,7 +273,7 @@ export function Objectives() {
                         {predictabilityPct}%
                       </span>
                     ) : (
-                      <span className="text-xs text-slate-400">Not yet scored</span>
+                      <span className="text-xs text-bark-400">Not yet scored</span>
                     )}
                   </td>
                 </tr>
@@ -293,7 +293,7 @@ export function Objectives() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label htmlFor="obj-desc" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="obj-desc" className="mb-1 block text-sm font-medium text-bark-700">
               Description<span aria-hidden="true"> *</span>
             </label>
             <textarea
@@ -301,20 +301,20 @@ export function Objectives() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={2}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           {!editing && (
             <div>
-              <label htmlFor="obj-team" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="obj-team" className="mb-1 block text-sm font-medium text-bark-700">
                 Team<span aria-hidden="true"> *</span>
               </label>
               <select
                 id="obj-team"
                 value={form.team_id}
                 onChange={(e) => setForm({ ...form, team_id: e.target.value })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               >
                 <option value="">Select team…</option>
                 {teams.map((t) => (
@@ -326,7 +326,7 @@ export function Objectives() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="obj-planned-bv" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="obj-planned-bv" className="mb-1 block text-sm font-medium text-bark-700">
                 Planned BV (1–10)<span aria-hidden="true"> *</span>
               </label>
               <input
@@ -336,12 +336,12 @@ export function Objectives() {
                 max={10}
                 value={form.planned_business_value}
                 onChange={(e) => setForm({ ...form, planned_business_value: Number(e.target.value) })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div>
-              <label htmlFor="obj-actual-bv" className="mb-1 block text-sm font-medium text-slate-700">
-                Actual BV <span className="font-normal text-slate-400">(blank if not yet scored)</span>
+              <label htmlFor="obj-actual-bv" className="mb-1 block text-sm font-medium text-bark-700">
+                Actual BV <span className="font-normal text-bark-400">(blank if not yet scored)</span>
               </label>
               <input
                 id="obj-actual-bv"
@@ -351,17 +351,17 @@ export function Objectives() {
                 value={form.actual_business_value}
                 onChange={(e) => setForm({ ...form, actual_business_value: e.target.value })}
                 placeholder="—"
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-bark-700 cursor-pointer">
             <input
               type="checkbox"
               checked={form.is_stretch}
               onChange={(e) => setForm({ ...form, is_stretch: e.target.checked })}
-              className="rounded border-slate-300"
+              className="rounded border-bark-300"
             />
             Stretch objective (not counted in ART predictability)
           </label>
@@ -370,14 +370,14 @@ export function Objectives() {
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {isPending ? 'Saving…' : editing ? 'Save Changes' : 'Add Objective'}
             </button>

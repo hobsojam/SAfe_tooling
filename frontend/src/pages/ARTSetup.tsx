@@ -82,17 +82,17 @@ export function ARTSetup() {
 
   return (
     <div className="p-6 max-w-2xl">
-      <h1 className="mb-6 text-xl font-semibold text-slate-800">ART Setup</h1>
+      <h1 className="mb-6 text-xl font-semibold text-bark-800">ART Setup</h1>
 
-      <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
-          <h2 className="text-sm font-semibold text-slate-700">
+      <div className="rounded-lg border border-bark-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-bark-200 px-5 py-3">
+          <h2 className="text-sm font-semibold text-bark-700">
             Agile Release Trains ({sortedArts.length})
           </h2>
           {!addOpen && (
             <button
               onClick={() => { setAddOpen(true); setAddName(''); setAddError(''); }}
-              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+              className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
             >
               + Add ART
             </button>
@@ -101,16 +101,16 @@ export function ARTSetup() {
 
         {sortedArts.length > 0 && (
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-100 bg-slate-50">
+            <thead className="border-b border-bark-100 bg-bark-50">
               <tr>
                 {['Name', 'Teams', ''].map((h) => (
-                  <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-bark-500 uppercase tracking-wide">
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {sortedArts.map((art) => {
                 if (edit?.artId === art.id) {
                   return (
@@ -123,19 +123,19 @@ export function ARTSetup() {
                             value={edit.name}
                             onChange={(e) => setEdit({ ...edit, name: e.target.value })}
                             aria-label="ART name"
-                            className="w-56 rounded-md border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            className="w-56 rounded-md border border-bark-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                           />
                           <button
                             type="submit"
                             disabled={updateMut.isPending}
-                            className="rounded-md bg-slate-800 px-3 py-1 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                            className="rounded-md bg-bark-800 px-3 py-1 text-xs font-medium text-white hover:bg-bark-700 disabled:opacity-50 transition-colors"
                           >
                             {updateMut.isPending ? 'Saving…' : 'Save'}
                           </button>
                           <button
                             type="button"
                             onClick={() => { setEdit(null); setEditError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                           >
                             Cancel
                           </button>
@@ -151,7 +151,7 @@ export function ARTSetup() {
                       <td colSpan={3} className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                          <span className="text-sm text-slate-700">Delete <strong>{art.name}</strong>?</span>
+                          <span className="text-sm text-bark-700">Delete <strong>{art.name}</strong>?</span>
                           <button
                             onClick={() => deleteMut.mutate(art.id)}
                             disabled={deleteMut.isPending}
@@ -161,7 +161,7 @@ export function ARTSetup() {
                           </button>
                           <button
                             onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                           >
                             Cancel
                           </button>
@@ -173,12 +173,12 @@ export function ARTSetup() {
 
                 return (
                   <tr key={art.id}>
-                    <td className="px-4 py-2.5 font-medium text-slate-800">{art.name}</td>
-                    <td className="px-4 py-2.5 text-slate-500">{art.team_ids.length}</td>
+                    <td className="px-4 py-2.5 font-medium text-bark-800">{art.name}</td>
+                    <td className="px-4 py-2.5 text-bark-500">{art.team_ids.length}</td>
                     <td className="px-4 py-2.5 text-right">
                       <button
                         onClick={() => startEdit(art)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                        className="mr-3 text-xs text-bark-500 hover:text-bark-800 transition-colors"
                       >
                         Edit
                       </button>
@@ -197,11 +197,11 @@ export function ARTSetup() {
         )}
 
         {addOpen && (
-          <form onSubmit={submitAdd} className="border-t border-slate-100 px-5 py-4 space-y-4">
-            <h3 className="text-sm font-medium text-slate-700">New ART</h3>
+          <form onSubmit={submitAdd} className="border-t border-bark-100 px-5 py-4 space-y-4">
+            <h3 className="text-sm font-medium text-bark-700">New ART</h3>
             {addError && <p className="text-sm text-red-600">{addError}</p>}
             <div>
-              <label htmlFor="art-name" className="mb-1 block text-xs font-medium text-slate-700">
+              <label htmlFor="art-name" className="mb-1 block text-xs font-medium text-bark-700">
                 Name
               </label>
               <input
@@ -210,21 +210,21 @@ export function ARTSetup() {
                 value={addName}
                 onChange={(e) => setAddName(e.target.value)}
                 placeholder="e.g. Platform ART"
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div className="flex gap-3 justify-end">
               <button
                 type="button"
                 onClick={() => { setAddOpen(false); setAddError(''); }}
-                className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+                className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={createMut.isPending}
-                className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
               >
                 {createMut.isPending ? 'Adding…' : 'Add ART'}
               </button>
@@ -233,7 +233,7 @@ export function ARTSetup() {
         )}
 
         {sortedArts.length === 0 && !addOpen && (
-          <p className="px-5 py-4 text-sm text-slate-400">
+          <p className="px-5 py-4 text-sm text-bark-400">
             No ARTs yet. Add one to get started — you will need an ART before you can create a PI.
           </p>
         )}

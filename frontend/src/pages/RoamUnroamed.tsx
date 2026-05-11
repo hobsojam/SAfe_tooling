@@ -88,14 +88,14 @@ export function RoamUnroamed() {
       <div className="mb-5">
         <Link
           to={`/pi/${piId}/risks`}
-          className="text-sm text-slate-500 hover:text-slate-700 underline"
+          className="text-sm text-bark-500 hover:text-bark-700 underline"
         >
           ← Back to Risk Register
         </Link>
-        <h1 className="mt-2 text-xl font-semibold text-slate-800">
+        <h1 className="mt-2 text-xl font-semibold text-bark-800">
           ROAM Unroamed Risks — {pi?.name}
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-bark-500">
           {unroamed.length} risk{unroamed.length !== 1 ? 's' : ''} need attention
         </p>
       </div>
@@ -108,22 +108,22 @@ export function RoamUnroamed() {
             const row = getRow(r);
             const pending = saving[r.id] ?? false;
             return (
-              <div key={r.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="mb-3 font-medium text-slate-800">{r.description}</p>
+              <div key={r.id} className="rounded-lg border border-bark-200 bg-white p-4 shadow-sm">
+                <p className="mb-3 font-medium text-bark-800">{r.description}</p>
                 {r.team_id && (
-                  <p className="mb-2 text-xs text-slate-500">
+                  <p className="mb-2 text-xs text-bark-500">
                     Team: {teamMap[r.team_id] ?? r.team_id}
                   </p>
                 )}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label className="mb-1 block text-xs font-medium text-bark-600">
                       ROAM Status
                     </label>
                     <select
                       value={row.roam_status}
                       onChange={(e) => setField(r.id, r, 'roam_status', e.target.value)}
-                      className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="w-full rounded-md border border-bark-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                     >
                       {ROAM_OPTIONS.map((s) => (
                         <option key={s} value={s}>{s}</option>
@@ -131,17 +131,17 @@ export function RoamUnroamed() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">Owner</label>
+                    <label className="mb-1 block text-xs font-medium text-bark-600">Owner</label>
                     <input
                       type="text"
                       value={row.owner}
                       onChange={(e) => setField(r.id, r, 'owner', e.target.value)}
                       placeholder="Assign owner…"
-                      className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="w-full rounded-md border border-bark-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label className="mb-1 block text-xs font-medium text-bark-600">
                       Mitigation Notes
                     </label>
                     <input
@@ -149,7 +149,7 @@ export function RoamUnroamed() {
                       value={row.mitigation_notes}
                       onChange={(e) => setField(r.id, r, 'mitigation_notes', e.target.value)}
                       placeholder="Notes…"
-                      className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="w-full rounded-md border border-bark-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                     />
                   </div>
                 </div>
@@ -160,7 +160,7 @@ export function RoamUnroamed() {
                   <button
                     onClick={() => save(r)}
                     disabled={pending}
-                    className="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                    className="rounded-md bg-bark-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-bark-700 disabled:opacity-50 transition-colors"
                   >
                     {pending ? 'Saving…' : 'ROAM this risk'}
                   </button>

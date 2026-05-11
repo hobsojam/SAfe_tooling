@@ -134,16 +134,16 @@ export function Setup() {
 
   return (
     <div className="p-6 max-w-2xl">
-      <h1 className="mb-6 text-xl font-semibold text-slate-800">PI Setup</h1>
+      <h1 className="mb-6 text-xl font-semibold text-bark-800">PI Setup</h1>
 
       {/* Details */}
-      <section className="mb-8 rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
-          <h2 className="text-sm font-semibold text-slate-700">Details</h2>
+      <section className="mb-8 rounded-lg border border-bark-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-bark-200 px-5 py-3">
+          <h2 className="text-sm font-semibold text-bark-700">Details</h2>
           {!editing && (
             <button
               onClick={startEditing}
-              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+              className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
             >
               Edit
             </button>
@@ -154,34 +154,34 @@ export function Setup() {
             <form onSubmit={submitDetails} className="space-y-4">
               {detailsError && <p className="text-sm text-red-600">{detailsError}</p>}
               <div>
-                <label htmlFor="pi-name" className="mb-1 block text-sm font-medium text-slate-700">Name</label>
+                <label htmlFor="pi-name" className="mb-1 block text-sm font-medium text-bark-700">Name</label>
                 <input
                   id="pi-name"
                   type="text"
                   value={form.name ?? ''}
                   onChange={(e) => setDetailsForm({ ...detailsForm!, name: e.target.value })}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-slate-700">Start Date</label>
+                  <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-bark-700">Start Date</label>
                   <input
                     id="pi-start"
                     type="date"
                     value={form.start_date ?? ''}
                     onChange={(e) => setDetailsForm({ ...detailsForm!, start_date: e.target.value })}
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="pi-end" className="mb-1 block text-sm font-medium text-slate-700">End Date</label>
+                  <label htmlFor="pi-end" className="mb-1 block text-sm font-medium text-bark-700">End Date</label>
                   <input
                     id="pi-end"
                     type="date"
                     value={form.end_date ?? ''}
                     onChange={(e) => setDetailsForm({ ...detailsForm!, end_date: e.target.value })}
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                   />
                 </div>
               </div>
@@ -189,14 +189,14 @@ export function Setup() {
                 <button
                   type="button"
                   onClick={() => { setDetailsForm(null); setDetailsError(''); }}
-                  className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+                  className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updatePIMut.isPending}
-                  className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                  className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
                 >
                   {updatePIMut.isPending ? 'Saving…' : 'Save'}
                 </button>
@@ -205,16 +205,16 @@ export function Setup() {
           ) : (
             <dl className="space-y-2 text-sm">
               <div className="flex gap-4">
-                <dt className="w-24 text-slate-500">Name</dt>
-                <dd className="font-medium text-slate-800">{pi.name}</dd>
+                <dt className="w-24 text-bark-500">Name</dt>
+                <dd className="font-medium text-bark-800">{pi.name}</dd>
               </div>
               <div className="flex gap-4">
-                <dt className="w-24 text-slate-500">Status</dt>
+                <dt className="w-24 text-bark-500">Status</dt>
                 <dd><PIStatusBadge status={pi.status} /></dd>
               </div>
               <div className="flex gap-4">
-                <dt className="w-24 text-slate-500">Dates</dt>
-                <dd className="text-slate-700">{pi.start_date} – {pi.end_date}</dd>
+                <dt className="w-24 text-bark-500">Dates</dt>
+                <dd className="text-bark-700">{pi.start_date} – {pi.end_date}</dd>
               </div>
             </dl>
           )}
@@ -222,9 +222,9 @@ export function Setup() {
       </section>
 
       {/* Lifecycle */}
-      <section className="mb-8 rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-5 py-3">
-          <h2 className="text-sm font-semibold text-slate-700">Lifecycle</h2>
+      <section className="mb-8 rounded-lg border border-bark-200 bg-white shadow-sm">
+        <div className="border-b border-bark-200 px-5 py-3">
+          <h2 className="text-sm font-semibold text-bark-700">Lifecycle</h2>
         </div>
         <div className="px-5 py-4">
           {lifecycleError && <p className="mb-3 text-sm text-red-600">{lifecycleError}</p>}
@@ -239,12 +239,12 @@ export function Setup() {
             <button
               onClick={() => { setLifecycleError(''); closeMut.mutate(); }}
               disabled={pi.status !== 'active' || closeMut.isPending}
-              className="rounded-md bg-slate-600 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-40 transition-colors"
+              className="rounded-md bg-bark-600 px-4 py-2 text-sm font-medium text-white hover:bg-bark-700 disabled:opacity-40 transition-colors"
             >
               Close
             </button>
           </div>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-bark-400">
             {pi.status === 'planning' && 'Activate when PI Planning is complete.'}
             {pi.status === 'active' && 'Close after the PI System Demo and Inspect & Adapt.'}
             {pi.status === 'closed' && 'This PI is closed and cannot be transitioned further.'}
@@ -253,15 +253,15 @@ export function Setup() {
       </section>
 
       {/* Iterations */}
-      <section className="mb-8 rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
-          <h2 className="text-sm font-semibold text-slate-700">
+      <section className="mb-8 rounded-lg border border-bark-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-bark-200 px-5 py-3">
+          <h2 className="text-sm font-semibold text-bark-700">
             Iterations ({sortedIters.length})
           </h2>
           {!showIterForm && (
             <button
               onClick={openIterForm}
-              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+              className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
             >
               + Add
             </button>
@@ -270,23 +270,23 @@ export function Setup() {
 
         {sortedIters.length > 0 && (
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-100 bg-slate-50">
+            <thead className="border-b border-bark-100 bg-bark-50">
               <tr>
                 {['#', 'Name', 'Start', 'End', 'IP?', ''].map((h) => (
-                  <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-bark-500 uppercase tracking-wide">
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {sortedIters.map((it) => (
                 <tr key={it.id}>
-                  <td className="px-4 py-2 text-slate-700">{it.number}</td>
-                  <td className="px-4 py-2 text-slate-700">{it.name || '—'}</td>
-                  <td className="px-4 py-2 text-slate-500">{it.start_date}</td>
-                  <td className="px-4 py-2 text-slate-500">{it.end_date}</td>
-                  <td className="px-4 py-2 text-slate-500">{it.is_ip ? 'Yes' : 'No'}</td>
+                  <td className="px-4 py-2 text-bark-700">{it.number}</td>
+                  <td className="px-4 py-2 text-bark-700">{it.name || '—'}</td>
+                  <td className="px-4 py-2 text-bark-500">{it.start_date}</td>
+                  <td className="px-4 py-2 text-bark-500">{it.end_date}</td>
+                  <td className="px-4 py-2 text-bark-500">{it.is_ip ? 'Yes' : 'No'}</td>
                   <td className="px-4 py-2 text-right">
                     <button
                       onClick={() => deleteIterMut.mutate(it.id)}
@@ -303,54 +303,54 @@ export function Setup() {
         )}
 
         {showIterForm && (
-          <form onSubmit={submitIter} className="border-t border-slate-100 px-5 py-4 space-y-4">
-            <h3 className="text-sm font-medium text-slate-700">New Iteration</h3>
+          <form onSubmit={submitIter} className="border-t border-bark-100 px-5 py-4 space-y-4">
+            <h3 className="text-sm font-medium text-bark-700">New Iteration</h3>
             {iterError && <p className="text-sm text-red-600">{iterError}</p>}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="iter-number" className="mb-1 block text-xs font-medium text-slate-700">Number</label>
+                <label htmlFor="iter-number" className="mb-1 block text-xs font-medium text-bark-700">Number</label>
                 <input
                   id="iter-number"
                   type="number"
                   min={1}
                   value={iterForm.number}
                   onChange={(e) => setIterForm({ ...iterForm, number: Number(e.target.value) })}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                 />
               </div>
               <div>
-                <label htmlFor="iter-name" className="mb-1 block text-xs font-medium text-slate-700">Name (optional)</label>
+                <label htmlFor="iter-name" className="mb-1 block text-xs font-medium text-bark-700">Name (optional)</label>
                 <input
                   id="iter-name"
                   type="text"
                   value={iterForm.name}
                   onChange={(e) => setIterForm({ ...iterForm, name: e.target.value })}
                   placeholder="e.g. Innovation & Planning"
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                 />
               </div>
               <div>
-                <label htmlFor="iter-start" className="mb-1 block text-xs font-medium text-slate-700">Start Date</label>
+                <label htmlFor="iter-start" className="mb-1 block text-xs font-medium text-bark-700">Start Date</label>
                 <input
                   id="iter-start"
                   type="date"
                   value={iterForm.start_date}
                   onChange={(e) => setIterForm({ ...iterForm, start_date: e.target.value })}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                 />
               </div>
               <div>
-                <label htmlFor="iter-end" className="mb-1 block text-xs font-medium text-slate-700">End Date</label>
+                <label htmlFor="iter-end" className="mb-1 block text-xs font-medium text-bark-700">End Date</label>
                 <input
                   id="iter-end"
                   type="date"
                   value={iterForm.end_date}
                   onChange={(e) => setIterForm({ ...iterForm, end_date: e.target.value })}
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
                 />
               </div>
             </div>
-            <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-bark-700 cursor-pointer">
               <input
                 type="checkbox"
                 checked={iterForm.is_ip}
@@ -363,14 +363,14 @@ export function Setup() {
               <button
                 type="button"
                 onClick={() => { setShowIterForm(false); setIterError(''); }}
-                className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+                className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={createIterMut.isPending}
-                className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
               >
                 {createIterMut.isPending ? 'Adding…' : 'Add Iteration'}
               </button>
@@ -379,7 +379,7 @@ export function Setup() {
         )}
 
         {sortedIters.length === 0 && !showIterForm && (
-          <p className="px-5 py-4 text-sm text-slate-400">No iterations yet. Add one to start planning.</p>
+          <p className="px-5 py-4 text-sm text-bark-400">No iterations yet. Add one to start planning.</p>
         )}
       </section>
 
@@ -392,8 +392,8 @@ export function Setup() {
           {!deleteConfirm ? (
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-700">Delete this PI</p>
-                <p className="text-xs text-slate-400">Permanently removes the PI and its iterations. Features, risks, and dependencies must be deleted first.</p>
+                <p className="text-sm font-medium text-bark-700">Delete this PI</p>
+                <p className="text-xs text-bark-400">Permanently removes the PI and its iterations. Features, risks, and dependencies must be deleted first.</p>
               </div>
               <button
                 onClick={() => setDeleteConfirm(true)}
@@ -405,13 +405,13 @@ export function Setup() {
           ) : (
             <div className="space-y-3">
               {lifecycleError && <p className="text-sm text-red-600">{lifecycleError}</p>}
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-medium text-bark-700">
                 Are you sure? This cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => { setDeleteConfirm(false); setLifecycleError(''); }}
-                  className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+                  className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
                 >
                   Cancel
                 </button>

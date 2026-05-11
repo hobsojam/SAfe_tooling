@@ -1,0 +1,8 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="SAFe Tooling mark">
+  <rect x="4" y="30" width="8" height="14" rx="1.5" fill="#43372a"></rect>
+  <rect x="16" y="22" width="8" height="22" rx="1.5" fill="#43372a"></rect>
+  <rect x="28" y="14" width="8" height="30" rx="1.5" fill="#43372a"></rect>
+  <circle cx="38" cy="10" r="6" fill="#3e6230"></circle>
+  <path d="M38 4 C 41 7, 41 10, 38 10 C 35 10, 35 7, 38 4 Z" fill="#d9e5cb"></path>
+</svg>

@@ -178,10 +178,10 @@ export function Dependencies() {
     <div className="p-6">
       <div className="mb-5 flex items-baseline justify-between">
         <div>
-          <h1 className="mb-1 text-xl font-semibold text-slate-800">
+          <h1 className="mb-1 text-xl font-semibold text-bark-800">
             Dependencies — {pi?.name}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-bark-500">
             {deps.length} dependenc{deps.length !== 1 ? 'ies' : 'y'}
             {unresolved > 0 && (
               <span className="ml-2 font-medium text-red-600">{unresolved} unresolved</span>
@@ -190,7 +190,7 @@ export function Dependencies() {
         </div>
         <button
           onClick={openNew}
-          className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+          className="rounded-md bg-moss-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-moss-700 transition-colors"
         >
           + New Dependency
         </button>
@@ -199,21 +199,21 @@ export function Dependencies() {
       {deps.length === 0 ? (
         <EmptyState message="No dependencies for this PI." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto overflow-hidden rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
                 {['From', 'To', 'Description', 'Status', 'Owner', 'Needed By', ''].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {pageDeps.map((d) => {
                 if (deleteId === d.id) {
                   return (
@@ -221,7 +221,7 @@ export function Dependencies() {
                       <td colSpan={7} className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                          <span className="text-sm text-slate-700">
+                          <span className="text-sm text-bark-700">
                             Delete <strong>{d.description.slice(0, 60)}{d.description.length > 60 ? '…' : ''}</strong>?
                           </span>
                           <button
@@ -233,7 +233,7 @@ export function Dependencies() {
                           </button>
                           <button
                             onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                           >
                             Cancel
                           </button>
@@ -243,13 +243,13 @@ export function Dependencies() {
                   );
                 }
                 return (
-                  <tr key={d.id} className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 font-medium text-slate-700">{depFromLabel(d)}</td>
-                    <td className="px-4 py-2.5 font-medium text-slate-700">{depToLabel(d)}</td>
+                  <tr key={d.id} className="hover:bg-bark-50/60">
+                    <td className="px-4 py-2.5 font-medium text-bark-700">{depFromLabel(d)}</td>
+                    <td className="px-4 py-2.5 font-medium text-bark-700">{depToLabel(d)}</td>
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => openEdit(d)}
-                        className="text-slate-600 hover:text-slate-800 hover:underline text-left"
+                        className="text-bark-600 hover:text-bark-800 hover:underline text-left"
                       >
                         {d.description}
                       </button>
@@ -257,14 +257,14 @@ export function Dependencies() {
                     <td className="px-4 py-2.5">
                       <DepBadge status={d.status} />
                     </td>
-                    <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-slate-500 tabular-nums">
+                    <td className="px-4 py-2.5 text-bark-500">{d.owner ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-bark-500 tabular-nums">
                       {d.needed_by_date ?? '—'}
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">
                       <button
                         onClick={() => openEdit(d)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        className="mr-3 text-xs text-bark-500 hover:text-bark-800 underline"
                       >
                         Edit
                       </button>
@@ -293,7 +293,7 @@ export function Dependencies() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label htmlFor="dep-description" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="dep-description" className="mb-1 block text-sm font-medium text-bark-700">
               Description<span aria-hidden="true"> *</span>
             </label>
             <textarea
@@ -301,13 +301,13 @@ export function Dependencies() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="dep-from" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="dep-from" className="mb-1 block text-sm font-medium text-bark-700">
                 From Feature<span aria-hidden="true"> *</span>
               </label>
               <select
@@ -315,7 +315,7 @@ export function Dependencies() {
                 value={form.from_feature_id}
                 onChange={(e) => setForm({ ...form, from_feature_id: e.target.value })}
                 disabled={!!editing}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500 disabled:bg-bark-50 disabled:text-bark-400"
               >
                 <option value="">Select…</option>
                 {features.map((f) => (
@@ -324,7 +324,7 @@ export function Dependencies() {
               </select>
             </div>
             <div>
-              <label htmlFor="dep-to" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="dep-to" className="mb-1 block text-sm font-medium text-bark-700">
                 To Feature<span aria-hidden="true"> *</span>
               </label>
               <select
@@ -332,7 +332,7 @@ export function Dependencies() {
                 value={form.to_feature_id}
                 onChange={(e) => setForm({ ...form, to_feature_id: e.target.value })}
                 disabled={!!editing}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500 disabled:bg-bark-50 disabled:text-bark-400"
               >
                 <option value="">Select…</option>
                 {features.map((f) => (
@@ -343,12 +343,12 @@ export function Dependencies() {
           </div>
 
           <div>
-            <label htmlFor="dep-status" className="mb-1 block text-sm font-medium text-slate-700">Status</label>
+            <label htmlFor="dep-status" className="mb-1 block text-sm font-medium text-bark-700">Status</label>
             <select
               id="dep-status"
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value as DependencyStatus })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -358,36 +358,36 @@ export function Dependencies() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="dep-owner" className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
+              <label htmlFor="dep-owner" className="mb-1 block text-sm font-medium text-bark-700">Owner</label>
               <input
                 id="dep-owner"
                 type="text"
                 value={form.owner ?? ''}
                 onChange={(e) => setForm({ ...form, owner: e.target.value || null })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div>
-              <label htmlFor="dep-needed-by" className="mb-1 block text-sm font-medium text-slate-700">Needed By</label>
+              <label htmlFor="dep-needed-by" className="mb-1 block text-sm font-medium text-bark-700">Needed By</label>
               <input
                 id="dep-needed-by"
                 type="date"
                 value={form.needed_by_date ?? ''}
                 onChange={(e) => setForm({ ...form, needed_by_date: e.target.value || null })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
           </div>
 
           {editing && (
             <div>
-              <label htmlFor="dep-resolution" className="mb-1 block text-sm font-medium text-slate-700">Resolution Notes</label>
+              <label htmlFor="dep-resolution" className="mb-1 block text-sm font-medium text-bark-700">Resolution Notes</label>
               <textarea
                 id="dep-resolution"
                 value={form.resolution_notes}
                 onChange={(e) => setForm({ ...form, resolution_notes: e.target.value })}
                 rows={2}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
           )}
@@ -396,14 +396,14 @@ export function Dependencies() {
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {isPending ? 'Saving…' : editing ? 'Save Changes' : 'Add Dependency'}
             </button>

@@ -73,11 +73,11 @@ export function Layout() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-bark-50">
       {/* Sidebar */}
-      <aside className="flex w-56 flex-col bg-slate-900 text-slate-100">
+      <aside className="flex w-56 flex-col bg-bark-900 text-bark-100">
         <div className="px-4 py-5">
-          <span className="text-sm font-semibold tracking-wide text-slate-300 uppercase">
+          <span className="text-sm font-semibold tracking-wide text-bark-300 uppercase">
             SAFe Tools
           </span>
         </div>
@@ -86,7 +86,7 @@ export function Layout() {
         <div className="px-3 pb-4">
           <label
             htmlFor="pi-select"
-            className="mb-1 block text-xs text-slate-400"
+            className="mb-1 block text-xs text-bark-400"
           >
             Program Increment
           </label>
@@ -96,7 +96,7 @@ export function Layout() {
             onChange={(e) => {
               if (e.target.value) navigate(`/pi/${e.target.value}/board`);
             }}
-            className="w-full rounded bg-slate-700 px-2 py-1.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400"
+            className="w-full rounded bg-bark-700 px-2 py-1.5 text-sm text-bark-100 focus:outline-none focus:ring-2 focus:ring-moss-500"
           >
             <option value="" disabled>
               Select PI…
@@ -108,7 +108,7 @@ export function Layout() {
             ))}
           </select>
           {activePi && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-bark-400">
               <PIStatusBadge status={activePi.status} />
               <span>
                 {activePi.start_date} – {activePi.end_date}
@@ -127,8 +127,8 @@ export function Layout() {
                 className={({ isActive }) =>
                   `block rounded px-3 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-slate-700 text-white'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
+                      ? 'bg-bark-700 text-white'
+                      : 'text-bark-400 hover:bg-bark-800 hover:text-bark-100'
                   }`
                 }
               >
@@ -139,14 +139,14 @@ export function Layout() {
         )}
 
         {/* Global nav */}
-        <div className="mt-auto border-t border-slate-700 px-2 pt-2">
+        <div className="mt-auto border-t border-bark-700 px-2 pt-2">
           <NavLink
             to="/art-setup"
             className={({ isActive }) =>
               `block rounded px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-slate-700 text-white'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
+                  ? 'bg-bark-700 text-white'
+                  : 'text-bark-400 hover:bg-bark-800 hover:text-bark-100'
               }`
             }
           >
@@ -158,14 +158,14 @@ export function Layout() {
         <div className="px-3 py-2">
           <button
             onClick={openNewPI}
-            className="w-full rounded bg-slate-700 px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
+            className="w-full rounded bg-bark-700 px-2 py-1.5 text-left text-sm text-bark-300 hover:bg-bark-600 hover:text-white transition-colors"
           >
             + New PI
           </button>
         </div>
 
         {/* Disclaimer */}
-        <p className="px-3 pb-4 text-xs leading-tight text-slate-500">
+        <p className="px-3 pb-4 text-xs leading-tight text-bark-500">
           Not an official Scaled Agile product. SAFe® is a registered trademark of Scaled Agile, Inc.
         </p>
       </aside>
@@ -175,7 +175,7 @@ export function Layout() {
         {piId || !location.pathname.startsWith('/pi') ? (
           <Outlet />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">
+          <div className="flex h-full items-center justify-center text-bark-400">
             <p className="text-sm">Select a Program Increment to get started.</p>
           </div>
         )}
@@ -190,7 +190,7 @@ export function Layout() {
           {piError && <p className="text-sm text-red-600">{piError}</p>}
 
           <div>
-            <label htmlFor="pi-name" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="pi-name" className="mb-1 block text-sm font-medium text-bark-700">
               Name<span aria-hidden="true"> *</span>
             </label>
             <input
@@ -199,19 +199,19 @@ export function Layout() {
               value={piForm.name}
               onChange={(e) => setPiForm({ ...piForm, name: e.target.value })}
               placeholder="e.g. PI 2026.2"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div>
-            <label htmlFor="pi-art" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="pi-art" className="mb-1 block text-sm font-medium text-bark-700">
               ART<span aria-hidden="true"> *</span>
             </label>
             <select
               id="pi-art"
               value={piForm.art_id}
               onChange={(e) => setPiForm({ ...piForm, art_id: e.target.value })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               <option value="">Select ART…</option>
               {arts.map((a) => (
@@ -219,9 +219,9 @@ export function Layout() {
               ))}
             </select>
             {arts.length === 0 && (
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-bark-400">
                 No ARTs found.{' '}
-                <a href="/art-setup" className="underline hover:text-slate-300">
+                <a href="/art-setup" className="underline hover:text-bark-300">
                   Create one in ART Setup.
                 </a>
               </p>
@@ -230,7 +230,7 @@ export function Layout() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="pi-start" className="mb-1 block text-sm font-medium text-bark-700">
                 Start Date<span aria-hidden="true"> *</span>
               </label>
               <input
@@ -238,11 +238,11 @@ export function Layout() {
                 type="date"
                 value={piForm.start_date}
                 onChange={(e) => setPiForm({ ...piForm, start_date: e.target.value })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div>
-              <label htmlFor="pi-end" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="pi-end" className="mb-1 block text-sm font-medium text-bark-700">
                 End Date<span aria-hidden="true"> *</span>
               </label>
               <input
@@ -250,7 +250,7 @@ export function Layout() {
                 type="date"
                 value={piForm.end_date}
                 onChange={(e) => setPiForm({ ...piForm, end_date: e.target.value })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
           </div>
@@ -259,14 +259,14 @@ export function Layout() {
             <button
               type="button"
               onClick={() => setPiModalOpen(false)}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={createPIMut.isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {createPIMut.isPending ? 'Creating…' : 'Create PI'}
             </button>

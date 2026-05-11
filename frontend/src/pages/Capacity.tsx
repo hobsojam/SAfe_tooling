@@ -146,8 +146,8 @@ export function Capacity() {
   return (
     <div className="p-6">
       <div className="mb-5">
-        <h1 className="mb-1 text-xl font-semibold text-slate-800">Capacity — {pi?.name}</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="mb-1 text-xl font-semibold text-bark-800">Capacity — {pi?.name}</h1>
+        <p className="text-sm text-bark-500">
           Available person-days per team per iteration.{' '}
           {totalCells > 0 && `${totalSet} of ${totalCells} cells set. `}
           Click a cell to set or update.
@@ -163,26 +163,26 @@ export function Capacity() {
           }
         />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide">
                   Iteration
                 </th>
                 {sortedTeams.map((t) => (
-                  <th key={t.id} className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                  <th key={t.id} className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide">
                     {t.name}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {nonIpIterations.map((iter) => (
                 <tr key={iter.id}>
-                  <td className="px-4 py-3 font-medium text-slate-700">
+                  <td className="px-4 py-3 font-medium text-bark-700">
                     Iteration {iter.number}
-                    <div className="text-xs font-normal text-slate-400">
+                    <div className="text-xs font-normal text-bark-400">
                       {iter.start_date} – {iter.end_date}
                     </div>
                   </td>
@@ -194,15 +194,15 @@ export function Capacity() {
                           onClick={() => openCell(team.id, iter.id)}
                           className={`w-full rounded-md px-3 py-2 text-left text-xs transition-colors ${
                             plan
-                              ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                              : 'border border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:text-slate-600'
+                              ? 'bg-bark-100 hover:bg-bark-200 text-bark-800'
+                              : 'border border-dashed border-bark-300 text-bark-400 hover:border-bark-400 hover:text-bark-600'
                           }`}
                         >
                           {plan ? (
                             <>
-                              <span className="font-semibold text-slate-900">{plan.available_capacity}</span>
-                              <span className="text-slate-500"> days</span>
-                              <div className="text-xs text-slate-400">
+                              <span className="font-semibold text-bark-900">{plan.available_capacity}</span>
+                              <span className="text-bark-500"> days</span>
+                              <div className="text-xs text-bark-400">
                                 {plan.team_size} ppl · {plan.pto_days}d PTO · {Math.round(plan.overhead_pct * 100)}% OH
                               </div>
                             </>
@@ -210,7 +210,7 @@ export function Capacity() {
                             <span>Not set</span>
                           )}
                           {(storyPts[`${team.id}:${iter.id}`] ?? 0) > 0 && (
-                            <div className={`mt-0.5 text-xs ${plan ? 'text-slate-500' : 'font-medium text-slate-600'}`}>
+                            <div className={`mt-0.5 text-xs ${plan ? 'text-bark-500' : 'font-medium text-bark-600'}`}>
                               {storyPts[`${team.id}:${iter.id}`]} pts committed
                             </div>
                           )}
@@ -235,7 +235,7 @@ export function Capacity() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="cap-team-size" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="cap-team-size" className="mb-1 block text-sm font-medium text-bark-700">
                 Team Size
               </label>
               <input
@@ -244,11 +244,11 @@ export function Capacity() {
                 min={1}
                 value={form.team_size}
                 onChange={(e) => setForm({ ...form, team_size: Number(e.target.value) })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div>
-              <label htmlFor="cap-iter-days" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="cap-iter-days" className="mb-1 block text-sm font-medium text-bark-700">
                 Iteration Days
               </label>
               <input
@@ -257,11 +257,11 @@ export function Capacity() {
                 min={1}
                 value={form.iteration_days}
                 onChange={(e) => setForm({ ...form, iteration_days: Number(e.target.value) })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div>
-              <label htmlFor="cap-pto" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="cap-pto" className="mb-1 block text-sm font-medium text-bark-700">
                 PTO Days (total across team)
               </label>
               <input
@@ -271,11 +271,11 @@ export function Capacity() {
                 step={0.5}
                 value={form.pto_days}
                 onChange={(e) => setForm({ ...form, pto_days: Number(e.target.value) })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
             <div>
-              <label htmlFor="cap-overhead" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="cap-overhead" className="mb-1 block text-sm font-medium text-bark-700">
                 Overhead %
               </label>
               <input
@@ -285,13 +285,13 @@ export function Capacity() {
                 max={100}
                 value={form.overhead_pct}
                 onChange={(e) => setForm({ ...form, overhead_pct: Number(e.target.value) })}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
               />
             </div>
           </div>
 
           {form.team_size > 0 && form.iteration_days > 0 && (
-            <p className="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
+            <p className="rounded-md bg-bark-50 px-3 py-2 text-sm text-bark-600">
               Available:{' '}
               <strong>
                 {(
@@ -307,14 +307,14 @@ export function Capacity() {
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={upsertMut.isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {upsertMut.isPending ? 'Saving…' : 'Set Capacity'}
             </button>

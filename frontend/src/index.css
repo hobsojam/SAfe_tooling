@@ -1,1 +1,55 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
+
+/* ---------------------------------------------------------------
+   Tailwind v4 theme: bind our design-system tokens to the names
+   Tailwind generates utilities for. Anything else (red, amber,
+   yellow, cyan, blue, purple) keeps Tailwind defaults — they
+   already match our status hues closely enough for AA contrast.
+   --------------------------------------------------------------- */
+@theme {
+  /* Bark — replaces Tailwind's `slate` scale across the app. */
+  --color-bark-50:  var(--bark-50);
+  --color-bark-100: var(--bark-100);
+  --color-bark-200: var(--bark-200);
+  --color-bark-300: var(--bark-300);
+  --color-bark-400: var(--bark-400);
+  --color-bark-500: var(--bark-500);
+  --color-bark-600: var(--bark-600);
+  --color-bark-700: var(--bark-700);
+  --color-bark-800: var(--bark-800);
+  --color-bark-900: var(--bark-900);
+  --color-bark-950: var(--bark-950);
+
+  /* Moss — brand action / success. Primary buttons, focus rings,
+     links, and the "active PI" state all draw from here. */
+  --color-moss-50:  var(--moss-50);
+  --color-moss-100: var(--moss-100);
+  --color-moss-200: var(--moss-200);
+  --color-moss-300: var(--moss-300);
+  --color-moss-400: var(--moss-400);
+  --color-moss-500: var(--moss-500);
+  --color-moss-600: var(--moss-600);
+  --color-moss-700: var(--moss-700);
+  --color-moss-800: var(--moss-800);
+  --color-moss-900: var(--moss-900);
+
+  /* Type. */
+  --font-sans: 'Geist', 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'Menlo', monospace;
+}
+
+/* Honour reduced-motion (BFSG / WCAG 2.1 AA). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Body default. */
+html, body { font-family: var(--font-sans); color: var(--fg-default); }
+
+/* Tabular numerics for any element marked .num — opt-in. */
+.num { font-variant-numeric: tabular-nums; font-family: var(--font-mono); }

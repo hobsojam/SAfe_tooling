@@ -133,10 +133,10 @@ export function Risks() {
     <div className="p-6">
       <div className="mb-5 flex items-baseline justify-between">
         <div>
-          <h1 className="mb-1 text-xl font-semibold text-slate-800">
+          <h1 className="mb-1 text-xl font-semibold text-bark-800">
             Risk Register — {pi?.name}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-bark-500">
             {risks.length} risk{risks.length !== 1 ? 's' : ''}
             {unroamed > 0 && (
               <Link
@@ -150,7 +150,7 @@ export function Risks() {
         </div>
         <button
           onClick={openNew}
-          className="rounded-md bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+          className="rounded-md bg-moss-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-moss-700 transition-colors"
         >
           + New Risk
         </button>
@@ -159,21 +159,21 @@ export function Risks() {
       {risks.length === 0 ? (
         <EmptyState message="No risks for this PI." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto overflow-hidden rounded-lg border border-bark-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-bark-200 bg-bark-50">
               <tr>
                 {['Description', 'Team', 'Status', 'Owner', 'Raised', 'Notes', ''].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    className="px-4 py-2.5 text-left text-xs font-semibold text-bark-600 uppercase tracking-wide"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-bark-100">
               {pageRisks.map((r) => {
                 if (deleteId === r.id) {
                   return (
@@ -181,7 +181,7 @@ export function Risks() {
                       <td colSpan={7} className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                          <span className="text-sm text-slate-700">
+                          <span className="text-sm text-bark-700">
                             Delete <strong>{r.description.slice(0, 60)}{r.description.length > 60 ? '…' : ''}</strong>?
                           </span>
                           <button
@@ -193,7 +193,7 @@ export function Risks() {
                           </button>
                           <button
                             onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            className="text-xs text-bark-500 hover:text-bark-800 transition-colors"
                           >
                             Cancel
                           </button>
@@ -203,30 +203,30 @@ export function Risks() {
                   );
                 }
                 return (
-                  <tr key={r.id} className="hover:bg-slate-50/60">
+                  <tr key={r.id} className="hover:bg-bark-50/60">
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => openEdit(r)}
-                        className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                        className="font-medium text-bark-800 hover:text-bark-600 hover:underline text-left"
                       >
                         {r.description}
                       </button>
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-bark-600">
                       {r.team_id ? (teamMap[r.team_id] ?? r.team_id) : '—'}
                     </td>
                     <td className="px-4 py-2.5">
                       <ROAMBadge status={r.roam_status} />
                     </td>
-                    <td className="px-4 py-2.5 text-slate-500">{r.owner ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-slate-500 tabular-nums">{r.raised_date}</td>
-                    <td className="max-w-xs px-4 py-2.5 text-slate-500">
+                    <td className="px-4 py-2.5 text-bark-500">{r.owner ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-bark-500 tabular-nums">{r.raised_date}</td>
+                    <td className="max-w-xs px-4 py-2.5 text-bark-500">
                       {r.mitigation_notes || '—'}
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">
                       <button
                         onClick={() => openEdit(r)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        className="mr-3 text-xs text-bark-500 hover:text-bark-800 underline"
                       >
                         Edit
                       </button>
@@ -251,7 +251,7 @@ export function Risks() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
-            <label htmlFor="risk-description" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="risk-description" className="mb-1 block text-sm font-medium text-bark-700">
               Description<span aria-hidden="true"> *</span>
             </label>
             <textarea
@@ -259,17 +259,17 @@ export function Risks() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div>
-            <label htmlFor="risk-team" className="mb-1 block text-sm font-medium text-slate-700">Team</label>
+            <label htmlFor="risk-team" className="mb-1 block text-sm font-medium text-bark-700">Team</label>
             <select
               id="risk-team"
               value={form.team_id ?? ''}
               onChange={(e) => setForm({ ...form, team_id: e.target.value || null })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               <option value="">— none —</option>
               {teams.map((t) => (
@@ -279,12 +279,12 @@ export function Risks() {
           </div>
 
           <div>
-            <label htmlFor="risk-roam-status" className="mb-1 block text-sm font-medium text-slate-700">ROAM Status</label>
+            <label htmlFor="risk-roam-status" className="mb-1 block text-sm font-medium text-bark-700">ROAM Status</label>
             <select
               id="risk-roam-status"
               value={form.roam_status}
               onChange={(e) => setForm({ ...form, roam_status: e.target.value as ROAMStatus })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             >
               {ROAM_OPTIONS.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -293,24 +293,24 @@ export function Risks() {
           </div>
 
           <div>
-            <label htmlFor="risk-owner" className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
+            <label htmlFor="risk-owner" className="mb-1 block text-sm font-medium text-bark-700">Owner</label>
             <input
               id="risk-owner"
               type="text"
               value={form.owner ?? ''}
               onChange={(e) => setForm({ ...form, owner: e.target.value || null })}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
           <div>
-            <label htmlFor="risk-notes" className="mb-1 block text-sm font-medium text-slate-700">Mitigation Notes</label>
+            <label htmlFor="risk-notes" className="mb-1 block text-sm font-medium text-bark-700">Mitigation Notes</label>
             <textarea
               id="risk-notes"
               value={form.mitigation_notes}
               onChange={(e) => setForm({ ...form, mitigation_notes: e.target.value })}
               rows={3}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              className="w-full rounded-md border border-bark-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-moss-500"
             />
           </div>
 
@@ -318,14 +318,14 @@ export function Risks() {
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 transition-colors"
+              className="rounded-md px-4 py-2 text-sm text-bark-600 hover:bg-bark-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-moss-600 px-4 py-2 text-sm font-medium text-white hover:bg-moss-700 disabled:opacity-50 transition-colors"
             >
               {isPending ? 'Saving…' : editing ? 'Save Changes' : 'Add Risk'}
             </button>
