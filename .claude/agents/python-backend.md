@@ -54,6 +54,10 @@ mutmut html     # generates html/ report
 - **Before switching branches**, commit and push all finished work on the current branch. If changes aren't ready to commit, ask the user whether to stash or continue on the current branch — never silently discard work.
 - Each logical change (new feature, bug fix, refactor) gets its own branch and PR.
 - Never force-push to `main`. Never amend published commits on shared branches without user confirmation.
+- Always include the co-author trailer in commit messages:
+  ```
+  Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+  ```
 
 ## Shell usage
 
