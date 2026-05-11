@@ -218,7 +218,6 @@ class TestFeature:
         assert f.iteration_id is None
         assert f.description == ""
         assert f.acceptance_criteria == ""
-        assert f.story_ids == []
         assert f.dependency_ids == []
 
     def test_iteration_id_set(self):

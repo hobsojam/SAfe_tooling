@@ -1611,7 +1611,6 @@ components:
       - job_size
       - cost_of_delay
       - wsjf_score
-      - story_ids
       - dependency_ids
       properties:
         id:
@@ -1665,11 +1664,6 @@ components:
           format: float
           readOnly: true
           description: 'Computed: cost_of_delay / job_size (rounded to 2 dp)'
-        story_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
         dependency_ids:
           type: array
           items:
