@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from pydantic import Field, computed_field
+from pydantic import Field, computed_field, field_validator
 
 from safe.models.base import SAFeBaseModel
 
@@ -59,3 +59,10 @@ class Story(SAFeBaseModel):
     points: int = Field(ge=1)
     status: StoryStatus = StoryStatus.NOT_STARTED
     acceptance_criteria: str = ""
+
+    @field_validator("points", mode="before")
+    @classmethod
+    def validate_points(cls, v):
+        if isinstance(v, int) and not isinstance(v, bool) and v < 1:
+            raise ValueError(f"story points must be at least 1 (got {v})")
+        return v

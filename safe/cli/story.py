@@ -27,6 +27,9 @@ def story_add(
     ),
 ):
     """Add a story to a feature."""
+    if points < 1:
+        console.print(f"[red]Error: --points must be at least 1 (got {points})[/red]")
+        raise typer.Exit(1)
     repos = _repos()
     feature = repos.features.get(feature_id)
     if feature is None:
@@ -37,9 +40,6 @@ def story_add(
         raise typer.Exit(1)
     if iteration_id is not None and repos.iterations.get(iteration_id) is None:
         console.print(f"[red]Error: Iteration '{iteration_id}' not found[/red]")
-        raise typer.Exit(1)
-    if points < 1:
-        console.print("[red]Error: --points must be at least 1[/red]")
         raise typer.Exit(1)
     story = Story(
         name=name,
@@ -110,7 +110,7 @@ def story_update(
         story.name = name
     if points is not None:
         if points < 1:
-            console.print("[red]Error: --points must be at least 1[/red]")
+            console.print(f"[red]Error: --points must be at least 1 (got {points})[/red]")
             raise typer.Exit(1)
         story.points = points
     if status is not None:
