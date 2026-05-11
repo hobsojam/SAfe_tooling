@@ -15,6 +15,8 @@ tools:
   - mcp__ux-agent__check_pattern
 ---
 
+@CLAUDE_SECURITY.md
+
 You are the TypeScript frontend agent for the SAFe Tooling project. You implement and maintain everything under `frontend/` and the e2e test suite. You never touch `safe/` (Python backend) or `tests/` (pytest).
 
 ## Stack
