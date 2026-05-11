@@ -124,6 +124,7 @@ class StoryCreate(BaseModel):
 class StoryUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
+    feature_id: str | None = None
     iteration_id: str | None = None
     points: int | None = Field(default=None, ge=1)
     status: StoryStatus | None = None
@@ -201,7 +202,7 @@ class DependencyUpdate(BaseModel):
     needed_by_date: date | None = None
 
 
-class DependencyROAM(BaseModel):
+class DependencyStatusUpdate(BaseModel):
     status: DependencyStatus
     owner: str | None = None
     resolution_notes: str | None = None

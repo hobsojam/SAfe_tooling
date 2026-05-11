@@ -1,4 +1,6 @@
 import os
+import threading
+from collections.abc import Generator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -10,6 +12,7 @@ _DEFAULT_DB_PATH = Path.home() / ".safe_tooling" / "db.json"
 _DEV_SESSION_FILE = ".dev_session"
 
 _db: TinyDB | None = None
+_db_lock = threading.Lock()
 
 
 def _dev_session_file(db_path: Path) -> Path:
@@ -65,11 +68,13 @@ async def lifespan(app):
         _db = None
 
 
-def get_repos_dep() -> Repos:
-    # TinyDB defines __len__, so an empty database is falsy — use identity check.
+def get_repos_dep() -> Generator[Repos, None, None]:
+    # TinyDB is not thread-safe. Hold _db_lock for the duration of each request
+    # so concurrent FastAPI worker threads never touch the JSON file simultaneously.
     if _db is None:
         raise RuntimeError("Database not initialised — lifespan not running")
-    return Repos(_db)
+    with _db_lock:
+        yield Repos(_db)
 
 
 def clear_cache() -> None:

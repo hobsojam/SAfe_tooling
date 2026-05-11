@@ -5,6 +5,8 @@ from rich.console import Console
 from rich.table import Table
 
 import safe.cli.state as state
+from safe.exceptions import IllegalPITransitionError
+from safe.logic import pi as pi_logic
 from safe.logic.predictability import art_predictability, predictability_rating
 from safe.models.pi import PI, Iteration, PIStatus
 from safe.store.db import get_db
@@ -94,11 +96,11 @@ def pi_activate(pi_id: str = typer.Argument(..., help="PI id")):
     if pi is None:
         console.print(f"[red]Error: PI '{pi_id}' not found[/red]")
         raise typer.Exit(1)
-    if pi.status != PIStatus.PLANNING:
-        console.print(
-            f"[red]Error: PI is {pi.status.value}, only planning PIs can be activated[/red]"
-        )
-        raise typer.Exit(1)
+    try:
+        pi_logic.validate_pi_transition(pi, PIStatus.ACTIVE)
+    except IllegalPITransitionError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1) from None
     active = [p for p in repos.pis.find(art_id=pi.art_id) if p.status == PIStatus.ACTIVE]
     if active:
         console.print(f"[red]Error: PI '{active[0].name}' is already active for this ART[/red]")
@@ -116,12 +118,14 @@ def pi_close(pi_id: str = typer.Argument(..., help="PI id")):
     if pi is None:
         console.print(f"[red]Error: PI '{pi_id}' not found[/red]")
         raise typer.Exit(1)
-    if pi.status != PIStatus.ACTIVE:
-        console.print(f"[red]Error: PI is {pi.status.value}, only active PIs can be closed[/red]")
-        raise typer.Exit(1)
-    pi.status = PIStatus.CLOSED
-    repos.pis.save(pi)
-    console.print(f"PI [bold]{pi.name}[/bold] is now closed.")
+    try:
+        pi_logic.validate_pi_transition(pi, PIStatus.CLOSED)
+        pi.status = PIStatus.CLOSED
+        repos.pis.save(pi)
+        console.print(f"PI [bold]{pi.name}[/bold] is now closed.")
+    except IllegalPITransitionError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1) from None
 
 
 @pi_app.command("predictability")

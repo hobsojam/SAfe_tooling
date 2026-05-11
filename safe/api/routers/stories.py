@@ -50,6 +50,23 @@ def update_story(story_id: str, body: StoryUpdate, repos: Repos = Depends(get_re
                 status_code=404,
                 detail=f"Iteration '{update_data['iteration_id']}' not found",
             )
+    if "feature_id" in update_data:
+        new_feature_id = update_data["feature_id"]
+        if repos.features.get(new_feature_id) is None:
+            raise HTTPException(status_code=404, detail=f"Feature '{new_feature_id}' not found")
+        if new_feature_id != story.feature_id:
+            old_feature = repos.features.get(story.feature_id)
+            if old_feature is not None:
+                repos.features.save(
+                    old_feature.model_copy(
+                        update={"story_ids": [s for s in old_feature.story_ids if s != story_id]}
+                    )
+                )
+            new_feature = repos.features.get(new_feature_id)
+            if new_feature is not None:
+                repos.features.save(
+                    new_feature.model_copy(update={"story_ids": new_feature.story_ids + [story_id]})
+                )
     updated = story.model_copy(update=update_data)
     return repos.stories.save(updated)
 

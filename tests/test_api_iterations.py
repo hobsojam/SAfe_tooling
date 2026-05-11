@@ -100,6 +100,42 @@ class TestIterationCreate:
         assert r.status_code == 201
         assert r.json()["is_ip"] is True
 
+    def test_default_name_from_number(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        r = _create_iteration(client, pi_id, number=2, start="2026-01-19", end="2026-01-30")
+        assert r.json()["name"] == "Iteration 2"
+
+    def test_default_name_ip_iteration(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        r = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 5,
+                "start_date": "2026-03-16",
+                "end_date": "2026-03-27",
+                "is_ip": True,
+            },
+        )
+        assert r.json()["name"] == "IP Iteration"
+
+    def test_explicit_name_preserved(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        r = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 1,
+                "start_date": "2026-01-05",
+                "end_date": "2026-01-16",
+                "name": "Sprint Alpha",
+            },
+        )
+        assert r.json()["name"] == "Sprint Alpha"
+
 
 class TestIterationList:
     def test_requires_pi_id(self, client):

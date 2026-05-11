@@ -5,7 +5,9 @@ import { api } from '../api';
 import type { PIObjective, PIObjectiveCreate, PIObjectiveUpdate } from '../types';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { usePagination } from '../hooks/usePagination';
 
 interface ObjectiveFormState {
   description: string;
@@ -72,12 +74,14 @@ export function Objectives() {
     onError: (e: Error) => setDeleteError(e.message),
   });
 
-  if (isLoading) return <Spinner />;
-
-  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const committed = objectives.filter((o) => !o.is_stretch);
   const stretch = objectives.filter((o) => o.is_stretch);
   const sorted = [...committed, ...stretch];
+  const { page, totalPages, pageItems: pageSorted, goTo } = usePagination(sorted, 25, piId);
+
+  if (isLoading) return <Spinner />;
+
+  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
 
   const committedPlannedBV = committed.reduce((s, o) => s + o.planned_business_value, 0);
   const scoredCommitted = committed.filter((o) => o.actual_business_value !== null);
@@ -182,7 +186,7 @@ export function Objectives() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sorted.map((obj) => {
+              {pageSorted.map((obj) => {
                 if (deleteId === obj.id) {
                   return (
                     <tr key={obj.id} className="bg-red-50">
@@ -276,6 +280,7 @@ export function Objectives() {
               </tfoot>
             )}
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

@@ -17,7 +17,9 @@ import type {
 import { FeatureStatusBadge, StoryStatusBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { usePagination } from '../hooks/usePagination';
 
 const FEATURE_STATUS_OPTIONS: FeatureStatus[] = ['funnel', 'analyzing', 'backlog', 'implementing', 'done'];
 const STORY_STATUS_OPTIONS: StoryStatus[] = ['not_started', 'in_progress', 'done', 'accepted'];
@@ -421,7 +423,16 @@ export function Backlog() {
     enabled: !!piId,
   });
 
+  const { data: allStories = [] } = useQuery({
+    queryKey: ['stories'],
+    queryFn: api.listStories,
+  });
+
   const nonIpIterations = iterations.filter((it) => !it.is_ip).sort((a, b) => a.number - b.number);
+
+  const storyCountByFeature = Object.fromEntries(
+    features.map((f) => [f.id, allStories.filter((s) => s.feature_id === f.id).length])
+  );
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['features', piId] });
 
@@ -442,9 +453,11 @@ export function Backlog() {
     onSuccess: invalidate,
   });
 
+  const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
+  const { page, totalPages, pageItems: pageSorted, goTo } = usePagination(sorted, 25, piId);
+
   if (isLoading) return <Spinner />;
 
-  const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
 
   function openNew() {
@@ -553,10 +566,10 @@ export function Backlog() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sorted.map((f, i) => (
+              {pageSorted.map((f, i) => (
                 <Fragment key={f.id}>
                   <tr className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{i + 1}</td>
+                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => openEdit(f)}
@@ -588,7 +601,7 @@ export function Backlog() {
                         aria-expanded={expandedFeatureId === f.id}
                       >
                         <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
-                        <span>Stories</span>
+                        <span>Stories{storyCountByFeature[f.id] > 0 ? ` (${storyCountByFeature[f.id]})` : ''}</span>
                       </button>
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">
@@ -619,6 +632,7 @@ export function Backlog() {
               ))}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

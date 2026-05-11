@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import type { Risk, RiskCreate, RiskUpdate, ROAMStatus } from '../types';
 import { ROAMBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { usePagination } from '../hooks/usePagination';
 
 const ROAM_OPTIONS: ROAMStatus[] = ['unroamed', 'owned', 'accepted', 'mitigated', 'resolved'];
 
@@ -74,6 +76,8 @@ export function Risks() {
     onError: (e: Error) => setDeleteError(e.message),
   });
 
+  const { page, totalPages, pageItems: pageRisks, goTo } = usePagination(risks, 25, piId);
+
   if (isLoading) return <Spinner />;
 
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
@@ -135,7 +139,12 @@ export function Risks() {
           <p className="text-sm text-slate-500">
             {risks.length} risk{risks.length !== 1 ? 's' : ''}
             {unroamed > 0 && (
-              <span className="ml-2 font-medium text-red-600">{unroamed} unroamed</span>
+              <Link
+                to={`/pi/${piId}/risks/roam`}
+                className="ml-2 font-medium text-red-600 hover:text-red-800 underline"
+              >
+                {unroamed} unroamed
+              </Link>
             )}
           </p>
         </div>
@@ -165,7 +174,7 @@ export function Risks() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {risks.map((r) => {
+              {pageRisks.map((r) => {
                 if (deleteId === r.id) {
                   return (
                     <tr key={r.id} className="bg-red-50">
@@ -233,6 +242,7 @@ export function Risks() {
               })}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

@@ -185,6 +185,13 @@ class TestStoryUpdate:
         result = invoke(db_path, "story", "update", story.id, "--status", "bad")
         assert result.exit_code == 1
 
+    def test_zero_points_exits_1(self, db_path, patch_console):
+        fid, tid = _setup(db_path)
+        _add_story(db_path, fid, tid)
+        story = repos_for(db_path).stories.get_all()[0]
+        result = invoke(db_path, "story", "update", story.id, "--points", "0")
+        assert result.exit_code == 1
+
     def test_unknown_exits_1(self, db_path, patch_console):
         result = invoke(db_path, "story", "update", "no-such-id", "--name", "X")
         assert result.exit_code == 1

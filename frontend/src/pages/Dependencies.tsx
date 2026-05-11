@@ -6,9 +6,11 @@ import type { Dependency, DependencyCreate, DependencyStatus, DependencyUpdate, 
 import { DepBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { usePagination } from '../hooks/usePagination';
 
-const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'owned', 'accepted', 'mitigated', 'resolved'];
+const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'acknowledged', 'in_progress', 'resolved'];
 
 interface DepFormState {
   description: string;
@@ -89,6 +91,8 @@ export function Dependencies() {
     onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
     onError: (e: Error) => setDeleteError(e.message),
   });
+
+  const { page, totalPages, pageItems: pageDeps, goTo } = usePagination(deps, 25, piId);
 
   if (isLoading) return <Spinner />;
 
@@ -210,7 +214,7 @@ export function Dependencies() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {deps.map((d) => {
+              {pageDeps.map((d) => {
                 if (deleteId === d.id) {
                   return (
                     <tr key={d.id} className="bg-red-50">
@@ -276,6 +280,7 @@ export function Dependencies() {
               })}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

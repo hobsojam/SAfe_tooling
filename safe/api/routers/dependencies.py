@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from safe.api.deps import get_repos_dep
-from safe.api.schemas import DependencyCreate, DependencyROAM, DependencyUpdate
+from safe.api.schemas import DependencyCreate, DependencyStatusUpdate, DependencyUpdate
 from safe.models.dependency import Dependency
 from safe.store.repos import Repos
 
@@ -53,9 +53,9 @@ def update_dependency(
     return repos.dependencies.save(updated)
 
 
-@router.post("/{dependency_id}/roam", response_model=Dependency)
-def roam_dependency(
-    dependency_id: str, body: DependencyROAM, repos: Repos = Depends(get_repos_dep)
+@router.post("/{dependency_id}/update-status", response_model=Dependency)
+def update_dependency_status(
+    dependency_id: str, body: DependencyStatusUpdate, repos: Repos = Depends(get_repos_dep)
 ):
     dep = _get_or_404(repos, dependency_id)
     updated = dep.model_copy(update=body.model_dump(exclude_unset=True))

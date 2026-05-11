@@ -43,6 +43,7 @@ frontend/test-results/
 frontend/reports/
 frontend/stryker.log
 frontend/.stryker-tmp/
+node_modules/
 
 # E2e working DB — generated from tests/e2e_fixture.clean.json at test time
 tests/e2e_fixture.db.json
