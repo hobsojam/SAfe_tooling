@@ -277,6 +277,14 @@ Example: building a modal → `check_pattern({ component_type: "dialog" })` firs
 
 ## Testing
 
+### Vitest config (`frontend/vitest.config.ts`)
+
+- **Environment:** `jsdom` — DOM APIs available in all tests, no browser needed
+- **Globals:** `true` — `describe`, `it`, `test`, `expect`, `beforeEach`, `vi`, etc. are available without importing them
+- **Setup file:** `src/__tests__/setup.ts` — imports `@testing-library/jest-dom`, which adds DOM matchers (`toBeInTheDocument`, `toHaveValue`, `toBeDisabled`, etc.) to `expect` globally
+- **Test pattern:** `src/**/*.test.{ts,tsx}` — only files under `src/`, not `e2e/`
+- **Plugins:** React and Tailwind plugins are included so JSX transforms and CSS work correctly in tests
+
 ### Unit/component tests (Vitest + Testing Library)
 
 - Test files: `src/**/*.test.{ts,tsx}`, run with `npm run test:run`
