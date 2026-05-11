@@ -271,9 +271,9 @@ React Router v7. All pages nest under `<Layout />`. The `piId` param is extracte
 
 ## Accessibility
 
-Before writing any interactive UI component — button with state, dialog, combobox, tabs, menu, disclosure, tooltip, switch, alert/status, listbox, radio group — call the `check_pattern` MCP tool to get the full ARIA spec. Do this before writing any markup.
+Before writing any interactive UI component — button with state, dialog, combobox, tabs, menu, disclosure, tooltip, switch, alert/status, listbox, radio group — call the `mcp__ux-agent__check_pattern` tool to get the full ARIA spec. Do this before writing any markup.
 
-Example: building a modal → `check_pattern({ component_type: "dialog" })` first.
+Example: building a modal → `mcp__ux-agent__check_pattern({ component_type: "dialog" })` first.
 
 ## Testing
 
