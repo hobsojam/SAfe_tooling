@@ -80,7 +80,9 @@ npx playwright test
 
 ## CI — run before every commit
 
-```bash
+Run these locally using **PowerShell**:
+
+```powershell
 cd frontend
 npm run build          # tsc -b (type-check) + Vite build — this IS the type-check step
 npm run test:run       # Vitest unit/component tests (single run)

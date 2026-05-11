@@ -73,7 +73,9 @@ pip install -e ".[dev]"
 
 ## CI — always run all three before committing
 
-```bash
+Run these locally using **PowerShell**:
+
+```powershell
 python -m ruff check .
 python -m ruff format --check .
 python -m pytest tests/
