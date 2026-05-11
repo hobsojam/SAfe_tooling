@@ -59,10 +59,7 @@ npm run stryker
 - **Before switching branches**, commit and push all finished work on the current branch. If changes aren't ready to commit, ask the user whether to stash or continue on the current branch — never silently discard work.
 - Each logical change (new feature, bug fix, refactor) gets its own branch and PR.
 - Never force-push to `main`. Never amend published commits on shared branches without user confirmation.
-- Always include the co-author trailer in commit messages (as defined in CLAUDE.md):
-  ```
-  Co-Authored-By: Claude Code <noreply@anthropic.com>
-  ```
+- Always include the co-author trailer in commit messages as defined in CLAUDE.md.
 
 ## Shell usage
 
