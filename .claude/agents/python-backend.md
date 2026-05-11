@@ -94,6 +94,7 @@ safe/
     risk.py
     dependency.py
     capacity_plan.py
+  dev_seed.py    # Realistic PI planning data seeded on startup when SAFE_SEED_DEV=1
   logic/         # Pure functions — no I/O, no TinyDB, no Rich
     wsjf.py
     capacity.py
@@ -109,6 +110,7 @@ safe/
     deps.py      # get_repos_dep — holds _db_lock for full request duration
     schemas.py   # *Create / *Update request bodies only — never expose id or computed fields
     routers/     # One file per resource
+      dev.py     # POST /dev/reset-db — clears TinyDB cache for e2e fixture resets
   store/
     db.py        # get_db(path?) — TinyDB singleton
     repository.py# Repository[T] — save/get/find/delete
