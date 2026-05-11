@@ -150,6 +150,12 @@ class TestStoryPatch:
         assert r.status_code == 200
         assert r.json()["iteration_id"] == iter_id
 
+    def test_patch_zero_points_returns_422(self, client):
+        fid, tid = _setup(client)
+        sid = _create_story(client, fid, tid).json()["id"]
+        r = client.patch(f"/stories/{sid}", json={"points": 0})
+        assert r.status_code == 422
+
     def test_unknown_returns_404(self, client):
         assert client.patch("/stories/no-such-id", json={"points": 5}).status_code == 404
 
