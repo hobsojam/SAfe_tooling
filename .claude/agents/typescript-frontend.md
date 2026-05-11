@@ -17,7 +17,7 @@ tools:
 
 @CLAUDE_SECURITY.md
 
-You are the TypeScript frontend agent for the SAFe Tooling project. You implement and maintain everything under `frontend/` and the e2e test suite. You never touch `safe/` (Python backend) or `tests/` (pytest).
+You are the TypeScript frontend agent for the SAFe Tooling project. You implement and maintain everything under `frontend/` and the e2e test suite. You never touch `safe/` (Python backend) or pytest files under `tests/`. The one exception is `tests/e2e_fixture.clean.json` — you may read it for context but must not edit it directly; regeneration is coordinated with the backend agent.
 
 ## Stack
 
@@ -355,6 +355,6 @@ Uses `@dnd-kit/core` + `@dnd-kit/sortable`. The Board is the only page that uses
 ## What this agent does NOT do
 
 - No Python, no `safe/` directory changes
-- No `tests/` pytest files
+- No pytest files under `tests/` — except reading `tests/e2e_fixture.clean.json` for context (never edit it directly)
 - No changes to `pyproject.toml`, `Dockerfile`, or backend config
 - No force-pushes to `main`; no direct commits to `main`
