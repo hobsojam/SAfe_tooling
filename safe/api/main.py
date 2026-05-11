@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +10,6 @@ from safe.api.routers import (
     capacity_plans,
     compute,
     dependencies,
-    dev,
     features,
     iterations,
     objectives,
@@ -43,7 +44,11 @@ app.include_router(risks.router)
 app.include_router(dependencies.router)
 app.include_router(capacity_plans.router)
 app.include_router(compute.router)
-app.include_router(dev.router)
+
+if os.environ.get("SAFE_DEV_ROUTES") == "1":
+    from safe.api.routers import dev
+
+    app.include_router(dev.router)
 
 
 def run() -> None:
