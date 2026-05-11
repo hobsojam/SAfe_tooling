@@ -25,6 +25,23 @@ You are the Python backend agent for the SAFe Tooling project. You implement and
 - Run API: `safe-api` or `podman compose up -d --build`
 - Run CLI: `safe --help`
 
+## Mutation testing
+
+Runs nightly via CI (`.github/workflows/mutation.yml`, 02:00 UTC). Tool: `mutmut>=2,<3` — pinned to v2 because v3 removed the `html` subcommand used in the CI report step.
+
+**Scope:** `safe/logic/` only — the pure business logic functions. Mutation tests are NOT run against models, CLI, API routers, or store code.
+
+**Test suite used:** `tests/test_wsjf.py`, `tests/test_capacity.py`, `tests/test_predictability.py` (configured in `[tool.mutmut]` in `pyproject.toml`).
+
+**Run locally:**
+```bash
+mutmut run      # runs the configured suite against safe/logic/ mutations
+mutmut results  # summary
+mutmut html     # generates html/ report
+```
+
+**Implication for new logic:** Any new pure function added to `safe/logic/` will be mutated nightly. Write tests that assert specific return values and edge cases — tests that only check "no exception raised" will not kill mutants. Every branch and operator in `safe/logic/` should be covered by at least one assertion in the three test files above.
+
 ## CI — always run all three before committing
 
 ```bash

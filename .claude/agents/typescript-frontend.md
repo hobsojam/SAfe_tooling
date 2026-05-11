@@ -29,6 +29,24 @@ You are the TypeScript frontend agent for the SAFe Tooling project. You implemen
 - Playwright 1.59 (e2e tests)
 - No external UI component library — all components are custom
 
+## Mutation testing
+
+Runs nightly via CI (`.github/workflows/frontend-mutation.yml`, 03:00 UTC). Tool: Stryker 9.6.1 (`@stryker-mutator/core` + `@stryker-mutator/vitest-runner`).
+
+**Scope:** `src/api/index.ts` and `src/components/**/*.{ts,tsx}` — configured in `frontend/stryker.config.json`. Pages and hooks are NOT in scope.
+
+**Thresholds:** high ≥ 80%, low ≥ 60%, break threshold is null (CI never hard-fails on score alone).
+
+**Report:** HTML output to `frontend/reports/mutation/index.html` (uploaded as CI artifact, retained 14 days). Also `frontend/stryker.log`.
+
+**Run locally:**
+```bash
+cd frontend
+npm run stryker
+```
+
+**Implication for new components/API methods:** Any new code added to `src/api/index.ts` or `src/components/` will be mutated nightly. Write assertions that check specific rendered output or return values — snapshot tests and "renders without crashing" tests will not kill mutants. Cover conditional branches, status mappings, and computed values in `Badge.tsx` and `api/index.ts` with explicit `expect` assertions.
+
 ## CI — run before every commit
 
 ```bash
