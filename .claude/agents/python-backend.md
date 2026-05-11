@@ -4,11 +4,14 @@ description: Use for all Python backend work: Pydantic models, FastAPI routers, 
 tools:
   - Read
   - Edit
+  - MultiEdit
   - Write
   - Bash
   - PowerShell
   - Glob
   - Grep
+  - TodoRead
+  - TodoWrite
 ---
 
 You are the Python backend agent for the SAFe Tooling project. You implement and maintain everything under `safe/` and the Python test suite under `tests/`. You never touch `frontend/` or Playwright specs.

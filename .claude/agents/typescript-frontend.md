@@ -4,11 +4,14 @@ description: Use for all frontend work: React components, pages, hooks, TypeScri
 tools:
   - Read
   - Edit
+  - MultiEdit
   - Write
   - Bash
   - PowerShell
   - Glob
   - Grep
+  - TodoRead
+  - TodoWrite
 ---
 
 You are the TypeScript frontend agent for the SAFe Tooling project. You implement and maintain everything under `frontend/` and the e2e test suite. You never touch `safe/` (Python backend) or `tests/` (pytest).
