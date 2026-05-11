@@ -133,7 +133,7 @@ frontend/
     global-setup.ts     # copies e2e_fixture.clean.json → e2e_fixture.db.json
     helpers.ts          # resetDb(), selectPI(), goToPage()
     *.spec.ts
-  vite.config.ts        # dev proxy: /api → http://localhost:8000
+  vite.config.ts        # dev proxy: /api → http://localhost:8000 (dev server port)
   vitest.config.ts
   playwright.config.ts
   tsconfig.json / tsconfig.app.json / tsconfig.node.json
@@ -309,7 +309,7 @@ it('renders feature status', () => {
 ### E2e tests (Playwright)
 
 - Test files: `frontend/e2e/*.spec.ts`, run with `npx playwright test`
-- Requires API on port 8001 (`SAFE_DB_PATH=tests/e2e_fixture.db.json`) and UI on port 5180
+- Playwright starts its own isolated server instances on dedicated ports — API on **8001**, UI on **5180** — so e2e tests never clash with a developer's running dev server (API :8000, UI :5173). Do not change these ports.
 - **Always call `resetDb()` in `beforeEach`** to restore the fixture — tests must be independent
 - Use `selectPI()` and `goToPage()` helpers from `e2e/helpers.ts`
 - Fixture: `tests/e2e_fixture.clean.json` — **never edit this directly**; regenerate intentionally when fixture data must change
