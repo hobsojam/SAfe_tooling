@@ -116,6 +116,26 @@ safe/
   exceptions.py  # SafeToolingError hierarchy
 ```
 
+## Dev seed data
+
+`safe/dev_seed.py` seeds realistic PI planning data into the local dev database on every fresh API start. Activated by `SAFE_SEED_DEV=1`. The seed is idempotent — it skips if any ART already exists.
+
+**What is seeded:**
+- 1 ART: `Platform ART`
+- 4 Teams: `Alpha` (6), `Beta` (5), `Gamma` (7), `Delta` (4)
+- 1 PI: `PI 2026.1` (active, 2026-01-05 → 2026-03-13)
+- 5 Iterations: I1–I4 + IP iteration
+- 6 Features spread across teams with WSJF inputs: Auth Service, SSO Integration, Observability Dashboard, CI/CD Pipeline Upgrade, Data Lake Integration, API Gateway
+- 14 Stories assigned to iterations (drives Board placement)
+- 3 Risks with varying ROAM statuses
+- 5 Dependencies between features with varying statuses
+
+**How it works:** `deps.py` lifespan calls `seed(Repos(_db))` on startup when `SAFE_SEED_DEV=1`. On hot-reload it skips the wipe (detects same parent PID via `.dev_session` file). On fresh start it truncates all tables first so dev data never accumulates.
+
+**When to update `dev_seed.py`:** If you add a new entity type or field that should be represented in the dev environment, add it to the seed. Keep the data realistic and coherent — it is also used as the basis for the e2e fixture. Never change existing IDs or remove existing entities without checking whether the e2e fixture (`tests/e2e_fixture.clean.json`) needs to be regenerated.
+
+**Pagination seed script:** `scripts/seed_pagination.py` bulk-loads additional features and stories via the live API for pagination testing. Run it after `safe-api` is up: `python scripts/seed_pagination.py`.
+
 ## OpenAPI spec
 
 `docs/openapi.yaml` is the **authoritative API contract**. The FastAPI implementation must match it exactly — the spec is not generated from code, it is the source of truth.

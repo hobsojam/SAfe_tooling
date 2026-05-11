@@ -136,6 +136,23 @@ frontend/
   tsconfig.json / tsconfig.app.json / tsconfig.node.json
 ```
 
+## Dev seed data
+
+Two data sources are used for development and testing:
+
+**API dev seed (`safe/dev_seed.py`)** — active when the backend runs with `SAFE_SEED_DEV=1`. Populates a realistic dataset on every fresh start:
+- 1 ART (`Platform ART`), 4 Teams (Alpha, Beta, Gamma, Delta)
+- 1 active PI (`PI 2026.1`), 5 iterations (I1–I4 + IP)
+- 6 Features with WSJF scores across all teams
+- 14 Stories assigned to iterations (drives Board placement)
+- 3 Risks, 5 Dependencies with varying statuses
+
+This is the data you see when running `npm run dev` against a local API.
+
+**E2e fixture (`tests/e2e_fixture.clean.json`)** — the static DB snapshot used by Playwright tests. Copied to `tests/e2e_fixture.db.json` before each test run; `resetDb()` restores it in `beforeEach`. **Never edit `e2e_fixture.clean.json` directly** — regenerate it intentionally when fixture data must change (coordinate with the backend agent, as this file reflects the Python seed data structure).
+
+**Pagination seed (`scripts/seed_pagination.py`)** — bulk-loads additional features and stories via the live API for testing pagination. Run after the API is up: `python scripts/seed_pagination.py`. Only needed when working on pagination UI.
+
 ## OpenAPI spec
 
 `docs/openapi.yaml` is the **authoritative API contract**. When the backend changes, the spec is updated first — always read it before assuming what an endpoint looks like.
