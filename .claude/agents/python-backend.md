@@ -34,7 +34,7 @@ Runs nightly via CI (`.github/workflows/mutation.yml`, 02:00 UTC). Tool: `mutmut
 **Test suite used:** `tests/test_wsjf.py`, `tests/test_capacity.py`, `tests/test_predictability.py` (configured in `[tool.mutmut]` in `pyproject.toml`).
 
 **Run locally:**
-```bash
+```powershell
 mutmut run      # runs the configured suite against safe/logic/ mutations
 mutmut results  # summary
 mutmut html     # generates html/ report
@@ -186,9 +186,14 @@ safe/
 ## Testing patterns
 
 ### API tests (`tests/test_api_*.py`)
+
+`tests/conftest.py` provides two shared fixtures:
+- `db` — a fresh `TinyDB` instance in `tmp_path` per test
+- `client` — a `TestClient` with `app.dependency_overrides[get_repos_dep]` pointing at `db`
+
+Use them directly — do not create your own db or client fixtures.
+
 ```python
-# conftest.py provides `client` fixture via app.dependency_overrides[get_repos_dep]
-# Use it directly — do not create your own db or client fixtures.
 def test_something(client):
     r = client.post("/resource", json={...})
     assert r.status_code == 201

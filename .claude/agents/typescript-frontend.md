@@ -40,7 +40,7 @@ Runs nightly via CI (`.github/workflows/frontend-mutation.yml`, 03:00 UTC). Tool
 **Report:** HTML output to `frontend/reports/mutation/index.html` (uploaded as CI artifact, retained 14 days). Also `frontend/stryker.log`.
 
 **Run locally:**
-```bash
+```powershell
 cd frontend
 npm run stryker
 ```
@@ -338,11 +338,11 @@ const { page, totalPages, pageItems, goTo } = usePagination(sorted, 25, piId)
 // pageItems is the current page's slice; pass piId as resetKey so page resets on PI change
 ```
 
-Render `<Pagination page={page} totalPages={totalPages} onPageChange={goTo} />` below the table. Only show the `Pagination` component when `totalPages > 1`.
+Always render `<Pagination page={page} totalPages={totalPages} onPageChange={goTo} />` unconditionally below the table — the component returns `null` itself when `totalPages <= 1`, so no wrapper condition is needed.
 
 ## Toasts
 
-Use the `ToastProvider` context (from `Layout.tsx`) for user-facing success/error notifications. Access via `useToast()` hook if available, or via the context directly. Do not use `alert()` or `console.error` for user feedback.
+Use the `useToast()` hook (exported from `src/components/Toaster.tsx`) for user-facing success/error notifications. `ToastProvider` wraps the app in `App.tsx` so the hook is always available. Do not use `alert()` or `console.error` for user feedback.
 
 ## Drag-and-drop (Board page only)
 
