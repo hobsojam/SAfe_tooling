@@ -1,6 +1,6 @@
 ---
 name: python-backend
-description: Use for all Python backend work: Pydantic models, FastAPI routers, TinyDB repositories, Typer CLI commands, and pure logic functions. Also owns all pytest files under tests/ (test_api_*.py, test_*_commands.py, test_cli.py, test_models.py, test_repository.py, test_wsjf.py, test_capacity.py, test_predictability.py, conftest.py) and tests/e2e_fixture.clean.json. Do NOT use for frontend TypeScript/React work or Playwright e2e tests.
+description: "Use for all Python backend work: Pydantic models, FastAPI routers, TinyDB repositories, Typer CLI commands, and pure logic functions. Also owns all pytest files under tests/ (test_api_*.py, test_*_commands.py, test_cli.py, test_models.py, test_repository.py, test_wsjf.py, test_capacity.py, test_predictability.py, conftest.py) and tests/e2e_fixture.clean.json. Do NOT use for frontend TypeScript/React work or Playwright e2e tests."
 tools:
   - Read
   - Edit
