@@ -38,6 +38,9 @@ jobs:
   test:
     name: Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +64,14 @@ jobs:
 
       - name: Run tests
         run: pytest --cov=safe --cov-report=xml --cov-report=term-missing
+
+      - name: Coverage comment on PR
+        if: matrix.python-version == '3.12' && github.event_name == 'pull_request'
+        uses: MishaKav/pytest-coverage-comment@v1
+        with:
+          pytest-coverage-path: ./coverage.xml
+          title: Python test coverage
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload coverage
         if: matrix.python-version == '3.12'
