@@ -9,6 +9,7 @@ from datetime import date
 from safe.models.art import ART, Team
 from safe.models.backlog import Feature, Story
 from safe.models.dependency import Dependency, DependencyStatus
+from safe.models.objectives import PIObjective
 from safe.models.pi import PI, Iteration, PIStatus
 from safe.models.risk import Risk, ROAMStatus
 from safe.store.repos import Repos
@@ -147,6 +148,47 @@ def seed(repos: Repos) -> None:
     ]
     for s in stories:
         repos.stories.save(s)
+
+    # --- PI Objectives ---
+    obj1 = PIObjective(
+        description="Deliver Auth Service v2 with token refresh and password reset",
+        team_id=alpha.id,
+        pi_id=pi.id,
+        planned_business_value=10,
+        actual_business_value=10,
+    )
+    obj2 = PIObjective(
+        description="Roll out Observability Dashboard to all ART teams",
+        team_id=beta.id,
+        pi_id=pi.id,
+        planned_business_value=8,
+        actual_business_value=7,
+    )
+    obj3 = PIObjective(
+        description="Complete SSO integration with SAML and IdP configuration",
+        team_id=alpha.id,
+        pi_id=pi.id,
+        planned_business_value=7,
+        actual_business_value=None,
+        is_stretch=False,
+    )
+    obj4 = PIObjective(
+        description="Ingest first production dataset into Data Lake",
+        team_id=gamma.id,
+        pi_id=pi.id,
+        planned_business_value=9,
+        actual_business_value=None,
+    )
+    obj5 = PIObjective(
+        description="Exploratory API Gateway rate-limiting proof of concept",
+        team_id=delta.id,
+        pi_id=pi.id,
+        planned_business_value=5,
+        actual_business_value=None,
+        is_stretch=True,
+    )
+    for obj in [obj1, obj2, obj3, obj4, obj5]:
+        repos.objectives.save(obj)
 
     # --- Risks ---
     r1 = Risk(

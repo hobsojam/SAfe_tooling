@@ -405,6 +405,46 @@
       "actual_business_value": null,
       "is_stretch": true,
       "feature_ids": []
+    },
+    "4": {
+      "id": "aaaaaaaa-0004-0004-0004-aaaaaaaaaaaa",
+      "description": "Complete SSO integration with SAML and IdP configuration",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 7,
+      "actual_business_value": null,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "5": {
+      "id": "aaaaaaaa-0005-0005-0005-aaaaaaaaaaaa",
+      "description": "Ingest first production dataset into Data Lake",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 9,
+      "actual_business_value": null,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "6": {
+      "id": "aaaaaaaa-0006-0006-0006-aaaaaaaaaaaa",
+      "description": "Exploratory API Gateway rate-limiting proof of concept",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 5,
+      "actual_business_value": null,
+      "is_stretch": true,
+      "feature_ids": []
+    },
+    "7": {
+      "id": "aaaaaaaa-0007-0007-0007-aaaaaaaaaaaa",
+      "description": "Upgrade CI/CD pipeline to reduce build times by 50%",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 6,
+      "actual_business_value": null,
+      "is_stretch": false,
+      "feature_ids": []
     }
   },
   "risks": {
