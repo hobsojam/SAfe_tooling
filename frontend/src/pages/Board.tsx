@@ -16,7 +16,7 @@ import { api } from '../api';
 import { DepBadge, FeatureStatusBadge, TopologyBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Spinner } from '../components/Spinner';
-import type { Dependency, Feature, Story } from '../types';
+import type { Dependency, Feature } from '../types';
 
 type BoardGrid = Record<string, Record<string, Feature[]>>;
 
@@ -29,23 +29,11 @@ interface Arrow {
   resolved: boolean;
 }
 
-function featurePrimaryIteration(featureId: string, stories: Story[]): string {
-  const weight: Record<string, number> = {};
-  for (const s of stories) {
-    if (s.feature_id === featureId && s.iteration_id) {
-      weight[s.iteration_id] = (weight[s.iteration_id] ?? 0) + s.points;
-    }
-  }
-  const entries = Object.entries(weight);
-  if (entries.length === 0) return 'unplanned';
-  return entries.sort(([, a], [, b]) => b - a)[0][0];
-}
-
-function buildBoard(features: Feature[], stories: Story[]): BoardGrid {
+function buildBoard(features: Feature[]): BoardGrid {
   const grid: BoardGrid = {};
   for (const feature of features) {
     if (!feature.team_id) continue;
-    const key = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
+    const key = feature.iteration_id ?? 'unplanned';
     (grid[feature.team_id] ??= {})[key] ??= [];
     grid[feature.team_id][key].push(feature);
   }
@@ -159,11 +147,6 @@ export function Board() {
     enabled: !!piId,
   });
 
-  const { data: stories = [] } = useQuery({
-    queryKey: ['stories'],
-    queryFn: api.listStories,
-  });
-
   const ctDeps = useMemo(() => crossTeamOnly(deps, features), [deps, features]);
 
   const atRiskFeatureIds = useMemo(() => {
@@ -180,7 +163,7 @@ export function Board() {
 
     const featureIterKey: Record<string, string> = {};
     for (const f of features) {
-      featureIterKey[f.id] = f.iteration_id ?? featurePrimaryIteration(f.id, stories);
+      featureIterKey[f.id] = f.iteration_id ?? 'unplanned';
     }
 
     for (const d of deps) {
@@ -198,7 +181,7 @@ export function Board() {
     }
 
     return ids;
-  }, [features, deps, iterations, stories]);
+  }, [features, deps, iterations]);
 
   const measureArrows = useCallback(() => {
     if (!boardRef.current) return;
@@ -270,7 +253,7 @@ export function Board() {
 
     const [newTeamId, newIterColId] = overId.split('|');
     const newIterationId = newIterColId === 'unplanned' ? null : newIterColId;
-    const currentIterColId = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
+    const currentIterColId = feature.iteration_id ?? 'unplanned';
 
     if (feature.team_id === newTeamId && currentIterColId === newIterColId) return;
 
@@ -289,7 +272,7 @@ export function Board() {
   }
 
   const unassignedFeatures = features.filter((f) => !f.team_id);
-  const grid = buildBoard(assignedFeatures, stories);
+  const grid = buildBoard(assignedFeatures);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
   const teamIds = artTeams.map((t) => t.id);
 
