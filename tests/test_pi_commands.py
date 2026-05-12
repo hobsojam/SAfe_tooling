@@ -394,6 +394,69 @@ class TestIterationAdd:
         it = repos_for(db_path).iterations.get_all()[0]
         assert it.is_ip is True
 
+    def test_default_name_from_number(self, db_path, patch_console):
+        art_id = _create_art(db_path)
+        pi_id = _create_pi(db_path, art_id)
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "3",
+            "--start",
+            "2026-02-02",
+            "--end",
+            "2026-02-13",
+        )
+        it = repos_for(db_path).iterations.get_all()[0]
+        assert it.name == "Iteration 3"
+
+    def test_default_name_ip_iteration(self, db_path, patch_console):
+        art_id = _create_art(db_path)
+        pi_id = _create_pi(db_path, art_id)
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "5",
+            "--start",
+            "2026-03-16",
+            "--end",
+            "2026-03-27",
+            "--ip",
+        )
+        it = repos_for(db_path).iterations.get_all()[0]
+        assert it.name == "IP Iteration"
+
+    def test_explicit_name_preserved(self, db_path, patch_console):
+        art_id = _create_art(db_path)
+        pi_id = _create_pi(db_path, art_id)
+        invoke(
+            db_path,
+            "pi",
+            "iteration",
+            "add",
+            "--pi-id",
+            pi_id,
+            "--number",
+            "1",
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-01-16",
+            "--name",
+            "Sprint Alpha",
+        )
+        it = repos_for(db_path).iterations.get_all()[0]
+        assert it.name == "Sprint Alpha"
+
     def test_dates_outside_pi_exits_1(self, db_path, patch_console):
         art_id = _create_art(db_path)
         pi_id = _create_pi(db_path, art_id)

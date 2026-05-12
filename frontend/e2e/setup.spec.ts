@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { goToPage, resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  resetDb();
+  await resetDb();
   await selectPI(page);
   await goToPage(page, 'PI Setup');
 });
@@ -12,7 +12,7 @@ test('shows Setup heading', async ({ page }) => {
 });
 
 test('shows PI name in details section', async ({ page }) => {
-  await expect(page.getByText('PI 2026.1')).toBeVisible();
+  await expect(page.locator('dd', { hasText: 'PI 2026.1' })).toBeVisible();
 });
 
 test('shows PI status badge', async ({ page }) => {
@@ -34,7 +34,7 @@ test('Cancel edit restores read-only view', async ({ page }) => {
   await page.getByRole('button', { name: 'Edit' }).click();
   await page.getByRole('button', { name: 'Cancel' }).click();
   await expect(page.getByLabel('Name')).not.toBeVisible();
-  await expect(page.getByText('PI 2026.1')).toBeVisible();
+  await expect(page.locator('dd', { hasText: 'PI 2026.1' })).toBeVisible();
 });
 
 test('can rename the PI', async ({ page }) => {
@@ -42,7 +42,7 @@ test('can rename the PI', async ({ page }) => {
   await page.getByLabel('Name').fill('PI 2026.1 — Renamed');
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByLabel('Name')).not.toBeVisible();
-  await expect(page.getByText('PI 2026.1 — Renamed')).toBeVisible();
+  await expect(page.locator('dd', { hasText: 'PI 2026.1 — Renamed' })).toBeVisible();
 });
 
 test('Activate button is disabled when PI is active', async ({ page }) => {

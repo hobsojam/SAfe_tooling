@@ -6,9 +6,12 @@ import type { Dependency, DependencyCreate, DependencyStatus, DependencyUpdate, 
 import { DepBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
+import { usePagination } from '../hooks/usePagination';
 
-const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'owned', 'accepted', 'mitigated', 'resolved'];
+const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'acknowledged', 'in_progress', 'resolved'];
 
 interface DepFormState {
   description: string;
@@ -38,11 +41,14 @@ function featureLabel(feature: Feature, teamMap: Record<string, string>): string
 export function Dependencies() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Dependency | null>(null);
   const [form, setForm] = useState<DepFormState>(EMPTY_FORM);
   const [error, setError] = useState('');
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const { data: pi } = useQuery({
     queryKey: ['pi', piId],
@@ -71,21 +77,24 @@ export function Dependencies() {
 
   const createMut = useMutation({
     mutationFn: (body: DependencyCreate) => api.createDependency(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Dependency added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: DependencyUpdate }) =>
       api.updateDependency(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Dependency updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteDependency(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Dependency deleted'); },
+    onError: (e: Error) => setDeleteError(e.message),
   });
+
+  const { page, totalPages, pageItems: pageDeps, goTo } = usePagination(deps, 25, piId);
 
   if (isLoading) return <Spinner />;
 
@@ -155,11 +164,6 @@ export function Dependencies() {
     }
   }
 
-  function handleDelete(id: string) {
-    if (!window.confirm('Delete this dependency?')) return;
-    deleteMut.mutate(id);
-  }
-
   const isPending = createMut.isPending || updateMut.isPending;
 
   function depFromLabel(d: Dependency): string {
@@ -212,43 +216,73 @@ export function Dependencies() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {deps.map((d) => (
-                <tr key={d.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-2.5 font-medium text-slate-700">{depFromLabel(d)}</td>
-                  <td className="px-4 py-2.5 font-medium text-slate-700">{depToLabel(d)}</td>
-                  <td className="px-4 py-2.5">
-                    <button
-                      onClick={() => openEdit(d)}
-                      className="text-slate-600 hover:text-slate-800 hover:underline text-left"
-                    >
-                      {d.description}
-                    </button>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <DepBadge status={d.status} />
-                  </td>
-                  <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
-                  <td className="px-4 py-2.5 text-slate-500 tabular-nums">
-                    {d.needed_by_date ?? '—'}
-                  </td>
-                  <td className="px-4 py-2.5 whitespace-nowrap">
-                    <button
-                      onClick={() => openEdit(d)}
-                      className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(d.id)}
-                      className="text-xs text-red-400 hover:text-red-600 underline"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {pageDeps.map((d) => {
+                if (deleteId === d.id) {
+                  return (
+                    <tr key={d.id} className="bg-red-50">
+                      <td colSpan={7} className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
+                          <span className="text-sm text-slate-700">
+                            Delete <strong>{d.description.slice(0, 60)}{d.description.length > 60 ? '…' : ''}</strong>?
+                          </span>
+                          <button
+                            onClick={() => deleteMut.mutate(d.id)}
+                            disabled={deleteMut.isPending}
+                            className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                          >
+                            {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+                          </button>
+                          <button
+                            onClick={() => { setDeleteId(null); setDeleteError(''); }}
+                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                }
+                return (
+                  <tr key={d.id} className="hover:bg-slate-50/60">
+                    <td className="px-4 py-2.5 font-medium text-slate-700">{depFromLabel(d)}</td>
+                    <td className="px-4 py-2.5 font-medium text-slate-700">{depToLabel(d)}</td>
+                    <td className="px-4 py-2.5">
+                      <button
+                        onClick={() => openEdit(d)}
+                        className="text-slate-600 hover:text-slate-800 hover:underline text-left"
+                      >
+                        {d.description}
+                      </button>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <DepBadge status={d.status} />
+                    </td>
+                    <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-500 tabular-nums">
+                      {d.needed_by_date ?? '—'}
+                    </td>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
+                      <button
+                        onClick={() => openEdit(d)}
+                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => { setDeleteId(d.id); setDeleteError(''); }}
+                        className="text-xs text-red-400 hover:text-red-600 underline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

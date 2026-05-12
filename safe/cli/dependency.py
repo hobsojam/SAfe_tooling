@@ -14,9 +14,8 @@ console = Console()
 
 _STATUS_COLOUR = {
     DependencyStatus.IDENTIFIED: "red",
-    DependencyStatus.OWNED: "yellow",
-    DependencyStatus.ACCEPTED: "bright_yellow",
-    DependencyStatus.MITIGATED: "cyan",
+    DependencyStatus.ACKNOWLEDGED: "yellow",
+    DependencyStatus.IN_PROGRESS: "cyan",
     DependencyStatus.RESOLVED: "green",
 }
 
@@ -138,8 +137,8 @@ def dependency_show(dep_id: str = typer.Argument(..., help="Dependency id")):
         console.print(f"Notes        : {dep.resolution_notes}")
 
 
-@dependency_app.command("roam")
-def dependency_roam(
+@dependency_app.command("update-status")
+def dependency_update_status(
     dep_id: str = typer.Argument(..., help="Dependency id"),
     status: DependencyStatus = typer.Option(..., "--status", "-s", help="New status"),
     owner: str | None = typer.Option(None, "--owner", help="Dependency owner name"),

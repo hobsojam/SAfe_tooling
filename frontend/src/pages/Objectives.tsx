@@ -5,7 +5,10 @@ import { api } from '../api';
 import type { PIObjective, PIObjectiveCreate, PIObjectiveUpdate } from '../types';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
+import { usePagination } from '../hooks/usePagination';
 
 interface ObjectiveFormState {
   description: string;
@@ -26,6 +29,7 @@ const EMPTY_FORM: ObjectiveFormState = {
 export function Objectives() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<PIObjective | null>(null);
@@ -55,29 +59,45 @@ export function Objectives() {
 
   const createMut = useMutation({
     mutationFn: (body: PIObjectiveCreate) => api.createObjective(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Objective added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: PIObjectiveUpdate }) =>
       api.updateObjective(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Objective updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteObjective(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Objective deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
+
+  const committed = objectives.filter((o) => !o.is_stretch);
+  const stretch = objectives.filter((o) => o.is_stretch);
+  const sorted = [...committed, ...stretch];
+  const { page, totalPages, pageItems: pageSorted, goTo } = usePagination(sorted, 25, piId);
 
   if (isLoading) return <Spinner />;
 
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
-  const committed = objectives.filter((o) => !o.is_stretch);
-  const stretch = objectives.filter((o) => o.is_stretch);
-  const sorted = [...committed, ...stretch];
+
+  const committedPlannedBV = committed.reduce((s, o) => s + o.planned_business_value, 0);
+  const scoredCommitted = committed.filter((o) => o.actual_business_value !== null);
+  const committedActualBV = scoredCommitted.reduce((s, o) => s + (o.actual_business_value ?? 0), 0);
+  const predictabilityPct =
+    committedPlannedBV > 0 && scoredCommitted.length > 0
+      ? Math.round((committedActualBV / committedPlannedBV) * 100)
+      : null;
+
+  function predictabilityClass(pct: number): string {
+    if (pct >= 80) return 'font-bold text-green-700';
+    if (pct >= 60) return 'font-bold text-amber-600';
+    return 'font-bold text-red-600';
+  }
 
   function openNew() {
     setEditing(null);
@@ -168,7 +188,7 @@ export function Objectives() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sorted.map((obj) => {
+              {pageSorted.map((obj) => {
                 if (deleteId === obj.id) {
                   return (
                     <tr key={obj.id} className="bg-red-50">
@@ -237,7 +257,32 @@ export function Objectives() {
                 );
               })}
             </tbody>
+            {committed.length > 0 && (
+              <tfoot className="border-t-2 border-slate-200 bg-slate-50">
+                <tr>
+                  <td colSpan={3} className="px-4 py-2.5 text-xs text-slate-500">
+                    Committed totals · {scoredCommitted.length} of {committed.length} scored
+                  </td>
+                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                    {committedPlannedBV}
+                  </td>
+                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                    {scoredCommitted.length > 0 ? committedActualBV : '—'}
+                  </td>
+                  <td className="px-4 py-2.5 text-right">
+                    {predictabilityPct !== null ? (
+                      <span className={`text-sm ${predictabilityClass(predictabilityPct)}`}>
+                        {predictabilityPct}%
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">Not yet scored</span>
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

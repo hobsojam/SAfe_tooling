@@ -205,7 +205,7 @@ def feature_delete(feature_id: str = typer.Argument(..., help="Feature id")):
     if feature is None:
         console.print(f"[red]Error: Feature '{feature_id}' not found[/red]")
         raise typer.Exit(1)
-    for story_id in list(feature.story_ids):
-        repos.stories.delete(story_id)
+    for story in repos.stories.find(feature_id=feature_id):
+        repos.stories.delete(story.id)
     repos.features.delete(feature_id)
     console.print(f"Deleted feature [bold]{feature.name}[/bold]")

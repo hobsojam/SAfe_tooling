@@ -36,12 +36,6 @@ class TestStoryCreate:
         assert body["status"] == "not_started"
         assert body["points"] == 3
 
-    def test_create_adds_id_to_feature_story_ids(self, client):
-        fid, tid = _setup(client)
-        sid = _create_story(client, fid, tid).json()["id"]
-        feature = client.get(f"/features/{fid}").json()
-        assert sid in feature["story_ids"]
-
     def test_unknown_feature_returns_404(self, client):
         _, tid = _setup(client)
         r = _create_story(client, "no-feature", tid)
@@ -150,6 +144,12 @@ class TestStoryPatch:
         assert r.status_code == 200
         assert r.json()["iteration_id"] == iter_id
 
+    def test_patch_zero_points_returns_422(self, client):
+        fid, tid = _setup(client)
+        sid = _create_story(client, fid, tid).json()["id"]
+        r = client.patch(f"/stories/{sid}", json={"points": 0})
+        assert r.status_code == 422
+
     def test_unknown_returns_404(self, client):
         assert client.patch("/stories/no-such-id", json={"points": 5}).status_code == 404
 
@@ -160,13 +160,6 @@ class TestStoryDelete:
         sid = _create_story(client, fid, tid).json()["id"]
         assert client.delete(f"/stories/{sid}").status_code == 204
         assert client.get(f"/stories/{sid}").status_code == 404
-
-    def test_delete_removes_id_from_feature_story_ids(self, client):
-        fid, tid = _setup(client)
-        sid = _create_story(client, fid, tid).json()["id"]
-        client.delete(f"/stories/{sid}")
-        feature = client.get(f"/features/{fid}").json()
-        assert sid not in feature["story_ids"]
 
     def test_unknown_returns_404(self, client):
         assert client.delete("/stories/no-such-id").status_code == 404

@@ -2,25 +2,63 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
+import { TOPOLOGY_LABELS, TopologyBadge } from '../components/Badge';
 import { Spinner } from '../components/Spinner';
-import type { Team, TeamCreate, TeamUpdate } from '../types';
+import { useToast } from '../components/Toaster';
+import type { Team, TeamCreate, TeamTopologyType, TeamUpdate } from '../types';
 
 interface EditState {
   teamId: string;
   name: string;
   member_count: number;
+  topology_type: TeamTopologyType | null;
 }
 
 interface AddState {
   name: string;
   member_count: number;
+  topology_type: TeamTopologyType | null;
 }
 
-const EMPTY_ADD: AddState = { name: '', member_count: 5 };
+const EMPTY_ADD: AddState = { name: '', member_count: 5, topology_type: null };
+
+const TOPOLOGY_OPTIONS: { value: TeamTopologyType; label: string }[] = [
+  { value: 'stream_aligned', label: TOPOLOGY_LABELS.stream_aligned },
+  { value: 'enabling', label: TOPOLOGY_LABELS.enabling },
+  { value: 'complicated_subsystem', label: TOPOLOGY_LABELS.complicated_subsystem },
+  { value: 'platform', label: TOPOLOGY_LABELS.platform },
+];
+
+function TopologySelect({
+  value,
+  onChange,
+  id,
+}: {
+  value: TeamTopologyType | null;
+  onChange: (v: TeamTopologyType | null) => void;
+  id?: string;
+}) {
+  return (
+    <select
+      id={id}
+      value={value ?? ''}
+      onChange={(e) => onChange((e.target.value as TeamTopologyType) || null)}
+      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+    >
+      <option value="">— None —</option>
+      {TOPOLOGY_OPTIONS.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export function TeamSetup() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: pi, isLoading: loadingPi } = useQuery({
     queryKey: ['pi', piId],
@@ -56,6 +94,7 @@ export function TeamSetup() {
       qc.invalidateQueries({ queryKey: ['teams', pi?.art_id] });
       setEdit(null);
       setEditError('');
+      toast('Team updated');
     },
     onError: (e: Error) => setEditError(e.message),
   });
@@ -67,6 +106,7 @@ export function TeamSetup() {
       setAddOpen(false);
       setAddForm(EMPTY_ADD);
       setAddError('');
+      toast('Team created');
     },
     onError: (e: Error) => setAddError(e.message),
   });
@@ -77,6 +117,7 @@ export function TeamSetup() {
       qc.invalidateQueries({ queryKey: ['teams', pi?.art_id] });
       setDeleteId(null);
       setDeleteError('');
+      toast('Team deleted');
     },
     onError: (e: Error) => setDeleteError(e.message),
   });
@@ -84,7 +125,12 @@ export function TeamSetup() {
   if (loadingPi || loadingTeams) return <Spinner />;
 
   function startEdit(team: Team) {
-    setEdit({ teamId: team.id, name: team.name, member_count: team.member_count });
+    setEdit({
+      teamId: team.id,
+      name: team.name,
+      member_count: team.member_count,
+      topology_type: team.topology_type,
+    });
     setEditError('');
     setDeleteId(null);
   }
@@ -93,14 +139,22 @@ export function TeamSetup() {
     e.preventDefault();
     if (!edit!.name.trim()) { setEditError('Name is required.'); return; }
     if (edit!.member_count < 1) { setEditError('Member count must be at least 1.'); return; }
-    updateMut.mutate({ id: edit!.teamId, body: { name: edit!.name, member_count: edit!.member_count } });
+    updateMut.mutate({
+      id: edit!.teamId,
+      body: { name: edit!.name, member_count: edit!.member_count, topology_type: edit!.topology_type },
+    });
   }
 
   function submitAdd(e: React.FormEvent) {
     e.preventDefault();
     if (!addForm.name.trim()) { setAddError('Name is required.'); return; }
     if (addForm.member_count < 1) { setAddError('Member count must be at least 1.'); return; }
-    createMut.mutate({ name: addForm.name, member_count: addForm.member_count, art_id: pi!.art_id });
+    createMut.mutate({
+      name: addForm.name,
+      member_count: addForm.member_count,
+      art_id: pi!.art_id,
+      topology_type: addForm.topology_type,
+    });
   }
 
   const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name));
@@ -131,7 +185,7 @@ export function TeamSetup() {
           <table className="w-full text-sm">
             <thead className="border-b border-slate-100 bg-slate-50">
               <tr>
-                {['Name', 'Members', ''].map((h) => (
+                {['Name', 'Members', 'Topology Type', ''].map((h) => (
                   <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                     {h}
                   </th>
@@ -143,9 +197,9 @@ export function TeamSetup() {
                 if (edit?.teamId === team.id) {
                   return (
                     <tr key={team.id}>
-                      <td colSpan={3} className="px-4 py-3">
-                        <form onSubmit={submitEdit} className="flex items-center gap-3">
-                          {editError && <span className="text-xs text-red-600">{editError}</span>}
+                      <td colSpan={4} className="px-4 py-3">
+                        <form onSubmit={submitEdit} className="flex flex-wrap items-center gap-3">
+                          {editError && <span className="w-full text-xs text-red-600">{editError}</span>}
                           <input
                             type="text"
                             value={edit.name}
@@ -161,6 +215,19 @@ export function TeamSetup() {
                             aria-label="Member count"
                             className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
                           />
+                          <select
+                            value={edit.topology_type ?? ''}
+                            onChange={(e) =>
+                              setEdit({ ...edit, topology_type: (e.target.value as TeamTopologyType) || null })
+                            }
+                            aria-label="Topology type"
+                            className="rounded-md border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                          >
+                            <option value="">— None —</option>
+                            {TOPOLOGY_OPTIONS.map((o) => (
+                              <option key={o.value} value={o.value}>{o.label}</option>
+                            ))}
+                          </select>
                           <button
                             type="submit"
                             disabled={updateMut.isPending}
@@ -184,7 +251,7 @@ export function TeamSetup() {
                 if (deleteId === team.id) {
                   return (
                     <tr key={team.id} className="bg-red-50">
-                      <td colSpan={3} className="px-4 py-3">
+                      <td colSpan={4} className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
                           <span className="text-sm text-slate-700">Delete <strong>{team.name}</strong>?</span>
@@ -211,6 +278,9 @@ export function TeamSetup() {
                   <tr key={team.id}>
                     <td className="px-4 py-2.5 font-medium text-slate-800">{team.name}</td>
                     <td className="px-4 py-2.5 text-slate-500">{team.member_count}</td>
+                    <td className="px-4 py-2.5">
+                      <TopologyBadge type={team.topology_type} />
+                    </td>
                     <td className="px-4 py-2.5 text-right">
                       <button
                         onClick={() => startEdit(team)}
@@ -261,6 +331,16 @@ export function TeamSetup() {
                   value={addForm.member_count}
                   onChange={(e) => setAddForm({ ...addForm, member_count: Number(e.target.value) })}
                   className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                />
+              </div>
+              <div className="col-span-2">
+                <label htmlFor="team-topology" className="mb-1 block text-xs font-medium text-slate-700">
+                  Topology Type <span className="font-normal text-slate-400">(optional)</span>
+                </label>
+                <TopologySelect
+                  id="team-topology"
+                  value={addForm.topology_type}
+                  onChange={(v) => setAddForm({ ...addForm, topology_type: v })}
                 />
               </div>
             </div>

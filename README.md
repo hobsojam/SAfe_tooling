@@ -24,9 +24,9 @@ A local PI Planning platform for Scaled Agile Framework (SAFe) teams. Manage you
 
 | Interface | Best for | How to start |
 |-----------|----------|-------------|
-| **Web UI** | Browsing and reviewing PI data | `SAFE_SEED_DEV=1 safe-api` + `cd frontend && npm run dev` |
+| **Web UI** | Creating and reviewing PI data (ARTs, Teams, PIs, Board, Backlog, …) | `SAFE_SEED_DEV=1 safe-api` + `cd frontend && npm run dev` |
 | **REST API** | Integrations and scripting | `safe-api` → `http://127.0.0.1:8000/docs` |
-| **CLI** | Creating and updating records | `safe --help` |
+| **CLI** | Bulk creation and scripting | `safe --help` |
 
 ---
 
@@ -97,7 +97,7 @@ safe-api
 # or: python -m safe.api.main
 ```
 
-Use the CLI (`safe` or `python -m safe.cli.main`) to create your own ARTs, teams, PIs, and features, then use the web UI or API docs to browse them.
+Use the web UI to create ARTs and Teams via the ART Setup and Team Setup pages, and the CLI (`safe` or `python -m safe.cli.main`) to create PIs, features, stories, and other records. Browse everything via the web UI or API docs.
 
 ### Option B — CLI only
 
@@ -128,12 +128,13 @@ The React SPA provides views across all key PI artifacts for a selected PI.
 |------|-------|-------------|
 | **Board** | `/pi/:id/board` | Program Board — feature cards placed in team × iteration grid with dependency arrows |
 | **Backlog** | `/pi/:id/backlog` | WSJF-ranked feature list with inline story management per feature |
-| **Objectives** | `/pi/:id/objectives` | PI Objectives — committed and stretch objectives with planned/actual BV scoring |
+| **Objectives** | `/pi/:id/objectives` | PI Objectives — committed and stretch objectives with planned/actual BV scoring; predictability summary footer |
+| **Predictability** | `/pi/:id/predictability` | ART PI Predictability — per-team and ART-level actual vs planned BV with colour-coded predictability % |
 | **Capacity** | `/pi/:id/capacity` | Capacity grid — set team size, PTO, and overhead per iteration; shows available person-days |
 | **Risks** | `/pi/:id/risks` | ROAM risk register with unroamed count callout |
 | **Dependencies** | `/pi/:id/dependencies` | Cross-team dependency tracker with unresolved count |
 | **PI Setup** | `/pi/:id/setup` | Edit PI details, manage lifecycle (activate/close), add/delete iterations, delete PI |
-| **Team Setup** | `/pi/:id/team-setup` | Create, rename, and delete ART teams |
+| **Team Setup** | `/pi/:id/team-setup` | Create, rename, and delete ART teams; set Team Topologies type (stream-aligned, enabling, complicated-subsystem, platform) |
 | **ART Setup** | `/art-setup` | Create, rename, and delete Agile Release Trains (always accessible) |
 
 Built with Vite, React 18, TypeScript, Tailwind CSS v4, TanStack Query, and React Router.
@@ -186,6 +187,8 @@ safe art list
 safe art show <id>
 
 safe team create --name "Alpha" --members 6 --art-id <art-id>
+safe team create --name "Platform Team" --members 7 --art-id <art-id> \
+  --topology-type platform          # stream_aligned | enabling | complicated_subsystem | platform
 safe team list
 safe team list --art-id <art-id>
 safe team show <id>
@@ -303,17 +306,49 @@ pytest
 pytest --cov=safe   # with coverage
 ```
 
+### End-to-end (Playwright)
+
+```bash
+cd frontend
+npx playwright test        # runs all 154 e2e tests against a local API + UI
+npx playwright test --ui   # interactive UI mode
+```
+
+The e2e suite starts a dedicated API server on port 8001 and a Vite server on port 5180 automatically. It uses a static fixture database (`tests/e2e_fixture.clean.json`) that is restored before each test.
+
 ### Mutation testing
 
-Mutation tests run nightly on `main` via GitHub Actions, scoped to `safe/logic/`. Results are published as a downloadable HTML report artifact on each run.
+#### Python (`safe/logic/`)
 
-**View in the browser:** go to [Actions → Mutation Testing](https://github.com/hobsojam/SAFe_tooling/actions/workflows/mutation-testing.yml), open the latest run, and download the `mutation-report` artifact at the bottom of the page.
+Mutation tests run nightly on `main` via GitHub Actions using `mutmut`, scoped to `safe/logic/`. Results are published as a downloadable HTML report artifact on each run.
+
+**View in the browser:** go to [Actions → Mutation Testing](https://github.com/hobsojam/SAFe_tooling/actions/workflows/mutation.yml), open the latest run, and download the `mutation-report` artifact at the bottom of the page.
 
 **Download via CLI** (run from the repo root, not from `frontend/`):
 
 ```bash
 gh run download <run-id> -R hobsojam/SAFe_tooling -n mutation-report
-# run-id is shown in the Actions UI or: gh run list --workflow "Mutation Testing" -R hobsojam/SAFe_tooling
+# run-id: gh run list --workflow "Mutation Testing" -R hobsojam/SAFe_tooling
+```
+
+Then open `index.html` from the downloaded folder in your browser.
+
+#### Frontend (`frontend/src/`)
+
+Mutation tests run nightly on `main` via GitHub Actions using [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `src/api/` and `src/components/`.
+
+**Run locally** (from the `frontend/` directory):
+
+```bash
+npm run stryker
+# Report written to frontend/reports/mutation/index.html
+```
+
+**Download the CI report** (run from the repo root):
+
+```bash
+gh run download <run-id> -R hobsojam/SAFe_tooling -n frontend-mutation-report
+# run-id: gh run list --workflow "Frontend Mutation Testing" -R hobsojam/SAFe_tooling
 ```
 
 Then open `index.html` from the downloaded folder in your browser.
@@ -327,7 +362,8 @@ frontend/           React SPA (Vite + TypeScript + Tailwind)
   src/
     api/            Typed fetch client
     components/     Layout, Badge, Spinner, EmptyState
-    pages/          Board, Backlog, Objectives, Capacity, Risks, Dependencies, Setup, TeamSetup, ARTSetup
+    pages/          Board, Backlog, Objectives, Predictability, Capacity, Risks, Dependencies, Setup, TeamSetup, ARTSetup
+  e2e/              Playwright end-to-end tests (154 tests)
   Dockerfile        Multi-stage build → nginx
   nginx.conf        SPA routing + /api/ proxy to FastAPI
 safe/
@@ -353,7 +389,7 @@ safe/
     schemas.py      Create/Update/action request body schemas
     routers/        One file per resource (arts, teams, pi, iterations, features, ...)
   store/            TinyDB persistence (Repository[T], get_repos())
-tests/              pytest test suite (464 tests — unit, CLI, API, smoke)
+tests/              pytest test suite (495 tests — unit, CLI, API, smoke)
 Dockerfile          Python API image
 docker-compose.yml  API (port 8000) + frontend/nginx (port 3000)
 pyproject.toml
@@ -367,7 +403,11 @@ Data is stored at `~/.safe_tooling/db.json`. The CLI and API share this file.
 
 | Area | Description |
 |------|-------------|
-| **Frontend mutation testing** | Add [Stryker Mutator](https://stryker-mutator.io/) with the Vitest runner, scoped to `frontend/src/` — equivalent to the `mutmut` setup on the Python side |
+| **Feature CRUD in UI** | Add create, edit, assign, and status-update flows for Features in the web UI — the most impactful gap since Features are the core PI planning artefact and currently require the CLI |
+| **Feature-to-PI assignment in UI** | Allow features to be assigned to a PI directly from the web UI; currently requires the CLI (`safe feature assign`) |
+| **Story, Capacity, and Objectives UI** | Extend web UI mutation flows to Stories, Capacity Plans, and PI Objectives, so the full PI planning workflow is available without the CLI |
+| **Inspect & Adapt page** | Add an I&A ceremony page covering the PI System Demo, quantitative measurement (predictability, quality metrics), and a structured problem-solving workshop view |
+| **Better API error messages** | Surface actionable error details in the web UI — e.g. which field failed validation, what state-machine constraint was violated — rather than showing raw HTTP status codes |
 | **Responsive design** | Make the web UI usable across screen sizes (mobile, tablet, desktop) using Tailwind's responsive breakpoints |
 
 ---

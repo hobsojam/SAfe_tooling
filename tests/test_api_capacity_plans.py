@@ -1,3 +1,25 @@
+from datetime import date
+
+from safe.api.routers.capacity_plans import _weekdays
+
+
+class TestWeekdays:
+    def test_full_two_week_iteration(self):
+        # Mon 2026-01-05 → Fri 2026-01-16 = 10 weekdays
+        assert _weekdays(date(2026, 1, 5), date(2026, 1, 16)) == 10
+
+    def test_single_monday(self):
+        assert _weekdays(date(2026, 1, 5), date(2026, 1, 5)) == 1
+
+    def test_weekend_only_returns_zero(self):
+        # Sat 2026-01-10 → Sun 2026-01-11
+        assert _weekdays(date(2026, 1, 10), date(2026, 1, 11)) == 0
+
+    def test_start_saturday_end_monday(self):
+        # Sat 2026-01-10 → Mon 2026-01-12 = 1 weekday (Monday)
+        assert _weekdays(date(2026, 1, 10), date(2026, 1, 12)) == 1
+
+
 def _setup(client):
     art_id = client.post("/art", json={"name": "ART"}).json()["id"]
     pi_id = client.post(
@@ -85,3 +107,52 @@ def test_delete_returns_204(client):
     plan_id = _create_plan(client, pi_id, team_id, iter_id).json()["id"]
     assert client.delete(f"/capacity-plans/{plan_id}").status_code == 204
     assert client.get(f"/capacity-plans/{plan_id}").status_code == 404
+
+
+def _setup_for_seed(client):
+    """Return (art_id, pi_id) with one team attached to art and two non-IP iterations."""
+    art_id = client.post("/art", json={"name": "ART"}).json()["id"]
+    pi_id = client.post(
+        "/pi",
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
+    ).json()["id"]
+    client.post("/team", json={"name": "Alpha", "member_count": 6, "art_id": art_id})
+    client.post(
+        "/iterations",
+        json={"pi_id": pi_id, "number": 1, "start_date": "2026-01-05", "end_date": "2026-01-16"},
+    )
+    client.post(
+        "/iterations",
+        json={"pi_id": pi_id, "number": 2, "start_date": "2026-01-19", "end_date": "2026-01-30"},
+    )
+    return art_id, pi_id
+
+
+class TestSeedCapacityPlans:
+    def test_creates_plans_for_each_team_iteration_cell(self, client):
+        _, pi_id = _setup_for_seed(client)
+        r = client.post("/capacity-plans/seed", json={"pi_id": pi_id})
+        assert r.status_code == 201
+        assert len(r.json()) == 2  # 1 team × 2 non-IP iterations
+
+    def test_seed_uses_iteration_weekdays_as_iteration_days(self, client):
+        _, pi_id = _setup_for_seed(client)
+        plans = client.post("/capacity-plans/seed", json={"pi_id": pi_id}).json()
+        # Jan 5–16 = 10 weekdays
+        assert plans[0]["iteration_days"] == 10
+
+    def test_idempotent_does_not_duplicate(self, client):
+        _, pi_id = _setup_for_seed(client)
+        client.post("/capacity-plans/seed", json={"pi_id": pi_id})
+        r = client.post("/capacity-plans/seed", json={"pi_id": pi_id})
+        assert r.status_code == 201
+        assert len(r.json()) == 0  # nothing new created
+
+    def test_unknown_pi_returns_404(self, client):
+        r = client.post("/capacity-plans/seed", json={"pi_id": "no-such-pi"})
+        assert r.status_code == 404

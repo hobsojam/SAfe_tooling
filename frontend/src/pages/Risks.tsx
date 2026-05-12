@@ -1,12 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import type { Risk, RiskCreate, RiskUpdate, ROAMStatus } from '../types';
 import { ROAMBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
+import { usePagination } from '../hooks/usePagination';
 
 const ROAM_OPTIONS: ROAMStatus[] = ['unroamed', 'owned', 'accepted', 'mitigated', 'resolved'];
 
@@ -29,11 +32,14 @@ const EMPTY_FORM: RiskFormState = {
 export function Risks() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Risk | null>(null);
   const [form, setForm] = useState<RiskFormState>(EMPTY_FORM);
   const [error, setError] = useState('');
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const { data: pi } = useQuery({
     queryKey: ['pi', piId],
@@ -56,20 +62,23 @@ export function Risks() {
 
   const createMut = useMutation({
     mutationFn: (body: RiskCreate) => api.createRisk(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Risk added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: RiskUpdate }) => api.updateRisk(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Risk updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteRisk(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Risk deleted'); },
+    onError: (e: Error) => setDeleteError(e.message),
   });
+
+  const { page, totalPages, pageItems: pageRisks, goTo } = usePagination(risks, 25, piId);
 
   if (isLoading) return <Spinner />;
 
@@ -120,11 +129,6 @@ export function Risks() {
     }
   }
 
-  function handleDelete(id: string) {
-    if (!window.confirm('Delete this risk?')) return;
-    deleteMut.mutate(id);
-  }
-
   const isPending = createMut.isPending || updateMut.isPending;
 
   return (
@@ -137,7 +141,12 @@ export function Risks() {
           <p className="text-sm text-slate-500">
             {risks.length} risk{risks.length !== 1 ? 's' : ''}
             {unroamed > 0 && (
-              <span className="ml-2 font-medium text-red-600">{unroamed} unroamed</span>
+              <Link
+                to={`/pi/${piId}/risks/roam`}
+                className="ml-2 font-medium text-red-600 hover:text-red-800 underline"
+              >
+                {unroamed} unroamed
+              </Link>
             )}
           </p>
         </div>
@@ -167,45 +176,75 @@ export function Risks() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {risks.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-2.5">
-                    <button
-                      onClick={() => openEdit(r)}
-                      className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
-                    >
-                      {r.description}
-                    </button>
-                  </td>
-                  <td className="px-4 py-2.5 text-slate-600">
-                    {r.team_id ? (teamMap[r.team_id] ?? r.team_id) : '—'}
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <ROAMBadge status={r.roam_status} />
-                  </td>
-                  <td className="px-4 py-2.5 text-slate-500">{r.owner ?? '—'}</td>
-                  <td className="px-4 py-2.5 text-slate-500 tabular-nums">{r.raised_date}</td>
-                  <td className="max-w-xs px-4 py-2.5 text-slate-500">
-                    {r.mitigation_notes || '—'}
-                  </td>
-                  <td className="px-4 py-2.5 whitespace-nowrap">
-                    <button
-                      onClick={() => openEdit(r)}
-                      className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(r.id)}
-                      className="text-xs text-red-400 hover:text-red-600 underline"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {pageRisks.map((r) => {
+                if (deleteId === r.id) {
+                  return (
+                    <tr key={r.id} className="bg-red-50">
+                      <td colSpan={7} className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
+                          <span className="text-sm text-slate-700">
+                            Delete <strong>{r.description.slice(0, 60)}{r.description.length > 60 ? '…' : ''}</strong>?
+                          </span>
+                          <button
+                            onClick={() => deleteMut.mutate(r.id)}
+                            disabled={deleteMut.isPending}
+                            className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                          >
+                            {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+                          </button>
+                          <button
+                            onClick={() => { setDeleteId(null); setDeleteError(''); }}
+                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                }
+                return (
+                  <tr key={r.id} className="hover:bg-slate-50/60">
+                    <td className="px-4 py-2.5">
+                      <button
+                        onClick={() => openEdit(r)}
+                        className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                      >
+                        {r.description}
+                      </button>
+                    </td>
+                    <td className="px-4 py-2.5 text-slate-600">
+                      {r.team_id ? (teamMap[r.team_id] ?? r.team_id) : '—'}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <ROAMBadge status={r.roam_status} />
+                    </td>
+                    <td className="px-4 py-2.5 text-slate-500">{r.owner ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-slate-500 tabular-nums">{r.raised_date}</td>
+                    <td className="max-w-xs px-4 py-2.5 text-slate-500">
+                      {r.mitigation_notes || '—'}
+                    </td>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
+                      <button
+                        onClick={() => openEdit(r)}
+                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => { setDeleteId(r.id); setDeleteError(''); }}
+                        className="text-xs text-red-400 hover:text-red-600 underline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

@@ -17,7 +17,10 @@ import type {
 import { FeatureStatusBadge, StoryStatusBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
+import { usePagination } from '../hooks/usePagination';
 
 const FEATURE_STATUS_OPTIONS: FeatureStatus[] = ['funnel', 'analyzing', 'backlog', 'implementing', 'done'];
 const STORY_STATUS_OPTIONS: StoryStatus[] = ['not_started', 'in_progress', 'done', 'accepted'];
@@ -51,6 +54,7 @@ function StoryPanel({
   piId: string;
 }) {
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: stories = [], isLoading } = useQuery({
     queryKey: ['stories', feature.id],
@@ -93,19 +97,20 @@ function StoryPanel({
       setAddOpen(false);
       setAddForm({ name: '', team_id: defaultTeamId, iteration_id: '', points: 3, status: 'not_started' });
       setAddError('');
+      toast('Story added');
     },
     onError: (e: Error) => setAddError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: StoryUpdate }) => api.updateStory(id, body),
-    onSuccess: () => { invalidate(); setEditId(null); setEditError(''); },
+    onSuccess: () => { invalidate(); setEditId(null); setEditError(''); toast('Story updated'); },
     onError: (e: Error) => setEditError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteStory(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Story deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 
@@ -391,6 +396,7 @@ type NumKey = 'user_business_value' | 'time_criticality' | 'risk_reduction_oppor
 export function Backlog() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Feature | null>(null);
@@ -421,30 +427,42 @@ export function Backlog() {
     enabled: !!piId,
   });
 
+  const { data: allStories = [] } = useQuery({
+    queryKey: ['stories'],
+    queryFn: api.listStories,
+  });
+
   const nonIpIterations = iterations.filter((it) => !it.is_ip).sort((a, b) => a.number - b.number);
+
+  const storyCountByFeature = Object.fromEntries(
+    features.map((f) => [f.id, allStories.filter((s) => s.feature_id === f.id).length])
+  );
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['features', piId] });
 
   const createMut = useMutation({
     mutationFn: (body: FeatureCreate) => api.createFeature(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Feature created'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: FeatureUpdate }) => api.updateFeature(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Feature updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteFeature(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); toast('Feature deleted'); },
+    onError: (e: Error) => toast(e.message, 'error'),
   });
+
+  const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
+  const { page, totalPages, pageItems: pageSorted, goTo } = usePagination(sorted, 25, piId);
 
   if (isLoading) return <Spinner />;
 
-  const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
 
   function openNew() {
@@ -553,10 +571,10 @@ export function Backlog() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sorted.map((f, i) => (
+              {pageSorted.map((f, i) => (
                 <Fragment key={f.id}>
                   <tr className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{i + 1}</td>
+                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => openEdit(f)}
@@ -588,7 +606,7 @@ export function Backlog() {
                         aria-expanded={expandedFeatureId === f.id}
                       >
                         <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
-                        <span>{f.story_ids.length > 0 ? f.story_ids.length : 'Stories'}</span>
+                        <span>Stories{storyCountByFeature[f.id] > 0 ? ` (${storyCountByFeature[f.id]})` : ''}</span>
                       </button>
                     </td>
                     <td className="px-4 py-2.5 whitespace-nowrap">
@@ -619,6 +637,7 @@ export function Backlog() {
               ))}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

@@ -5,7 +5,9 @@
       "name": "Platform ART",
       "team_ids": [
         "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
-        "03ed3b95-f268-4c4b-bbec-b6722cb28774"
+        "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+        "cccccccc-0003-0003-0003-cccccccccccc",
+        "dddddddd-0004-0004-0004-dddddddddddd"
       ]
     }
   },
@@ -21,6 +23,20 @@
       "id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
       "name": "Beta",
       "member_count": 5,
+      "art_id": "721983fc-0004-4ff5-8513-f3878ca0410e",
+      "velocity_history": []
+    },
+    "3": {
+      "id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "name": "Gamma",
+      "member_count": 7,
+      "art_id": "721983fc-0004-4ff5-8513-f3878ca0410e",
+      "velocity_history": []
+    },
+    "4": {
+      "id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "name": "Delta",
+      "member_count": 4,
       "art_id": "721983fc-0004-4ff5-8513-f3878ca0410e",
       "velocity_history": []
     }
@@ -96,6 +112,7 @@
       "description": "",
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
       "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "2f2387bc-9142-4ee9-bdab-0a4b72c91b44",
       "status": "backlog",
       "acceptance_criteria": "",
       "story_ids": [],
@@ -111,6 +128,7 @@
       "description": "",
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
       "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "a3995b07-3c8f-4cf1-9c96-e984701642fd",
       "status": "backlog",
       "acceptance_criteria": "",
       "story_ids": [],
@@ -126,6 +144,7 @@
       "description": "",
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
       "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "iteration_id": "2f2387bc-9142-4ee9-bdab-0a4b72c91b44",
       "status": "backlog",
       "acceptance_criteria": "",
       "story_ids": [],
@@ -141,6 +160,7 @@
       "description": "",
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
       "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "iteration_id": "2c0e72cd-a456-44df-8893-943e4f21e954",
       "status": "backlog",
       "acceptance_criteria": "",
       "story_ids": [],
@@ -149,6 +169,54 @@
       "time_criticality": 2,
       "risk_reduction_opportunity_enablement": 5,
       "job_size": 2
+    },
+    "5": {
+      "id": "gggggggg-0005-0005-0005-gggggggggggg",
+      "name": "Data Lake Integration",
+      "description": "",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "2c0e72cd-a456-44df-8893-943e4f21e954",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 7,
+      "time_criticality": 4,
+      "risk_reduction_opportunity_enablement": 6,
+      "job_size": 5
+    },
+    "6": {
+      "id": "dddddddd-0006-0006-0006-dddddddddddd",
+      "name": "API Gateway",
+      "description": "",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "a3995b07-3c8f-4cf1-9c96-e984701642fd",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 9,
+      "time_criticality": 7,
+      "risk_reduction_opportunity_enablement": 4,
+      "job_size": 3
+    },
+    "7": {
+      "id": "eeeeeeee-0005-0005-0005-eeeeeeeeeeee",
+      "name": "Reporting Module",
+      "description": "",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "team_id": null,
+      "iteration_id": null,
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 5,
+      "time_criticality": 3,
+      "risk_reduction_opportunity_enablement": 2,
+      "job_size": 3
     }
   },
   "stories": {
@@ -261,6 +329,82 @@
       "points": 2,
       "status": "not_started",
       "acceptance_criteria": ""
+    },
+    "11": {
+      "id": "gggggggg-0011-0011-0011-gggggggggggg",
+      "name": "Schema registry",
+      "description": "",
+      "feature_id": "gggggggg-0005-0005-0005-gggggggggggg",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "a3995b07-3c8f-4cf1-9c96-e984701642fd",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "12": {
+      "id": "gggggggg-0012-0012-0012-gggggggggggg",
+      "name": "Ingestion pipeline",
+      "description": "",
+      "feature_id": "gggggggg-0005-0005-0005-gggggggggggg",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "2c0e72cd-a456-44df-8893-943e4f21e954",
+      "points": 4,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "13": {
+      "id": "dddddddd-0013-0013-0013-dddddddddddd",
+      "name": "Rate limiting",
+      "description": "",
+      "feature_id": "dddddddd-0006-0006-0006-dddddddddddd",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "2f2387bc-9142-4ee9-bdab-0a4b72c91b44",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "14": {
+      "id": "dddddddd-0014-0014-0014-dddddddddddd",
+      "name": "Auth middleware",
+      "description": "",
+      "feature_id": "dddddddd-0006-0006-0006-dddddddddddd",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "a3995b07-3c8f-4cf1-9c96-e984701642fd",
+      "points": 4,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    }
+  },
+  "objectives": {
+    "1": {
+      "id": "aaaaaaaa-0001-0001-0001-aaaaaaaaaaaa",
+      "description": "Deliver Auth Service v2",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 10,
+      "actual_business_value": 10,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "2": {
+      "id": "aaaaaaaa-0002-0002-0002-aaaaaaaaaaaa",
+      "description": "Observability Dashboard rollout",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 10,
+      "actual_business_value": 8,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "3": {
+      "id": "aaaaaaaa-0003-0003-0003-aaaaaaaaaaaa",
+      "description": "Exploratory SSO stretch goal",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
+      "planned_business_value": 5,
+      "actual_business_value": null,
+      "is_stretch": true,
+      "feature_ids": []
     }
   },
   "risks": {
@@ -303,8 +447,8 @@
       "id": "efbaacd8-8970-4503-bd2a-5797ba1ee2f5",
       "description": "Auth API contract must be finalised before SSO integration begins",
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
-      "from_feature_id": "be64b200-598f-4143-b5a2-a17722e6dd15",
-      "to_feature_id": "da12fba6-faed-46b3-92c4-0c2d9285fc9f",
+      "from_feature_id": "da12fba6-faed-46b3-92c4-0c2d9285fc9f",
+      "to_feature_id": "be64b200-598f-4143-b5a2-a17722e6dd15",
       "status": "resolved",
       "owner": "Alice",
       "resolution_notes": "",
@@ -329,7 +473,7 @@
       "pi_id": "004066e4-1544-462e-a4ae-0d7a2bf10dcd",
       "from_feature_id": "0633dac9-2bfa-4958-b959-53d2faf44124",
       "to_feature_id": "be64b200-598f-4143-b5a2-a17722e6dd15",
-      "status": "mitigated",
+      "status": "in_progress",
       "owner": "Bob",
       "resolution_notes": "",
       "raised_date": "2026-05-04",
