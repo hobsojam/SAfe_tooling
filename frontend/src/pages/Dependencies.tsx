@@ -177,8 +177,8 @@ export function Dependencies() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-5 flex items-baseline justify-between">
+    <div className="p-3 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-y-2">
         <div>
           <h1 className="mb-1 text-xl font-semibold text-slate-800">
             Dependencies — {pi?.name}
@@ -201,87 +201,154 @@ export function Dependencies() {
       {deps.length === 0 ? (
         <EmptyState message="No dependencies for this PI." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
-              <tr>
-                {['From', 'To', 'Description', 'Status', 'Owner', 'Needed By', ''].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          {/* Mobile card list */}
+          <div className="block md:hidden divide-y divide-slate-100">
+            {pageDeps.map((d) => {
+              if (deleteId === d.id) {
+                return (
+                  <div key={d.id} className="bg-red-50 px-4 py-4">
+                    {deleteError && <p className="mb-2 text-xs text-red-600">{deleteError}</p>}
+                    <p className="mb-3 text-sm text-slate-700">
+                      Delete <strong>{d.description.slice(0, 60)}{d.description.length > 60 ? '…' : ''}</strong>?
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => deleteMut.mutate(d.id)}
+                        disabled={deleteMut.isPending}
+                        className="rounded-md bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                      >
+                        {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+                      </button>
+                      <button
+                        onClick={() => { setDeleteId(null); setDeleteError(''); }}
+                        className="rounded-md bg-white px-4 py-2.5 text-sm text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div key={d.id} className="px-4 py-4">
+                  <button
+                    onClick={() => openEdit(d)}
+                    className="mb-1 text-left font-medium text-slate-800 hover:text-slate-600"
                   >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {pageDeps.map((d) => {
-                if (deleteId === d.id) {
+                    {d.description}
+                  </button>
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <DepBadge status={d.status} />
+                  </div>
+                  <div className="mb-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-500">
+                    <div><span className="font-medium text-slate-600">From: </span>{depFromLabel(d)}</div>
+                    <div><span className="font-medium text-slate-600">To: </span>{depToLabel(d)}</div>
+                    {d.owner && <div><span className="font-medium text-slate-600">Owner: </span>{d.owner}</div>}
+                    {d.needed_by_date && <div><span className="font-medium text-slate-600">Needed by: </span>{d.needed_by_date}</div>}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEdit(d)}
+                      className="rounded-md bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => { setDeleteId(d.id); setDeleteError(''); }}
+                      className="rounded-md bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  {['From', 'To', 'Description', 'Status', 'Owner', 'Needed By', ''].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {pageDeps.map((d) => {
+                  if (deleteId === d.id) {
+                    return (
+                      <tr key={d.id} className="bg-red-50">
+                        <td colSpan={7} className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
+                            <span className="text-sm text-slate-700">
+                              Delete <strong>{d.description.slice(0, 60)}{d.description.length > 60 ? '…' : ''}</strong>?
+                            </span>
+                            <button
+                              onClick={() => deleteMut.mutate(d.id)}
+                              disabled={deleteMut.isPending}
+                              className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                            >
+                              {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+                            </button>
+                            <button
+                              onClick={() => { setDeleteId(null); setDeleteError(''); }}
+                              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
                   return (
-                    <tr key={d.id} className="bg-red-50">
-                      <td colSpan={7} className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                          <span className="text-sm text-slate-700">
-                            Delete <strong>{d.description.slice(0, 60)}{d.description.length > 60 ? '…' : ''}</strong>?
-                          </span>
-                          <button
-                            onClick={() => deleteMut.mutate(d.id)}
-                            disabled={deleteMut.isPending}
-                            className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
-                          >
-                            {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
-                          </button>
-                          <button
-                            onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
+                    <tr key={d.id} className="hover:bg-slate-50/60">
+                      <td className="px-4 py-2.5 font-medium text-slate-700">{depFromLabel(d)}</td>
+                      <td className="px-4 py-2.5 font-medium text-slate-700">{depToLabel(d)}</td>
+                      <td className="px-4 py-2.5">
+                        <button
+                          onClick={() => openEdit(d)}
+                          className="text-slate-600 hover:text-slate-800 hover:underline text-left"
+                        >
+                          {d.description}
+                        </button>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <DepBadge status={d.status} />
+                      </td>
+                      <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
+                      <td className="px-4 py-2.5 text-slate-500 tabular-nums">
+                        {d.needed_by_date ?? '—'}
+                      </td>
+                      <td className="px-4 py-2.5 whitespace-nowrap">
+                        <button
+                          onClick={() => openEdit(d)}
+                          className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => { setDeleteId(d.id); setDeleteError(''); }}
+                          className="text-xs text-red-400 hover:text-red-600 underline"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   );
-                }
-                return (
-                  <tr key={d.id} className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 font-medium text-slate-700">{depFromLabel(d)}</td>
-                    <td className="px-4 py-2.5 font-medium text-slate-700">{depToLabel(d)}</td>
-                    <td className="px-4 py-2.5">
-                      <button
-                        onClick={() => openEdit(d)}
-                        className="text-slate-600 hover:text-slate-800 hover:underline text-left"
-                      >
-                        {d.description}
-                      </button>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <DepBadge status={d.status} />
-                    </td>
-                    <td className="px-4 py-2.5 text-slate-500">{d.owner ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-slate-500 tabular-nums">
-                      {d.needed_by_date ?? '—'}
-                    </td>
-                    <td className="px-4 py-2.5 whitespace-nowrap">
-                      <button
-                        onClick={() => openEdit(d)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => { setDeleteId(d.id); setDeleteError(''); }}
-                        className="text-xs text-red-400 hover:text-red-600 underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                })}
+              </tbody>
+            </table>
+          </div>
           <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
@@ -307,7 +374,7 @@ export function Dependencies() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="dep-from" className="mb-1 block text-sm font-medium text-slate-700">
                 From Feature<span aria-hidden="true"> *</span>
@@ -358,7 +425,7 @@ export function Dependencies() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="dep-owner" className="mb-1 block text-sm font-medium text-slate-700">Owner</label>
               <input

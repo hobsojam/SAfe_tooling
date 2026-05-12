@@ -537,8 +537,8 @@ export function Backlog() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-5 flex items-baseline justify-between">
+    <div className="p-3 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-y-2">
         <div>
           <h1 className="mb-1 text-xl font-semibold text-slate-800">
             Program Backlog — {pi?.name}
@@ -556,87 +556,140 @@ export function Backlog() {
       {sorted.length === 0 ? (
         <EmptyState message="No features in this PI." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
-              <tr>
-                {['#', 'Feature', 'Status', 'Team', 'CoD', 'Size', 'WSJF', 'Stories', ''].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          {/* Mobile card list */}
+          <div className="block md:hidden divide-y divide-slate-100">
+            {pageSorted.map((f, i) => (
+              <div key={f.id} className="px-4 py-4">
+                <div className="mb-1 flex items-start justify-between gap-2">
+                  <button
+                    onClick={() => openEdit(f)}
+                    className="text-left font-medium text-slate-800 hover:text-slate-600 leading-snug"
                   >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {pageSorted.map((f, i) => (
-                <Fragment key={f.id}>
-                  <tr className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
-                    <td className="px-4 py-2.5">
-                      <button
-                        onClick={() => openEdit(f)}
-                        className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
-                      >
-                        {f.name}
-                      </button>
-                      {f.description && (
-                        <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
-                          {f.description}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <FeatureStatusBadge status={f.status} />
-                    </td>
-                    <td className="px-4 py-2.5 text-slate-600">
-                      {f.team_id ? (teamMap[f.team_id] ?? f.team_id) : '—'}
-                    </td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.cost_of_delay}</td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.job_size}</td>
-                    <td className="px-4 py-2.5">
-                      <span className="font-semibold text-slate-800 tabular-nums">{f.wsjf_score}</span>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <button
-                        onClick={() => toggleExpand(f.id)}
-                        className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 transition-colors"
-                        aria-expanded={expandedFeatureId === f.id}
-                      >
-                        <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
-                        <span>Stories{storyCountByFeature[f.id] > 0 ? ` (${storyCountByFeature[f.id]})` : ''}</span>
-                      </button>
-                    </td>
-                    <td className="px-4 py-2.5 whitespace-nowrap">
-                      <button
-                        onClick={() => openEdit(f)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(f.id)}
-                        className="text-xs text-red-400 hover:text-red-600 underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                  {expandedFeatureId === f.id && (
-                    <StoryPanel
-                      key={`stories-${f.id}`}
-                      feature={f}
-                      teams={teams}
-                      nonIpIterations={nonIpIterations}
-                      piId={piId!}
-                    />
+                    {f.name}
+                  </button>
+                  <span className="shrink-0 tabular-nums font-bold text-slate-800 text-sm">
+                    {f.wsjf_score}
+                  </span>
+                </div>
+                {f.description && (
+                  <p className="mb-2 text-xs text-slate-400 line-clamp-1">{f.description}</p>
+                )}
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <FeatureStatusBadge status={f.status} />
+                  {f.team_id && (
+                    <span className="text-xs text-slate-500">{teamMap[f.team_id] ?? f.team_id}</span>
                   )}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
+                </div>
+                <div className="mb-3 flex gap-4 text-xs text-slate-500">
+                  <span>#{(page - 1) * 25 + i + 1}</span>
+                  <span>CoD: {f.cost_of_delay}</span>
+                  <span>Size: {f.job_size}</span>
+                  {storyCountByFeature[f.id] > 0 && (
+                    <span>{storyCountByFeature[f.id]} stor{storyCountByFeature[f.id] === 1 ? 'y' : 'ies'}</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openEdit(f)}
+                    className="rounded-md bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(f.id)}
+                    className="rounded-md bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  {['#', 'Feature', 'Status', 'Team', 'CoD', 'Size', 'WSJF', 'Stories', ''].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {pageSorted.map((f, i) => (
+                  <Fragment key={f.id}>
+                    <tr className="hover:bg-slate-50/60">
+                      <td className="px-4 py-2.5 text-slate-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
+                      <td className="px-4 py-2.5">
+                        <button
+                          onClick={() => openEdit(f)}
+                          className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                        >
+                          {f.name}
+                        </button>
+                        {f.description && (
+                          <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                            {f.description}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <FeatureStatusBadge status={f.status} />
+                      </td>
+                      <td className="px-4 py-2.5 text-slate-600">
+                        {f.team_id ? (teamMap[f.team_id] ?? f.team_id) : '—'}
+                      </td>
+                      <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.cost_of_delay}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.job_size}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="font-semibold text-slate-800 tabular-nums">{f.wsjf_score}</span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <button
+                          onClick={() => toggleExpand(f.id)}
+                          className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                          aria-expanded={expandedFeatureId === f.id}
+                        >
+                          <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
+                          <span>Stories{storyCountByFeature[f.id] > 0 ? ` (${storyCountByFeature[f.id]})` : ''}</span>
+                        </button>
+                      </td>
+                      <td className="px-4 py-2.5 whitespace-nowrap">
+                        <button
+                          onClick={() => openEdit(f)}
+                          className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(f.id)}
+                          className="text-xs text-red-400 hover:text-red-600 underline"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedFeatureId === f.id && (
+                      <StoryPanel
+                        key={`stories-${f.id}`}
+                        feature={f}
+                        teams={teams}
+                        nonIpIterations={nonIpIterations}
+                        piId={piId!}
+                      />
+                    )}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
@@ -673,7 +726,7 @@ export function Backlog() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="feature-status" className="mb-1 block text-sm font-medium text-slate-700">Status</label>
               <select
@@ -706,7 +759,7 @@ export function Backlog() {
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             WSJF Inputs
           </p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {numInput('User / Business Value', 'user_business_value', 1, 10)}
             {numInput('Time Criticality', 'time_criticality', 1, 10)}
             {numInput('Risk Reduction / OE', 'risk_reduction_opportunity_enablement', 1, 10)}
