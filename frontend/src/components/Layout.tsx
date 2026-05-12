@@ -5,6 +5,7 @@ import { api } from '../api';
 import type { PICreate } from '../types';
 import { Modal } from './Modal';
 import { PIStatusBadge } from './Badge';
+import { useToast } from './Toaster';
 
 const NAV = [
   { to: 'board', label: 'Board' },
@@ -31,6 +32,7 @@ export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [piModalOpen, setPiModalOpen] = useState(false);
   const [piForm, setPiForm] = useState<PICreate>(EMPTY_PI_FORM);
@@ -54,6 +56,7 @@ export function Layout() {
       qc.invalidateQueries({ queryKey: ['pis'] });
       setPiModalOpen(false);
       navigate(`/pi/${pi.id}/board`);
+      toast('PI created');
     },
     onError: (e: Error) => setPiError(e.message),
   });

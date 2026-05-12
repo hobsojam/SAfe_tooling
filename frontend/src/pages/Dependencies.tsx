@@ -8,6 +8,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import { usePagination } from '../hooks/usePagination';
 
 const STATUS_OPTIONS: DependencyStatus[] = ['identified', 'acknowledged', 'in_progress', 'resolved'];
@@ -40,6 +41,7 @@ function featureLabel(feature: Feature, teamMap: Record<string, string>): string
 export function Dependencies() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Dependency | null>(null);
@@ -75,20 +77,20 @@ export function Dependencies() {
 
   const createMut = useMutation({
     mutationFn: (body: DependencyCreate) => api.createDependency(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Dependency added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: DependencyUpdate }) =>
       api.updateDependency(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Dependency updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteDependency(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Dependency deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 

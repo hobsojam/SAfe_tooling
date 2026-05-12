@@ -7,6 +7,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import { usePagination } from '../hooks/usePagination';
 
 interface ObjectiveFormState {
@@ -28,6 +29,7 @@ const EMPTY_FORM: ObjectiveFormState = {
 export function Objectives() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<PIObjective | null>(null);
@@ -57,20 +59,20 @@ export function Objectives() {
 
   const createMut = useMutation({
     mutationFn: (body: PIObjectiveCreate) => api.createObjective(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Objective added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: PIObjectiveUpdate }) =>
       api.updateObjective(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Objective updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteObjective(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Objective deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 

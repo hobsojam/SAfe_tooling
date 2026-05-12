@@ -5,6 +5,7 @@ import { api } from '../api';
 import type { Risk, RiskUpdate, ROAMStatus } from '../types';
 import { EmptyState } from '../components/EmptyState';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 
 const ROAM_OPTIONS: ROAMStatus[] = ['owned', 'accepted', 'mitigated', 'resolved'];
 
@@ -17,6 +18,7 @@ interface RowState {
 export function RoamUnroamed() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: pi } = useQuery({
     queryKey: ['pi', piId],
@@ -46,6 +48,7 @@ export function RoamUnroamed() {
       setSaving((p) => ({ ...p, [id]: false }));
       setRows((p) => { const n = { ...p }; delete n[id]; return n; });
       setErrors((p) => { const n = { ...p }; delete n[id]; return n; });
+      toast('Risk ROAMed');
     },
     onError: (e: Error, { id }) => {
       setSaving((p) => ({ ...p, [id]: false }));

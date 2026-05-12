@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { api } from '../api';
 import { TOPOLOGY_LABELS, TopologyBadge } from '../components/Badge';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import type { Team, TeamCreate, TeamTopologyType, TeamUpdate } from '../types';
 
 interface EditState {
@@ -57,6 +58,7 @@ function TopologySelect({
 export function TeamSetup() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: pi, isLoading: loadingPi } = useQuery({
     queryKey: ['pi', piId],
@@ -92,6 +94,7 @@ export function TeamSetup() {
       qc.invalidateQueries({ queryKey: ['teams', pi?.art_id] });
       setEdit(null);
       setEditError('');
+      toast('Team updated');
     },
     onError: (e: Error) => setEditError(e.message),
   });
@@ -103,6 +106,7 @@ export function TeamSetup() {
       setAddOpen(false);
       setAddForm(EMPTY_ADD);
       setAddError('');
+      toast('Team created');
     },
     onError: (e: Error) => setAddError(e.message),
   });
@@ -113,6 +117,7 @@ export function TeamSetup() {
       qc.invalidateQueries({ queryKey: ['teams', pi?.art_id] });
       setDeleteId(null);
       setDeleteError('');
+      toast('Team deleted');
     },
     onError: (e: Error) => setDeleteError(e.message),
   });

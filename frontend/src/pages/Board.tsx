@@ -16,6 +16,7 @@ import { api } from '../api';
 import { DepBadge, FeatureStatusBadge, TopologyBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import type { Dependency, Feature } from '../types';
 
 type BoardGrid = Record<string, Record<string, Feature[]>>;
@@ -112,6 +113,7 @@ function crossTeamOnly(deps: Dependency[], features: Feature[]): Dependency[] {
 export function Board() {
   const { piId } = useParams<{ piId: string }>();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const [arrows, setArrows] = useState<Arrow[]>([]);
@@ -231,6 +233,7 @@ export function Board() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['features', piId] });
     },
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   function handleDragStart(event: DragStartEvent) {

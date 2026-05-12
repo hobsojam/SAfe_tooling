@@ -4,12 +4,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { PIStatusBadge } from '../components/Badge';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import type { IterationCreate, PIUpdate } from '../types';
 
 export function Setup() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const { data: pi, isLoading } = useQuery({
     queryKey: ['pi', piId],
@@ -48,6 +50,7 @@ export function Setup() {
       setDetailsError('');
       // update local form to reflect saved state
       void updated;
+      toast('PI updated');
     },
     onError: (e: Error) => setDetailsError(e.message),
   });
@@ -58,6 +61,7 @@ export function Setup() {
       qc.invalidateQueries({ queryKey: ['pi', piId] });
       qc.invalidateQueries({ queryKey: ['pis'] });
       setLifecycleError('');
+      toast('PI activated');
     },
     onError: (e: Error) => setLifecycleError(e.message),
   });
@@ -68,6 +72,7 @@ export function Setup() {
       qc.invalidateQueries({ queryKey: ['pi', piId] });
       qc.invalidateQueries({ queryKey: ['pis'] });
       setLifecycleError('');
+      toast('PI closed');
     },
     onError: (e: Error) => setLifecycleError(e.message),
   });
@@ -80,6 +85,7 @@ export function Setup() {
       setShowIterForm(false);
       setIterError('');
       setIterForm({ number: 1, name: '', start_date: '', end_date: '', is_ip: false });
+      toast('Iteration added');
     },
     onError: (e: Error) => setIterError(e.message),
   });
@@ -89,7 +95,9 @@ export function Setup() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['iterations', piId] });
       qc.invalidateQueries({ queryKey: ['pi', piId] });
+      toast('Iteration deleted');
     },
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   const deletePIMut = useMutation({
@@ -97,6 +105,7 @@ export function Setup() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pis'] });
       navigate('/pi');
+      toast('PI deleted');
     },
     onError: (e: Error) => setLifecycleError(e.message),
   });
