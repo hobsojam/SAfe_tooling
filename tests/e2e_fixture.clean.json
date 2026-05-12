@@ -86,6 +86,51 @@
       "start_date": "2026-03-02",
       "end_date": "2026-03-13",
       "is_ip": true
+    },
+    "6": {
+      "id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "number": 1,
+      "name": "",
+      "start_date": "2026-03-30",
+      "end_date": "2026-04-10",
+      "is_ip": false
+    },
+    "7": {
+      "id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "number": 2,
+      "name": "",
+      "start_date": "2026-04-13",
+      "end_date": "2026-04-24",
+      "is_ip": false
+    },
+    "8": {
+      "id": "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "number": 3,
+      "name": "",
+      "start_date": "2026-04-27",
+      "end_date": "2026-05-08",
+      "is_ip": false
+    },
+    "9": {
+      "id": "bbbbbbbb-0009-0009-0009-bbbbbbbbbbbb",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "number": 4,
+      "name": "",
+      "start_date": "2026-05-11",
+      "end_date": "2026-05-22",
+      "is_ip": false
+    },
+    "10": {
+      "id": "bbbbbbbb-0010-0010-0010-bbbbbbbbbbbb",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "number": 5,
+      "name": "",
+      "start_date": "2026-05-25",
+      "end_date": "2026-06-05",
+      "is_ip": true
     }
   },
   "pis": {
@@ -103,6 +148,21 @@
         "435fbcc0-6f20-44bd-b2c5-e6d29353f5ae"
       ],
       "status": "active"
+    },
+    "2": {
+      "id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "name": "PI 2026.2",
+      "art_id": "721983fc-0004-4ff5-8513-f3878ca0410e",
+      "start_date": "2026-03-30",
+      "end_date": "2026-06-05",
+      "iteration_ids": [
+        "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+        "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+        "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+        "bbbbbbbb-0009-0009-0009-bbbbbbbbbbbb",
+        "bbbbbbbb-0010-0010-0010-bbbbbbbbbbbb"
+      ],
+      "status": "planning"
     }
   },
   "features": {
@@ -217,6 +277,86 @@
       "time_criticality": 3,
       "risk_reduction_opportunity_enablement": 2,
       "job_size": 3
+    },
+    "8": {
+      "id": "bbbbbbbb-f008-f008-f008-bbbbbbbbbbbb",
+      "name": "Mobile App MVP",
+      "description": "",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 9,
+      "time_criticality": 8,
+      "risk_reduction_opportunity_enablement": 3,
+      "job_size": 5
+    },
+    "9": {
+      "id": "bbbbbbbb-f009-f009-f009-bbbbbbbbbbbb",
+      "name": "Notification Service",
+      "description": "",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "iteration_id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 6,
+      "time_criticality": 5,
+      "risk_reduction_opportunity_enablement": 4,
+      "job_size": 3
+    },
+    "10": {
+      "id": "bbbbbbbb-f010-f010-f010-bbbbbbbbbbbb",
+      "name": "Search & Discovery",
+      "description": "",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 7,
+      "time_criticality": 4,
+      "risk_reduction_opportunity_enablement": 5,
+      "job_size": 4
+    },
+    "11": {
+      "id": "bbbbbbbb-f011-f011-f011-bbbbbbbbbbbb",
+      "name": "User Profile & Preferences",
+      "description": "",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 5,
+      "time_criticality": 3,
+      "risk_reduction_opportunity_enablement": 2,
+      "job_size": 2
+    },
+    "12": {
+      "id": "bbbbbbbb-f012-f012-f012-bbbbbbbbbbbb",
+      "name": "Billing & Subscriptions",
+      "description": "",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+      "status": "backlog",
+      "acceptance_criteria": "",
+      "story_ids": [],
+      "dependency_ids": [],
+      "user_business_value": 8,
+      "time_criticality": 6,
+      "risk_reduction_opportunity_enablement": 7,
+      "job_size": 5
     }
   },
   "stories": {
@@ -373,6 +513,171 @@
       "points": 4,
       "status": "not_started",
       "acceptance_criteria": ""
+    },
+    "15": {
+      "id": "bbbbbbbb-s015-s015-s015-bbbbbbbbbbbb",
+      "name": "App scaffolding",
+      "description": "",
+      "feature_id": "bbbbbbbb-f008-f008-f008-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "16": {
+      "id": "bbbbbbbb-s016-s016-s016-bbbbbbbbbbbb",
+      "name": "Auth integration",
+      "description": "",
+      "feature_id": "bbbbbbbb-f008-f008-f008-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "17": {
+      "id": "bbbbbbbb-s017-s017-s017-bbbbbbbbbbbb",
+      "name": "Offline mode",
+      "description": "",
+      "feature_id": "bbbbbbbb-f008-f008-f008-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "18": {
+      "id": "bbbbbbbb-s018-s018-s018-bbbbbbbbbbbb",
+      "name": "Email templates",
+      "description": "",
+      "feature_id": "bbbbbbbb-f009-f009-f009-bbbbbbbbbbbb",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "iteration_id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "19": {
+      "id": "bbbbbbbb-s019-s019-s019-bbbbbbbbbbbb",
+      "name": "Push notifications",
+      "description": "",
+      "feature_id": "bbbbbbbb-f009-f009-f009-bbbbbbbbbbbb",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "iteration_id": "bbbbbbbb-0006-0006-0006-bbbbbbbbbbbb",
+      "points": 4,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "20": {
+      "id": "bbbbbbbb-s020-s020-s020-bbbbbbbbbbbb",
+      "name": "Delivery tracking",
+      "description": "",
+      "feature_id": "bbbbbbbb-f009-f009-f009-bbbbbbbbbbbb",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "points": 2,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "21": {
+      "id": "bbbbbbbb-s021-s021-s021-bbbbbbbbbbbb",
+      "name": "Search indexing",
+      "description": "",
+      "feature_id": "bbbbbbbb-f010-f010-f010-bbbbbbbbbbbb",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "points": 5,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "22": {
+      "id": "bbbbbbbb-s022-s022-s022-bbbbbbbbbbbb",
+      "name": "Faceted filters",
+      "description": "",
+      "feature_id": "bbbbbbbb-f010-f010-f010-bbbbbbbbbbbb",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "23": {
+      "id": "bbbbbbbb-s023-s023-s023-bbbbbbbbbbbb",
+      "name": "Typeahead API",
+      "description": "",
+      "feature_id": "bbbbbbbb-f010-f010-f010-bbbbbbbbbbbb",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "iteration_id": "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+      "points": 2,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "24": {
+      "id": "bbbbbbbb-s024-s024-s024-bbbbbbbbbbbb",
+      "name": "Profile CRUD",
+      "description": "",
+      "feature_id": "bbbbbbbb-f011-f011-f011-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "points": 2,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "25": {
+      "id": "bbbbbbbb-s025-s025-s025-bbbbbbbbbbbb",
+      "name": "Avatar upload",
+      "description": "",
+      "feature_id": "bbbbbbbb-f011-f011-f011-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "26": {
+      "id": "bbbbbbbb-s026-s026-s026-bbbbbbbbbbbb",
+      "name": "Preferences API",
+      "description": "",
+      "feature_id": "bbbbbbbb-f011-f011-f011-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "iteration_id": "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "27": {
+      "id": "bbbbbbbb-s027-s027-s027-bbbbbbbbbbbb",
+      "name": "Payment gateway integration",
+      "description": "",
+      "feature_id": "bbbbbbbb-f012-f012-f012-bbbbbbbbbbbb",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+      "points": 5,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "28": {
+      "id": "bbbbbbbb-s028-s028-s028-bbbbbbbbbbbb",
+      "name": "Subscription tiers",
+      "description": "",
+      "feature_id": "bbbbbbbb-f012-f012-f012-bbbbbbbbbbbb",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "bbbbbbbb-0008-0008-0008-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
+    },
+    "29": {
+      "id": "bbbbbbbb-s029-s029-s029-bbbbbbbbbbbb",
+      "name": "Invoice generation",
+      "description": "",
+      "feature_id": "bbbbbbbb-f012-f012-f012-bbbbbbbbbbbb",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "iteration_id": "bbbbbbbb-0009-0009-0009-bbbbbbbbbbbb",
+      "points": 3,
+      "status": "not_started",
+      "acceptance_criteria": ""
     }
   },
   "objectives": {
@@ -445,6 +750,46 @@
       "actual_business_value": null,
       "is_stretch": false,
       "feature_ids": []
+    },
+    "8": {
+      "id": "bbbbbbbb-o008-o008-o008-bbbbbbbbbbbb",
+      "description": "Ship Mobile App MVP to beta users",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "planned_business_value": 9,
+      "actual_business_value": null,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "9": {
+      "id": "bbbbbbbb-o009-o009-o009-bbbbbbbbbbbb",
+      "description": "Launch Notification Service to all ART teams",
+      "team_id": "03ed3b95-f268-4c4b-bbec-b6722cb28774",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "planned_business_value": 8,
+      "actual_business_value": null,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "10": {
+      "id": "bbbbbbbb-o010-o010-o010-bbbbbbbbbbbb",
+      "description": "Enable full-text search across the platform",
+      "team_id": "cccccccc-0003-0003-0003-cccccccccccc",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "planned_business_value": 7,
+      "actual_business_value": null,
+      "is_stretch": false,
+      "feature_ids": []
+    },
+    "11": {
+      "id": "bbbbbbbb-o011-o011-o011-bbbbbbbbbbbb",
+      "description": "Explore billing automation proof of concept",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "planned_business_value": 5,
+      "actual_business_value": null,
+      "is_stretch": true,
+      "feature_ids": []
     }
   },
   "risks": {
@@ -478,6 +823,28 @@
       "feature_id": null,
       "roam_status": "owned",
       "owner": "Carol",
+      "mitigation_notes": "",
+      "raised_date": "2026-05-04"
+    },
+    "4": {
+      "id": "bbbbbbbb-r004-r004-r004-bbbbbbbbbbbb",
+      "description": "Mobile SDK compatibility with older Android versions unverified",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "cb5f9268-1dbf-4976-8884-d2db8c3a988b",
+      "feature_id": null,
+      "roam_status": "unroamed",
+      "owner": "Alice",
+      "mitigation_notes": "",
+      "raised_date": "2026-05-04"
+    },
+    "5": {
+      "id": "bbbbbbbb-r005-r005-r005-bbbbbbbbbbbb",
+      "description": "Payment gateway vendor contract not yet signed",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "team_id": "dddddddd-0004-0004-0004-dddddddddddd",
+      "feature_id": null,
+      "roam_status": "owned",
+      "owner": "Dave",
       "mitigation_notes": "",
       "raised_date": "2026-05-04"
     }
@@ -518,6 +885,30 @@
       "resolution_notes": "",
       "raised_date": "2026-05-04",
       "needed_by_date": null
+    },
+    "4": {
+      "id": "bbbbbbbb-d004-d004-d004-bbbbbbbbbbbb",
+      "description": "Mobile App requires Notification Service push endpoint",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "from_feature_id": "bbbbbbbb-f008-f008-f008-bbbbbbbbbbbb",
+      "to_feature_id": "bbbbbbbb-f009-f009-f009-bbbbbbbbbbbb",
+      "status": "identified",
+      "owner": "Alice",
+      "resolution_notes": "",
+      "raised_date": "2026-05-04",
+      "needed_by_date": "2026-04-10"
+    },
+    "5": {
+      "id": "bbbbbbbb-d005-d005-d005-bbbbbbbbbbbb",
+      "description": "Billing system requires User Profile service API",
+      "pi_id": "bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb",
+      "from_feature_id": "bbbbbbbb-f012-f012-f012-bbbbbbbbbbbb",
+      "to_feature_id": "bbbbbbbb-f011-f011-f011-bbbbbbbbbbbb",
+      "status": "acknowledged",
+      "owner": "Dave",
+      "resolution_notes": "",
+      "raised_date": "2026-05-04",
+      "needed_by_date": "2026-04-24"
     }
   }
 }

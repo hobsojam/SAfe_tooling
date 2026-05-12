@@ -267,3 +267,169 @@ def seed(repos: Repos) -> None:
     )
     for d in [d1, d2, d3, d4, d5]:
         repos.dependencies.save(d)
+
+    # --- PI 2026.2 (planning) ---
+    j1 = Iteration(pi_id="", number=1, start_date=date(2026, 3, 30), end_date=date(2026, 4, 10))
+    j2 = Iteration(pi_id="", number=2, start_date=date(2026, 4, 13), end_date=date(2026, 4, 24))
+    j3 = Iteration(pi_id="", number=3, start_date=date(2026, 4, 27), end_date=date(2026, 5, 8))
+    j4 = Iteration(pi_id="", number=4, start_date=date(2026, 5, 11), end_date=date(2026, 5, 22))
+    jp = Iteration(
+        pi_id="", number=5, start_date=date(2026, 5, 25), end_date=date(2026, 6, 5), is_ip=True
+    )
+    pi2 = PI(
+        name="PI 2026.2",
+        art_id=art.id,
+        start_date=date(2026, 3, 30),
+        end_date=date(2026, 6, 5),
+        status=PIStatus.PLANNING,
+        iteration_ids=[j1.id, j2.id, j3.id, j4.id, jp.id],
+    )
+    for it in [j1, j2, j3, j4, jp]:
+        repos.iterations.save(it.model_copy(update={"pi_id": pi2.id}))
+    repos.pis.save(pi2)
+
+    # --- PI 2026.2 Features ---
+    mobile_app = Feature(
+        name="Mobile App MVP",
+        pi_id=pi2.id,
+        team_id=alpha.id,
+        iteration_id=j1.id,
+        user_business_value=9,
+        time_criticality=8,
+        risk_reduction_opportunity_enablement=3,
+        job_size=5,
+    )
+    notifications = Feature(
+        name="Notification Service",
+        pi_id=pi2.id,
+        team_id=beta.id,
+        iteration_id=j1.id,
+        user_business_value=6,
+        time_criticality=5,
+        risk_reduction_opportunity_enablement=4,
+        job_size=3,
+    )
+    search = Feature(
+        name="Search & Discovery",
+        pi_id=pi2.id,
+        team_id=gamma.id,
+        iteration_id=j2.id,
+        user_business_value=7,
+        time_criticality=4,
+        risk_reduction_opportunity_enablement=5,
+        job_size=4,
+    )
+    user_profile = Feature(
+        name="User Profile & Preferences",
+        pi_id=pi2.id,
+        team_id=alpha.id,
+        iteration_id=j2.id,
+        user_business_value=5,
+        time_criticality=3,
+        risk_reduction_opportunity_enablement=2,
+        job_size=2,
+    )
+    billing = Feature(
+        name="Billing & Subscriptions",
+        pi_id=pi2.id,
+        team_id=delta.id,
+        iteration_id=j3.id,
+        user_business_value=8,
+        time_criticality=6,
+        risk_reduction_opportunity_enablement=7,
+        job_size=5,
+    )
+    for f in [mobile_app, notifications, search, user_profile, billing]:
+        repos.features.save(f)
+
+    # --- PI 2026.2 Stories ---
+    pi2_stories = [
+        story("App scaffolding", mobile_app.id, alpha.id, 3, j1.id),
+        story("Auth integration", mobile_app.id, alpha.id, 3, j1.id),
+        story("Offline mode", mobile_app.id, alpha.id, 3, j2.id),
+        story("Email templates", notifications.id, beta.id, 3, j1.id),
+        story("Push notifications", notifications.id, beta.id, 4, j1.id),
+        story("Delivery tracking", notifications.id, beta.id, 2, j2.id),
+        story("Search indexing", search.id, gamma.id, 5, j2.id),
+        story("Faceted filters", search.id, gamma.id, 3, j2.id),
+        story("Typeahead API", search.id, gamma.id, 2, j3.id),
+        story("Profile CRUD", user_profile.id, alpha.id, 2, j2.id),
+        story("Avatar upload", user_profile.id, alpha.id, 3, j2.id),
+        story("Preferences API", user_profile.id, alpha.id, 3, j3.id),
+        story("Payment gateway integration", billing.id, delta.id, 5, j3.id),
+        story("Subscription tiers", billing.id, delta.id, 3, j3.id),
+        story("Invoice generation", billing.id, delta.id, 3, j4.id),
+    ]
+    for s in pi2_stories:
+        repos.stories.save(s)
+
+    # --- PI 2026.2 Objectives ---
+    for obj in [
+        PIObjective(
+            description="Ship Mobile App MVP to beta users",
+            team_id=alpha.id,
+            pi_id=pi2.id,
+            planned_business_value=9,
+        ),
+        PIObjective(
+            description="Launch Notification Service to all ART teams",
+            team_id=beta.id,
+            pi_id=pi2.id,
+            planned_business_value=8,
+        ),
+        PIObjective(
+            description="Enable full-text search across the platform",
+            team_id=gamma.id,
+            pi_id=pi2.id,
+            planned_business_value=7,
+        ),
+        PIObjective(
+            description="Explore billing automation proof of concept",
+            team_id=delta.id,
+            pi_id=pi2.id,
+            planned_business_value=5,
+            is_stretch=True,
+        ),
+    ]:
+        repos.objectives.save(obj)
+
+    # --- PI 2026.2 Risks ---
+    for r in [
+        Risk(
+            description="Mobile SDK compatibility with older Android versions unverified",
+            pi_id=pi2.id,
+            team_id=alpha.id,
+            owner="Alice",
+        ),
+        Risk(
+            description="Payment gateway vendor contract not yet signed",
+            pi_id=pi2.id,
+            team_id=delta.id,
+            owner="Dave",
+            roam_status=ROAMStatus.OWNED,
+        ),
+    ]:
+        repos.risks.save(r)
+
+    # --- PI 2026.2 Dependencies ---
+    for dep in [
+        Dependency(
+            description="Mobile App requires Notification Service push endpoint",
+            pi_id=pi2.id,
+            from_feature_id=mobile_app.id,
+            to_feature_id=notifications.id,
+            owner="Alice",
+            needed_by_date=date(2026, 4, 10),
+            status=DependencyStatus.IDENTIFIED,
+        ),
+        Dependency(
+            description="Billing system requires User Profile service API",
+            pi_id=pi2.id,
+            from_feature_id=billing.id,
+            to_feature_id=user_profile.id,
+            owner="Dave",
+            needed_by_date=date(2026, 4, 24),
+            status=DependencyStatus.ACKNOWLEDGED,
+        ),
+    ]:
+        repos.dependencies.save(dep)
