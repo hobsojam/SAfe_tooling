@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 from pydantic import ValidationError
 
+from safe.exceptions import IllegalStateError
 from safe.models.art import ART, Team
 from safe.models.backlog import Feature, FeatureStatus, Story, StoryStatus
 from safe.models.capacity_plan import CapacityPlan
@@ -429,6 +430,18 @@ class TestCapacityPlan:
 # ---------------------------------------------------------------------------
 # models __init__ re-exports
 # ---------------------------------------------------------------------------
+
+
+class TestIllegalStateError:
+    def test_stores_current_and_required_state(self):
+        err = IllegalStateError("Bad transition", "planning", "active")
+        assert err.current_state == "planning"
+        assert err.required_state == "active"
+
+    def test_message_contains_states(self):
+        err = IllegalStateError("Bad transition", "planning", "active")
+        assert "planning" in str(err)
+        assert "active" in str(err)
 
 
 def test_models_package_exports_all():

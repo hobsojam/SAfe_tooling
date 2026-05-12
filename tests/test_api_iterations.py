@@ -172,6 +172,20 @@ class TestIterationGet:
         assert client.get("/iterations/no-such-id").status_code == 404
 
 
+class TestIterationPatch:
+    def test_patch_number(self, client):
+        art_id = _create_art(client)
+        pi_id = _create_pi(client, art_id)
+        iter_id = _create_iteration(client, pi_id).json()["id"]
+        r = client.patch(f"/iterations/{iter_id}", json={"number": 3})
+        assert r.status_code == 200
+        assert r.json()["number"] == 3
+
+    def test_patch_unknown_returns_404(self, client):
+        r = client.patch("/iterations/no-such-id", json={"number": 2})
+        assert r.status_code == 404
+
+
 class TestIterationDelete:
     def test_delete_returns_204(self, client):
         art_id = _create_art(client)
