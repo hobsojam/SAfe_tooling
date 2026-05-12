@@ -1,7 +1,7 @@
 export type PIStatus = 'planning' | 'active' | 'closed';
 export type FeatureStatus = 'funnel' | 'analyzing' | 'backlog' | 'implementing' | 'done';
 export type ROAMStatus = 'unroamed' | 'owned' | 'accepted' | 'mitigated' | 'resolved';
-export type DependencyStatus = 'identified' | 'owned' | 'accepted' | 'mitigated' | 'resolved';
+export type DependencyStatus = 'identified' | 'acknowledged' | 'in_progress' | 'resolved';
 
 export interface ART {
   id: string;
@@ -27,11 +27,14 @@ export interface PI {
   status: PIStatus;
 }
 
+export type TeamTopologyType = 'stream_aligned' | 'enabling' | 'complicated_subsystem' | 'platform';
+
 export interface Team {
   id: string;
   name: string;
   member_count: number;
   art_id: string | null;
+  topology_type: TeamTopologyType | null;
 }
 
 export interface Iteration {
@@ -52,7 +55,6 @@ export interface Feature {
   team_id: string | null;
   iteration_id: string | null;
   status: FeatureStatus;
-  story_ids: string[];
   user_business_value: number;
   time_criticality: number;
   risk_reduction_opportunity_enablement: number;
@@ -84,6 +86,7 @@ export interface StoryCreate {
 
 export interface StoryUpdate {
   name?: string;
+  feature_id?: string;
   iteration_id?: string | null;
   points?: number;
   status?: StoryStatus;
@@ -197,11 +200,13 @@ export interface TeamCreate {
   name: string;
   member_count: number;
   art_id: string;
+  topology_type?: TeamTopologyType | null;
 }
 
 export interface TeamUpdate {
   name?: string;
   member_count?: number;
+  topology_type?: TeamTopologyType | null;
 }
 
 export interface RiskCreate {

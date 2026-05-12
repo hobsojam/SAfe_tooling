@@ -94,13 +94,6 @@ class TestStoryAdd:
         assert stories[0].name == "Login flow"
         assert stories[0].points == 3
 
-    def test_added_to_feature_story_ids(self, db_path, patch_console):
-        fid, tid = _setup(db_path)
-        _add_story(db_path, fid, tid)
-        story = repos_for(db_path).stories.get_all()[0]
-        feature = repos_for(db_path).features.get(fid)
-        assert story.id in feature.story_ids
-
     def test_unknown_feature_exits_1(self, db_path, patch_console):
         _, tid = _setup(db_path)
         result = invoke(
@@ -192,9 +185,185 @@ class TestStoryUpdate:
         result = invoke(db_path, "story", "update", story.id, "--status", "bad")
         assert result.exit_code == 1
 
+    def test_zero_points_exits_1(self, db_path, patch_console):
+        fid, tid = _setup(db_path)
+        _add_story(db_path, fid, tid)
+        story = repos_for(db_path).stories.get_all()[0]
+        result = invoke(db_path, "story", "update", story.id, "--points", "0")
+        assert result.exit_code == 1
+
     def test_unknown_exits_1(self, db_path, patch_console):
         result = invoke(db_path, "story", "update", "no-such-id", "--name", "X")
         assert result.exit_code == 1
+
+
+def _full_setup(db_path):
+    """Set up ART → PI → Iteration + Feature + Team; return (feature_id, team_id, iter_id)."""
+    invoke(db_path, "art", "create", "--name", "ART")
+    art_id = repos_for(db_path).arts.get_all()[0].id
+    invoke(
+        db_path,
+        "pi",
+        "create",
+        "--name",
+        "PI 1",
+        "--art-id",
+        art_id,
+        "--start",
+        "2026-01-05",
+        "--end",
+        "2026-03-27",
+    )
+    pi_id = repos_for(db_path).pis.get_all()[0].id
+    invoke(
+        db_path,
+        "pi",
+        "iteration",
+        "add",
+        "--pi-id",
+        pi_id,
+        "--number",
+        "1",
+        "--start",
+        "2026-01-05",
+        "--end",
+        "2026-01-16",
+    )
+    iter_id = repos_for(db_path).iterations.get_all()[0].id
+    invoke(db_path, "feature", "add", *FEATURE_ARGS)
+    feature_id = repos_for(db_path).features.get_all()[0].id
+    invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+    team_id = repos_for(db_path).teams.get_all()[0].id
+    return feature_id, team_id, iter_id
+
+
+class TestStoryAddWithIteration:
+    def test_invalid_iteration_exits_1(self, db_path, patch_console):
+        fid, tid = _setup(db_path)
+        result = invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S",
+            "--feature-id",
+            fid,
+            "--team-id",
+            tid,
+            "--points",
+            "3",
+            "--iteration-id",
+            "no-such-iter",
+        )
+        assert result.exit_code == 1
+
+    def test_valid_iteration_stored(self, db_path, patch_console):
+        fid, tid, iter_id = _full_setup(db_path)
+        result = invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S",
+            "--feature-id",
+            fid,
+            "--team-id",
+            tid,
+            "--points",
+            "3",
+            "--iteration-id",
+            iter_id,
+        )
+        assert result.exit_code == 0
+        story = repos_for(db_path).stories.get_all()[0]
+        assert story.iteration_id == iter_id
+
+
+class TestStoryListFilters:
+    def test_filter_by_team(self, db_path, patch_console):
+        fid, tid = _setup(db_path)
+        _add_story(db_path, fid, tid, name="S1")
+        invoke(db_path, "team", "create", "--name", "Beta", "--members", "4")
+        tid2 = repos_for(db_path).teams.get_all()[1].id
+        _add_story(db_path, fid, tid2, name="S2")
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "story", "list", "--team-id", tid)
+        output = patch_console.getvalue()
+        assert "S1" in output
+        assert "S2" not in output
+
+    def test_filter_by_iteration(self, db_path, patch_console):
+        fid, tid, iter_id = _full_setup(db_path)
+        invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "In Iter",
+            "--feature-id",
+            fid,
+            "--team-id",
+            tid,
+            "--points",
+            "3",
+            "--iteration-id",
+            iter_id,
+        )
+        _add_story(db_path, fid, tid, name="No Iter")
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "story", "list", "--iteration-id", iter_id)
+        output = patch_console.getvalue()
+        assert "In Iter" in output
+        assert "No Iter" not in output
+
+
+class TestStoryUpdateIteration:
+    def test_update_name(self, db_path, patch_console):
+        fid, tid = _setup(db_path)
+        _add_story(db_path, fid, tid)
+        story = repos_for(db_path).stories.get_all()[0]
+        invoke(db_path, "story", "update", story.id, "--name", "Renamed")
+        updated = repos_for(db_path).stories.get(story.id)
+        assert updated.name == "Renamed"
+
+    def test_clear_iteration_id(self, db_path, patch_console):
+        fid, tid, iter_id = _full_setup(db_path)
+        invoke(
+            db_path,
+            "story",
+            "add",
+            "--name",
+            "S",
+            "--feature-id",
+            fid,
+            "--team-id",
+            tid,
+            "--points",
+            "3",
+            "--iteration-id",
+            iter_id,
+        )
+        story = repos_for(db_path).stories.get_all()[0]
+        invoke(db_path, "story", "update", story.id, "--iteration-id", "")
+        updated = repos_for(db_path).stories.get(story.id)
+        assert updated.iteration_id is None
+
+    def test_update_iteration_to_invalid_exits_1(self, db_path, patch_console):
+        fid, tid = _setup(db_path)
+        _add_story(db_path, fid, tid)
+        story = repos_for(db_path).stories.get_all()[0]
+        result = invoke(db_path, "story", "update", story.id, "--iteration-id", "no-such-iter")
+        assert result.exit_code == 1
+
+    def test_update_iteration_to_valid(self, db_path, patch_console):
+        fid, tid, iter_id = _full_setup(db_path)
+        _add_story(db_path, fid, tid)
+        story = repos_for(db_path).stories.get_all()[0]
+        invoke(db_path, "story", "update", story.id, "--iteration-id", iter_id)
+        updated = repos_for(db_path).stories.get(story.id)
+        assert updated.iteration_id == iter_id
 
 
 class TestStoryDelete:
@@ -204,14 +373,6 @@ class TestStoryDelete:
         story = repos_for(db_path).stories.get_all()[0]
         invoke(db_path, "story", "delete", story.id)
         assert repos_for(db_path).stories.get(story.id) is None
-
-    def test_removes_from_feature_story_ids(self, db_path, patch_console):
-        fid, tid = _setup(db_path)
-        _add_story(db_path, fid, tid)
-        story = repos_for(db_path).stories.get_all()[0]
-        invoke(db_path, "story", "delete", story.id)
-        feature = repos_for(db_path).features.get(fid)
-        assert story.id not in feature.story_ids
 
     def test_unknown_exits_1(self, db_path, patch_console):
         result = invoke(db_path, "story", "delete", "no-such-id")

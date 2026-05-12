@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { goToPage, resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  resetDb();
+  await resetDb();
   await selectPI(page);
   await goToPage(page, 'Risks');
 });
@@ -73,6 +73,21 @@ test('can change ROAM status via edit', async ({ page }) => {
   await expect(row.getByText('resolved')).toBeVisible();
 });
 
+test('delete shows inline confirmation row', async ({ page }) => {
+  const row = page.getByRole('row', { name: /Grafana Cloud trial expires mid-PI/ });
+  await row.getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(page.getByText(/Delete.*Grafana Cloud trial expires mid-PI/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Yes, delete' })).toBeVisible();
+});
+
+test('cancel delete dismisses inline confirmation', async ({ page }) => {
+  const row = page.getByRole('row', { name: /Grafana Cloud trial expires mid-PI/ });
+  await row.getByRole('button', { name: 'Delete', exact: true }).click();
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.getByRole('button', { name: 'Yes, delete' })).not.toBeVisible();
+  await expect(page.getByText('Grafana Cloud trial expires mid-PI')).toBeVisible();
+});
+
 test('can delete a newly created risk', async ({ page }) => {
   await page.getByRole('button', { name: '+ New Risk' }).click();
   await page.getByLabel('Description').fill('TEMP: to be deleted');
@@ -80,7 +95,8 @@ test('can delete a newly created risk', async ({ page }) => {
   await expect(page.getByText('TEMP: to be deleted')).toBeVisible();
 
   const row = page.getByRole('row', { name: /TEMP: to be deleted/ });
-  page.once('dialog', (d) => d.accept());
-  await row.getByRole('button', { name: 'Delete' }).click();
+  await row.getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(page.getByText(/Delete.*TEMP: to be deleted/)).toBeVisible();
+  await page.getByRole('button', { name: 'Yes, delete' }).click();
   await expect(page.getByText('TEMP: to be deleted')).not.toBeVisible();
 });

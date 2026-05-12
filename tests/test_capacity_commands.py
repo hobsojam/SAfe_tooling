@@ -201,6 +201,93 @@ class TestCapacityShow:
         assert result.exit_code == 0
 
 
+FEATURE_ARGS = [
+    "--name",
+    "F",
+    "--user-value",
+    "5",
+    "--time-crit",
+    "5",
+    "--risk-reduction",
+    "5",
+    "--job-size",
+    "5",
+]
+
+
+def _add_story(db_path, fid, tid, iter_id, points):
+    return invoke(
+        db_path,
+        "story",
+        "add",
+        "--name",
+        "S",
+        "--feature-id",
+        fid,
+        "--team-id",
+        tid,
+        "--points",
+        str(points),
+        "--iteration-id",
+        iter_id,
+    )
+
+
+class TestCapacityShowFilters:
+    def test_filter_by_team_id(self, db_path, patch_console):
+        pi_id, team_id, iter_id = _setup(db_path)
+        _set_plan(db_path, pi_id, team_id, iter_id)
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        result = invoke(db_path, "capacity", "show", "--team-id", team_id)
+        assert result.exit_code == 0
+        assert "Alpha" in patch_console.getvalue()
+
+    def test_filter_by_team_id_excludes_other_teams(self, db_path, patch_console):
+        pi_id, team_id, iter_id = _setup(db_path)
+        _set_plan(db_path, pi_id, team_id, iter_id)
+        invoke(db_path, "team", "create", "--name", "Beta", "--members", "5")
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "capacity", "show", "--team-id", "no-match-team-id")
+        assert "No capacity plans found" in patch_console.getvalue()
+
+
+class TestCapacityShowLoad:
+    def _setup_with_stories(self, db_path, story_points, team_size=5):
+        pi_id, team_id, iter_id = _setup(db_path)
+        _set_plan(db_path, pi_id, team_id, iter_id, team_size=team_size)
+        invoke(db_path, "feature", "add", *FEATURE_ARGS)
+        fid = repos_for(db_path).features.get_all()[0].id
+        _add_story(db_path, fid, team_id, iter_id, story_points)
+        return pi_id, team_id, iter_id
+
+    def test_shows_load_percentage_when_stories_committed(self, db_path, patch_console):
+        # team_size=5, capacity=40, committed=3 → ~7.5% load
+        self._setup_with_stories(db_path, story_points=3, team_size=5)
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "capacity", "show")
+        output = patch_console.getvalue()
+        assert "7.5" in output
+
+    def test_shows_warning_at_high_load(self, db_path, patch_console):
+        # team_size=5, capacity=40, committed=38 → 95% → yellow warning
+        self._setup_with_stories(db_path, story_points=38, team_size=5)
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "capacity", "show")
+        assert "95.0" in patch_console.getvalue()
+
+    def test_shows_overloaded_when_over_capacity(self, db_path, patch_console):
+        # team_size=5, capacity=40, committed=50 → 125% → OVERLOADED
+        self._setup_with_stories(db_path, story_points=50, team_size=5)
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "capacity", "show")
+        assert "125.0" in patch_console.getvalue()
+
+
 class TestCapacityExport:
     def test_creates_csv(self, db_path, patch_console, tmp_path):
         pi_id, team_id, iter_id = _setup(db_path)

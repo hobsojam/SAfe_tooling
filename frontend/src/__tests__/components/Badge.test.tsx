@@ -40,14 +40,13 @@ describe('ROAMBadge', () => {
 
 describe('DepBadge', () => {
   it.each([
-    ['identified', 'bg-red-100'],
-    ['owned', 'bg-yellow-100'],
-    ['accepted', 'bg-amber-100'],
-    ['mitigated', 'bg-cyan-100'],
-    ['resolved', 'bg-green-100'],
-  ])('status "%s" renders with class "%s"', (status, cls) => {
+    ['identified', 'identified', 'bg-red-100'],
+    ['acknowledged', 'acknowledged', 'bg-yellow-100'],
+    ['in_progress', 'in progress', 'bg-cyan-100'],
+    ['resolved', 'resolved', 'bg-green-100'],
+  ])('status "%s" renders label "%s" with class "%s"', (status, label, cls) => {
     render(<DepBadge status={status} />);
-    expect(screen.getByText(status)).toHaveClass(cls);
+    expect(screen.getByText(label)).toHaveClass(cls);
   });
 
   it('falls back to gray for an unknown status', () => {

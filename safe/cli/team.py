@@ -3,7 +3,7 @@ from rich.console import Console
 from rich.table import Table
 
 import safe.cli.state as state
-from safe.models.art import Team
+from safe.models.art import Team, TeamTopologyType
 from safe.store.db import get_db
 from safe.store.repos import get_repos
 
@@ -20,6 +20,12 @@ def team_create(
     name: str = typer.Option(..., "--name", "-n", help="Team name"),
     members: int = typer.Option(..., "--members", "-m", help="Number of team members"),
     art_id: str | None = typer.Option(None, "--art-id", help="ART to assign this team to"),
+    topology_type: TeamTopologyType | None = typer.Option(
+        None,
+        "--topology-type",
+        "-t",
+        help="Team Topologies type: stream_aligned, enabling, complicated_subsystem, platform",
+    ),
 ):
     """Create a new team."""
     repos = _repos()
@@ -28,7 +34,7 @@ def team_create(
         if art is None:
             console.print(f"[red]Error: ART '{art_id}' not found[/red]")
             raise typer.Exit(1)
-    team = Team(name=name, member_count=members, art_id=art_id)
+    team = Team(name=name, member_count=members, art_id=art_id, topology_type=topology_type)
     repos.teams.save(team)
     if art_id is not None:
         art.team_ids.append(team.id)
@@ -49,6 +55,7 @@ def team_show(team_id: str = typer.Argument(..., help="Team id")):
     table.add_row("Name", team.name)
     table.add_row("Members", str(team.member_count))
     table.add_row("ART", team.art_id or "-")
+    table.add_row("Topology Type", team.topology_type.value if team.topology_type else "-")
     table.add_row("Velocity History", str(team.velocity_history) if team.velocity_history else "-")
     console.print(table)
 
@@ -63,9 +70,15 @@ def team_list(
     if not teams:
         console.print("No teams found.")
         return
-    table = Table("ID", "Name", "Members", "ART")
+    table = Table("ID", "Name", "Members", "ART", "Topology Type")
     for team in teams:
-        table.add_row(team.id, team.name, str(team.member_count), team.art_id or "-")
+        table.add_row(
+            team.id,
+            team.name,
+            str(team.member_count),
+            team.art_id or "-",
+            team.topology_type.value if team.topology_type else "-",
+        )
     console.print(table)
 
 

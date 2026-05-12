@@ -17,9 +17,8 @@ console = Console()
 
 _DEP_STATUS_COLOUR = {
     DependencyStatus.IDENTIFIED: "red",
-    DependencyStatus.OWNED: "yellow",
-    DependencyStatus.ACCEPTED: "bright_yellow",
-    DependencyStatus.MITIGATED: "cyan",
+    DependencyStatus.ACKNOWLEDGED: "yellow",
+    DependencyStatus.IN_PROGRESS: "cyan",
     DependencyStatus.RESOLVED: "green",
 }
 
@@ -68,11 +67,7 @@ def board_show(
         console.print("No features assigned to teams for this PI.")
         return
 
-    all_stories = []
-    for f in features:
-        all_stories.extend(repos.stories.find(feature_id=f.id))
-
-    grid = build_board(features, all_stories)
+    grid = build_board(features)
     team_ids: list[str] = list(dict.fromkeys(f.team_id for f in features if f.team_id is not None))
 
     iter_labels = [f"I{i.number}" + (" (IP)" if i.is_ip else "") for i in iterations]
@@ -117,11 +112,7 @@ def board_export(
     iterations = _sorted_iterations(repos, pi)
     features = [f for f in repos.features.find(pi_id=pi_id) if f.team_id is not None]
 
-    all_stories = []
-    for f in features:
-        all_stories.extend(repos.stories.find(feature_id=f.id))
-
-    grid = build_board(features, all_stories)
+    grid = build_board(features)
     team_ids: list[str] = list(dict.fromkeys(f.team_id for f in features if f.team_id is not None))
 
     wb = openpyxl.Workbook()

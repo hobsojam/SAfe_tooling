@@ -5,14 +5,17 @@ import { api } from '../api';
 import type { PICreate } from '../types';
 import { Modal } from './Modal';
 import { PIStatusBadge } from './Badge';
+import { useToast } from './Toaster';
 
 const NAV = [
   { to: 'board', label: 'Board' },
   { to: 'backlog', label: 'Backlog' },
   { to: 'objectives', label: 'Objectives' },
+  { to: 'predictability', label: 'Predictability' },
   { to: 'capacity', label: 'Capacity' },
   { to: 'risks', label: 'Risks' },
   { to: 'dependencies', label: 'Dependencies' },
+  { to: 'stories', label: 'Stories' },
   { to: 'setup', label: 'PI Setup' },
   { to: 'team-setup', label: 'Team Setup' },
 ];
@@ -29,6 +32,7 @@ export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [piModalOpen, setPiModalOpen] = useState(false);
@@ -53,6 +57,7 @@ export function Layout() {
       qc.invalidateQueries({ queryKey: ['pis'] });
       setPiModalOpen(false);
       navigate(`/pi/${pi.id}/board`);
+      toast('PI created');
     },
     onError: (e: Error) => setPiError(e.message),
   });
@@ -259,7 +264,10 @@ export function Layout() {
             </select>
             {arts.length === 0 && (
               <p className="mt-1 text-xs text-slate-400">
-                No ARTs found. Create one with the CLI first.
+                No ARTs found.{' '}
+                <a href="/art-setup" className="underline hover:text-slate-300">
+                  Create one in ART Setup.
+                </a>
               </p>
             )}
           </div>

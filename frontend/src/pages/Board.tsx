@@ -7,15 +7,17 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import { Fragment } from 'react';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
-import { DepBadge, FeatureStatusBadge } from '../components/Badge';
+import { DepBadge, FeatureStatusBadge, TopologyBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Spinner } from '../components/Spinner';
-import type { Dependency, Feature, Story } from '../types';
+import { useToast } from '../components/Toaster';
+import type { Dependency, Feature } from '../types';
 
 type BoardGrid = Record<string, Record<string, Feature[]>>;
 
@@ -28,33 +30,23 @@ interface Arrow {
   resolved: boolean;
 }
 
-function featurePrimaryIteration(featureId: string, stories: Story[]): string {
-  const weight: Record<string, number> = {};
-  for (const s of stories) {
-    if (s.feature_id === featureId && s.iteration_id) {
-      weight[s.iteration_id] = (weight[s.iteration_id] ?? 0) + s.points;
-    }
-  }
-  const entries = Object.entries(weight);
-  if (entries.length === 0) return 'unplanned';
-  return entries.sort(([, a], [, b]) => b - a)[0][0];
-}
-
-function buildBoard(features: Feature[], stories: Story[]): BoardGrid {
+function buildBoard(features: Feature[]): BoardGrid {
   const grid: BoardGrid = {};
   for (const feature of features) {
     if (!feature.team_id) continue;
-    // Prefer explicit iteration_id override; fall back to story-majority
-    const key = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
+    const key = feature.iteration_id ?? 'unplanned';
     (grid[feature.team_id] ??= {})[key] ??= [];
     grid[feature.team_id][key].push(feature);
   }
   return grid;
 }
 
-function FeatureCard({ feature }: { feature: Feature }) {
+function FeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
+  const cardCls = atRisk
+    ? 'rounded border border-red-300 bg-red-50 px-2 py-1.5 shadow-sm'
+    : 'rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm';
   return (
-    <div className="rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm">
+    <div className={cardCls} data-at-risk={atRisk ? 'true' : undefined}>
       <p className="text-xs font-medium text-slate-800 leading-snug">{feature.name}</p>
       <div className="mt-1 flex items-center gap-1.5">
         <FeatureStatusBadge status={feature.status} />
@@ -64,7 +56,7 @@ function FeatureCard({ feature }: { feature: Feature }) {
   );
 }
 
-function DraggableFeatureCard({ feature }: { feature: Feature }) {
+function DraggableFeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: feature.id,
     data: { feature },
@@ -81,7 +73,7 @@ function DraggableFeatureCard({ feature }: { feature: Feature }) {
       {...listeners}
       className={isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'}
     >
-      <FeatureCard feature={feature} />
+      <FeatureCard feature={feature} atRisk={atRisk} />
     </div>
   );
 }
@@ -92,6 +84,18 @@ function DroppableCell({ id, children }: { id: string; children: React.ReactNode
     <div
       ref={setNodeRef}
       className={`min-h-[4rem] p-2 space-y-1.5 border-r border-slate-100 transition-colors ${isOver ? 'bg-blue-50' : ''}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function UnassignedDropZone({ children }: { children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'unassigned' });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`min-h-[3rem] rounded-md transition-colors ${isOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''}`}
     >
       {children}
     </div>
@@ -109,6 +113,7 @@ function crossTeamOnly(deps: Dependency[], features: Feature[]): Dependency[] {
 export function Board() {
   const { piId } = useParams<{ piId: string }>();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const [arrows, setArrows] = useState<Arrow[]>([]);
@@ -133,11 +138,6 @@ export function Board() {
     enabled: !!piId,
   });
 
-  const { data: stories = [] } = useQuery({
-    queryKey: ['stories'],
-    queryFn: api.listStories,
-  });
-
   const { data: teams = [], isLoading: loadingTeams } = useQuery({
     queryKey: ['teams'],
     queryFn: api.listTeams,
@@ -150,6 +150,40 @@ export function Board() {
   });
 
   const ctDeps = useMemo(() => crossTeamOnly(deps, features), [deps, features]);
+
+  const atRiskFeatureIds = useMemo(() => {
+    const ids = new Set<string>();
+
+    for (const f of features) {
+      if (!f.team_id) ids.add(f.id);
+    }
+
+    const iterNum: Record<string, number> = {};
+    for (const iter of iterations) {
+      iterNum[iter.id] = iter.number;
+    }
+
+    const featureIterKey: Record<string, string> = {};
+    for (const f of features) {
+      featureIterKey[f.id] = f.iteration_id ?? 'unplanned';
+    }
+
+    for (const d of deps) {
+      if (d.status === 'resolved') continue;
+      // from = consumer (has the dependency), to = provider (must fulfil it first)
+      const fromKey = featureIterKey[d.from_feature_id];
+      const toKey = featureIterKey[d.to_feature_id];
+      const fromNum = fromKey && fromKey !== 'unplanned' ? iterNum[fromKey] : null;
+      const toNum = toKey && toKey !== 'unplanned' ? iterNum[toKey] : null;
+      // Consumer is at-risk when provider is not planned in a strictly earlier iteration.
+      // Skip the check when consumer has no iteration (unsequenced features aren't a board concern).
+      if (fromNum !== null && (toNum === null || toNum >= fromNum)) {
+        ids.add(d.from_feature_id);
+      }
+    }
+
+    return ids;
+  }, [features, deps, iterations]);
 
   const measureArrows = useCallback(() => {
     if (!boardRef.current) return;
@@ -164,10 +198,10 @@ export function Board() {
       const tr = toEl.getBoundingClientRect();
       measured.push({
         depId: dep.id,
-        x1: fr.right - cr.left,
-        y1: fr.top + fr.height / 2 - cr.top,
-        x2: tr.left - cr.left,
-        y2: tr.top + tr.height / 2 - cr.top,
+        x1: tr.right - cr.left,
+        y1: tr.top + tr.height / 2 - cr.top,
+        x2: fr.left - cr.left,
+        y2: fr.top + fr.height / 2 - cr.top,
         resolved: dep.status === 'resolved',
       });
     }
@@ -194,11 +228,12 @@ export function Board() {
   }, [measureArrows, boardReady]);
 
   const moveMutation = useMutation({
-    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string; iterationId: string | null }) =>
+    mutationFn: ({ featureId, teamId, iterationId }: { featureId: string; teamId: string | null; iterationId: string | null }) =>
       api.updateFeature(featureId, { team_id: teamId, iteration_id: iterationId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['features', piId] });
     },
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   function handleDragStart(event: DragStartEvent) {
@@ -211,12 +246,17 @@ export function Board() {
     if (!event.over) return;
 
     const overId = event.over.id as string;
-    const [newTeamId, newIterColId] = overId.split('|');
     const feature = (event.active.data.current as { feature: Feature }).feature;
 
+    if (overId === 'unassigned') {
+      if (!feature.team_id) return;
+      moveMutation.mutate({ featureId: feature.id, teamId: null, iterationId: null });
+      return;
+    }
+
+    const [newTeamId, newIterColId] = overId.split('|');
     const newIterationId = newIterColId === 'unplanned' ? null : newIterColId;
-    const currentIterKey = feature.iteration_id ?? featurePrimaryIteration(feature.id, stories);
-    const currentIterColId = currentIterKey === null ? 'unplanned' : currentIterKey;
+    const currentIterColId = feature.iteration_id ?? 'unplanned';
 
     if (feature.team_id === newTeamId && currentIterColId === newIterColId) return;
 
@@ -234,8 +274,9 @@ export function Board() {
     return <EmptyState message="No teams configured for this PI's ART." />;
   }
 
-  const grid = buildBoard(assignedFeatures, stories);
-  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
+  const unassignedFeatures = features.filter((f) => !f.team_id);
+  const grid = buildBoard(assignedFeatures);
+  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
   const teamIds = artTeams.map((t) => t.id);
 
   const iterCols = sortedIters.map((i) => ({
@@ -284,20 +325,21 @@ export function Board() {
               const teamGrid = grid[teamId] ?? {};
               const rowBg = rowIdx % 2 === 0 ? '' : 'bg-slate-50/60';
               return (
-                <>
+                <Fragment key={teamId}>
                   <div
                     key={`${teamId}-name`}
-                    className={`border-b border-r border-slate-100 px-3 py-2 flex items-start ${rowBg}`}
+                    className={`border-b border-r border-slate-100 px-3 py-2 flex flex-col gap-1 ${rowBg}`}
                   >
                     <span className="font-medium text-sm text-slate-700">
-                      {teamMap[teamId] ?? teamId}
+                      {teamMap[teamId]?.name ?? teamId}
                     </span>
+                    <TopologyBadge type={teamMap[teamId]?.topology_type ?? null} />
                   </div>
                   {iterCols.map((c) => (
                     <div key={`${teamId}-${c.id}`} className={`border-b border-slate-100 ${rowBg}`}>
                       <DroppableCell id={`${teamId}|${c.id}`}>
                         {(teamGrid[c.id] ?? []).map((f) => (
-                          <DraggableFeatureCard key={f.id} feature={f} />
+                          <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                         ))}
                       </DroppableCell>
                     </div>
@@ -305,13 +347,34 @@ export function Board() {
                   <div key={`${teamId}-unplanned`} className={`border-b border-slate-100 ${rowBg}`}>
                     <DroppableCell id={`${teamId}|unplanned`}>
                       {(teamGrid['unplanned'] ?? []).map((f) => (
-                        <DraggableFeatureCard key={f.id} feature={f} />
+                        <DraggableFeatureCard key={f.id} feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
                       ))}
                     </DroppableCell>
                   </div>
-                </>
+                </Fragment>
               );
             })}
+          </div>
+
+          <div className="border-t border-slate-200 p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Unassigned ({unassignedFeatures.length})
+            </p>
+            <UnassignedDropZone>
+              {unassignedFeatures.length > 0 ? (
+                <div className="flex flex-wrap gap-2 p-1">
+                  {unassignedFeatures.map((f) => (
+                    <div key={f.id} className="w-44">
+                      <DraggableFeatureCard feature={f} atRisk={atRiskFeatureIds.has(f.id)} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="p-1 text-xs italic text-slate-400">
+                  No unassigned features — drop a feature here to remove its team assignment
+                </p>
+              )}
+            </UnassignedDropZone>
           </div>
 
           <DragOverlay>
@@ -378,10 +441,10 @@ export function Board() {
                   const fromFeature = features.find((f) => f.id === d.from_feature_id);
                   const toFeature = features.find((f) => f.id === d.to_feature_id);
                   const fromLabel = fromFeature
-                    ? `${fromFeature.name}${fromFeature.team_id ? ` (${teamMap[fromFeature.team_id] ?? ''})` : ''}`
+                    ? `${fromFeature.name}${fromFeature.team_id ? ` (${teamMap[fromFeature.team_id]?.name ?? ''})` : ''}`
                     : d.from_feature_id;
                   const toLabel = toFeature
-                    ? `${toFeature.name}${toFeature.team_id ? ` (${teamMap[toFeature.team_id] ?? ''})` : ''}`
+                    ? `${toFeature.name}${toFeature.team_id ? ` (${teamMap[toFeature.team_id]?.name ?? ''})` : ''}`
                     : d.to_feature_id;
                   return (
                     <tr key={d.id}>

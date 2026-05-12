@@ -17,7 +17,10 @@ import type {
 import { FeatureStatusBadge, StoryStatusBadge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
+import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
+import { usePagination } from '../hooks/usePagination';
 
 const FEATURE_STATUS_OPTIONS: FeatureStatus[] = ['funnel', 'analyzing', 'backlog', 'implementing', 'done'];
 const STORY_STATUS_OPTIONS: StoryStatus[] = ['not_started', 'in_progress', 'done', 'accepted'];
@@ -51,6 +54,7 @@ function StoryPanel({
   piId: string;
 }) {
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: stories = [], isLoading } = useQuery({
     queryKey: ['stories', feature.id],
@@ -93,19 +97,20 @@ function StoryPanel({
       setAddOpen(false);
       setAddForm({ name: '', team_id: defaultTeamId, iteration_id: '', points: 3, status: 'not_started' });
       setAddError('');
+      toast('Story added');
     },
     onError: (e: Error) => setAddError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: StoryUpdate }) => api.updateStory(id, body),
-    onSuccess: () => { invalidate(); setEditId(null); setEditError(''); },
+    onSuccess: () => { invalidate(); setEditId(null); setEditError(''); toast('Story updated'); },
     onError: (e: Error) => setEditError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteStory(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Story deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 
@@ -391,6 +396,7 @@ type NumKey = 'user_business_value' | 'time_criticality' | 'risk_reduction_oppor
 export function Backlog() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Feature | null>(null);
@@ -421,30 +427,42 @@ export function Backlog() {
     enabled: !!piId,
   });
 
+  const { data: allStories = [] } = useQuery({
+    queryKey: ['stories'],
+    queryFn: api.listStories,
+  });
+
   const nonIpIterations = iterations.filter((it) => !it.is_ip).sort((a, b) => a.number - b.number);
+
+  const storyCountByFeature = Object.fromEntries(
+    features.map((f) => [f.id, allStories.filter((s) => s.feature_id === f.id).length])
+  );
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['features', piId] });
 
   const createMut = useMutation({
     mutationFn: (body: FeatureCreate) => api.createFeature(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Feature created'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: FeatureUpdate }) => api.updateFeature(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Feature updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteFeature(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); toast('Feature deleted'); },
+    onError: (e: Error) => toast(e.message, 'error'),
   });
+
+  const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
+  const { page, totalPages, pageItems: pageSorted, goTo } = usePagination(sorted, 25, piId);
 
   if (isLoading) return <Spinner />;
 
-  const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
 
   function openNew() {
@@ -538,87 +556,141 @@ export function Backlog() {
       {sorted.length === 0 ? (
         <EmptyState message="No features in this PI." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
-              <tr>
-                {['#', 'Feature', 'Status', 'Team', 'CoD', 'Size', 'WSJF', 'Stories', ''].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          {/* Mobile card list */}
+          <div className="block md:hidden divide-y divide-slate-100">
+            {pageSorted.map((f, i) => (
+              <div key={f.id} className="px-4 py-4">
+                <div className="mb-1 flex items-start justify-between gap-2">
+                  <button
+                    onClick={() => openEdit(f)}
+                    className="text-left font-medium text-slate-800 hover:text-slate-600 leading-snug"
                   >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {sorted.map((f, i) => (
-                <Fragment key={f.id}>
-                  <tr className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-400 tabular-nums">{i + 1}</td>
-                    <td className="px-4 py-2.5">
-                      <button
-                        onClick={() => openEdit(f)}
-                        className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
-                      >
-                        {f.name}
-                      </button>
-                      {f.description && (
-                        <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
-                          {f.description}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <FeatureStatusBadge status={f.status} />
-                    </td>
-                    <td className="px-4 py-2.5 text-slate-600">
-                      {f.team_id ? (teamMap[f.team_id] ?? f.team_id) : '—'}
-                    </td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.cost_of_delay}</td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.job_size}</td>
-                    <td className="px-4 py-2.5">
-                      <span className="font-semibold text-slate-800 tabular-nums">{f.wsjf_score}</span>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <button
-                        onClick={() => toggleExpand(f.id)}
-                        className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 transition-colors"
-                        aria-expanded={expandedFeatureId === f.id}
-                      >
-                        <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
-                        <span>{f.story_ids.length > 0 ? f.story_ids.length : 'Stories'}</span>
-                      </button>
-                    </td>
-                    <td className="px-4 py-2.5 whitespace-nowrap">
-                      <button
-                        onClick={() => openEdit(f)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(f.id)}
-                        className="text-xs text-red-400 hover:text-red-600 underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                  {expandedFeatureId === f.id && (
-                    <StoryPanel
-                      key={`stories-${f.id}`}
-                      feature={f}
-                      teams={teams}
-                      nonIpIterations={nonIpIterations}
-                      piId={piId!}
-                    />
+                    {f.name}
+                  </button>
+                  <span className="shrink-0 tabular-nums font-bold text-slate-800 text-sm">
+                    {f.wsjf_score}
+                  </span>
+                </div>
+                {f.description && (
+                  <p className="mb-2 text-xs text-slate-400 line-clamp-1">{f.description}</p>
+                )}
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <FeatureStatusBadge status={f.status} />
+                  {f.team_id && (
+                    <span className="text-xs text-slate-500">{teamMap[f.team_id] ?? f.team_id}</span>
                   )}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
+                </div>
+                <div className="mb-3 flex gap-4 text-xs text-slate-500">
+                  <span>#{(page - 1) * 25 + i + 1}</span>
+                  <span>CoD: {f.cost_of_delay}</span>
+                  <span>Size: {f.job_size}</span>
+                  {storyCountByFeature[f.id] > 0 && (
+                    <span>{storyCountByFeature[f.id]} stor{storyCountByFeature[f.id] === 1 ? 'y' : 'ies'}</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openEdit(f)}
+                    className="rounded-md bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(f.id)}
+                    className="rounded-md bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  {['#', 'Feature', 'Status', 'Team', 'CoD', 'Size', 'WSJF', 'Stories', ''].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {pageSorted.map((f, i) => (
+                  <Fragment key={f.id}>
+                    <tr className="hover:bg-slate-50/60">
+                      <td className="px-4 py-2.5 text-slate-400 tabular-nums">{(page - 1) * 25 + i + 1}</td>
+                      <td className="px-4 py-2.5">
+                        <button
+                          onClick={() => openEdit(f)}
+                          className="font-medium text-slate-800 hover:text-slate-600 hover:underline text-left"
+                        >
+                          {f.name}
+                        </button>
+                        {f.description && (
+                          <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                            {f.description}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <FeatureStatusBadge status={f.status} />
+                      </td>
+                      <td className="px-4 py-2.5 text-slate-600">
+                        {f.team_id ? (teamMap[f.team_id] ?? f.team_id) : '—'}
+                      </td>
+                      <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.cost_of_delay}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-slate-700">{f.job_size}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="font-semibold text-slate-800 tabular-nums">{f.wsjf_score}</span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <button
+                          onClick={() => toggleExpand(f.id)}
+                          className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                          aria-expanded={expandedFeatureId === f.id}
+                        >
+                          <span>{expandedFeatureId === f.id ? '▼' : '▶'}</span>
+                          <span>Stories{storyCountByFeature[f.id] > 0 ? ` (${storyCountByFeature[f.id]})` : ''}</span>
+                        </button>
+                      </td>
+                      <td className="px-4 py-2.5 whitespace-nowrap">
+                        <button
+                          onClick={() => openEdit(f)}
+                          className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(f.id)}
+                          className="text-xs text-red-400 hover:text-red-600 underline"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedFeatureId === f.id && (
+                      <StoryPanel
+                        key={`stories-${f.id}`}
+                        feature={f}
+                        teams={teams}
+                        nonIpIterations={nonIpIterations}
+                        piId={piId!}
+                      />
+                    )}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
 

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { resetDb, selectPI } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  resetDb();
+  await resetDb();
   await selectPI(page);
 });
 
@@ -19,10 +19,12 @@ test('shows iteration column headers', async ({ page }) => {
   await expect(page.getByRole('columnheader', { name: 'Unplanned' })).toBeVisible();
 });
 
-test('shows both team names in the board rows', async ({ page }) => {
+test('shows all team names in the board rows', async ({ page }) => {
   // All ART teams appear as rows, regardless of whether they have assigned features
   await expect(page.getByText('Alpha', { exact: true })).toBeVisible();
   await expect(page.getByText('Beta', { exact: true })).toBeVisible();
+  await expect(page.getByText('Gamma', { exact: true })).toBeVisible();
+  await expect(page.getByText('Delta', { exact: true })).toBeVisible();
 });
 
 test('shows all four features', async ({ page }) => {
@@ -71,4 +73,55 @@ test('same-team dependencies do not produce board arrows', async ({ page }) => {
   // Confirm the two same-team dep descriptions are visible in the table but not as arrows
   await expect(page.getByText('Auth API contract', { exact: false })).toBeVisible();
   await expect(page.getByText('Observability metrics endpoint', { exact: false })).toBeVisible();
+});
+
+test('Unassigned section is always visible', async ({ page }) => {
+  await expect(page.getByText(/Unassigned \(/)).toBeVisible();
+});
+
+test('shows Unassigned section with correct count when features have no team', async ({ page }) => {
+  // Fixture includes "Reporting Module" with no team_id
+  await expect(page.getByText(/Unassigned \(1\)/)).toBeVisible();
+});
+
+test('unassigned feature appears in the Unassigned section as a draggable card', async ({ page }) => {
+  await expect(page.getByText('Reporting Module', { exact: true })).toBeVisible();
+});
+
+test('dragging an assigned feature to the Unassigned section removes its team', async ({ page }) => {
+  // Auth Service starts assigned to Alpha. Drag it onto Reporting Module which is
+  // already in the unassigned drop zone — the zone covers the whole area.
+  await page.getByText('Auth Service', { exact: true }).dragTo(
+    page.getByText('Reporting Module', { exact: true }),
+  );
+  // Count increases from 1 to 2 and Auth Service appears in the unassigned list
+  await expect(page.getByText(/Unassigned \(2\)/)).toBeVisible();
+});
+
+test('feature whose dependency provider is in the same iteration is marked at-risk', async ({ page }) => {
+  // Dep 3 (mitigated): Observability Dashboard (consumer, I1) needs Auth Service (provider, I1).
+  // Provider is in the same iteration as consumer, so it can't be done first → consumer is at-risk.
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Observability Dashboard' })).toBeVisible();
+});
+
+test('feature whose dependency provider is in an earlier iteration is not at-risk', async ({ page }) => {
+  // Dep 2 (identified): CI/CD Pipeline Upgrade (consumer, I3) needs Observability Dashboard (provider, I1).
+  // Provider (I1) is strictly before consumer (I3) → dependency will be satisfied → consumer is not at-risk.
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'CI/CD Pipeline Upgrade' })).not.toBeVisible();
+});
+
+test('feature that only provides dependencies is not marked at-risk', async ({ page }) => {
+  // Auth Service is the provider in dep 3 but never the consumer of an unresolved dep.
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Auth Service' })).not.toBeVisible();
+});
+
+test('unassigned feature is marked at-risk', async ({ page }) => {
+  // Reporting Module has no team — always at-risk regardless of dependencies
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'Reporting Module' })).toBeVisible();
+});
+
+test('feature only in a resolved dependency is not marked at-risk', async ({ page }) => {
+  // SSO Integration only appears in the resolved dep (Auth Service → SSO Integration)
+  // It is assigned to a team, so it should not be red
+  await expect(page.locator('[data-at-risk="true"]', { hasText: 'SSO Integration' })).not.toBeVisible();
 });

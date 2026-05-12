@@ -13,6 +13,9 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
+coverage/
+frontend/coverage/
 
 # Mutation test report (downloaded from CI artifacts via gh run download)
 /index.html
@@ -27,9 +30,10 @@ env/
 .vscode/
 .idea/
 
-# Claude Code — ignore local settings but track shared project commands
+# Claude Code — ignore local settings but track shared project commands and agents
 .claude/*
 !.claude/commands
+!.claude/agents
 
 # Tool data (stored outside repo at ~/.safe_tooling/)
 
@@ -40,6 +44,10 @@ frontend/.env.local
 frontend/.env
 frontend/.vite/
 frontend/test-results/
+frontend/reports/
+frontend/stryker.log
+frontend/.stryker-tmp/
+node_modules/
 
 # E2e working DB — generated from tests/e2e_fixture.clean.json at test time
 tests/e2e_fixture.db.json

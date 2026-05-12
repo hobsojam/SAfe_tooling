@@ -193,6 +193,87 @@ class TestFeatureAssign:
         assert result.exit_code == 1
 
 
+class TestFeatureShowDescription:
+    def test_shows_description_when_set(self, db_path, patch_console):
+        f = _add_feature(db_path, extra_args=["--description", "Handles auth flows"])
+        invoke(db_path, "feature", "show", f.id)
+        assert "Handles auth flows" in patch_console.getvalue()
+
+
+class TestFeatureListStatusFilter:
+    def test_valid_status_filters_results(self, db_path, patch_console):
+        _add_feature(db_path)
+        patch_console.truncate(0)
+        patch_console.seek(0)
+        invoke(db_path, "feature", "list", "--status", "backlog")
+        assert "Auth Service" in patch_console.getvalue()
+
+
+class TestFeatureUpdateFields:
+    def test_update_description(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        invoke(db_path, "feature", "update", f.id, "--description", "New desc")
+        assert repos_for(db_path).features.get(f.id).description == "New desc"
+
+    def test_update_user_value(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        invoke(db_path, "feature", "update", f.id, "--user-value", "2")
+        assert repos_for(db_path).features.get(f.id).user_business_value == 2
+
+    def test_update_time_crit(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        invoke(db_path, "feature", "update", f.id, "--time-crit", "3")
+        assert repos_for(db_path).features.get(f.id).time_criticality == 3
+
+    def test_update_risk_reduction(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        invoke(db_path, "feature", "update", f.id, "--risk-reduction", "4")
+        assert repos_for(db_path).features.get(f.id).risk_reduction_opportunity_enablement == 4
+
+    def test_update_job_size(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        invoke(db_path, "feature", "update", f.id, "--job-size", "7")
+        assert repos_for(db_path).features.get(f.id).job_size == 7
+
+
+class TestFeatureAssignWithPi:
+    def _create_pi(self, db_path):
+        invoke(db_path, "art", "create", "--name", "ART")
+        art_id = repos_for(db_path).arts.get_all()[0].id
+        invoke(
+            db_path,
+            "pi",
+            "create",
+            "--name",
+            "PI 1",
+            "--art-id",
+            art_id,
+            "--start",
+            "2026-01-05",
+            "--end",
+            "2026-03-27",
+        )
+        return repos_for(db_path).pis.get_all()[0].id
+
+    def test_assign_with_unknown_pi_exits_1(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        team_id = repos_for(db_path).teams.get_all()[0].id
+        result = invoke(
+            db_path, "feature", "assign", f.id, "--team-id", team_id, "--pi-id", "no-such-pi"
+        )
+        assert result.exit_code == 1
+
+    def test_assign_with_valid_pi_stores_pi_id(self, db_path, patch_console):
+        f = _add_feature(db_path)
+        pi_id = self._create_pi(db_path)
+        invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
+        team_id = repos_for(db_path).teams.get_all()[0].id
+        result = invoke(db_path, "feature", "assign", f.id, "--team-id", team_id, "--pi-id", pi_id)
+        assert result.exit_code == 0
+        assert repos_for(db_path).features.get(f.id).pi_id == pi_id
+
+
 class TestFeatureDelete:
     def test_removes_feature(self, db_path, patch_console):
         f = _add_feature(db_path)

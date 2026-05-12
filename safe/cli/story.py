@@ -27,9 +27,11 @@ def story_add(
     ),
 ):
     """Add a story to a feature."""
+    if points < 1:
+        console.print(f"[red]Error: --points must be at least 1 (got {points})[/red]")
+        raise typer.Exit(1)
     repos = _repos()
-    feature = repos.features.get(feature_id)
-    if feature is None:
+    if repos.features.get(feature_id) is None:
         console.print(f"[red]Error: Feature '{feature_id}' not found[/red]")
         raise typer.Exit(1)
     if repos.teams.get(team_id) is None:
@@ -37,9 +39,6 @@ def story_add(
         raise typer.Exit(1)
     if iteration_id is not None and repos.iterations.get(iteration_id) is None:
         console.print(f"[red]Error: Iteration '{iteration_id}' not found[/red]")
-        raise typer.Exit(1)
-    if points < 1:
-        console.print("[red]Error: --points must be at least 1[/red]")
         raise typer.Exit(1)
     story = Story(
         name=name,
@@ -50,8 +49,6 @@ def story_add(
         iteration_id=iteration_id,
     )
     repos.stories.save(story)
-    feature.story_ids.append(story.id)
-    repos.features.save(feature)
     console.print(f"Added story [bold]{story.name}[/bold] ({story.points} pts, id: {story.id})")
 
 
@@ -110,7 +107,7 @@ def story_update(
         story.name = name
     if points is not None:
         if points < 1:
-            console.print("[red]Error: --points must be at least 1[/red]")
+            console.print(f"[red]Error: --points must be at least 1 (got {points})[/red]")
             raise typer.Exit(1)
         story.points = points
     if status is not None:
@@ -142,9 +139,5 @@ def story_delete(story_id: str = typer.Argument(..., help="Story id")):
     if story is None:
         console.print(f"[red]Error: Story '{story_id}' not found[/red]")
         raise typer.Exit(1)
-    feature = repos.features.get(story.feature_id)
-    if feature is not None and story.id in feature.story_ids:
-        feature.story_ids.remove(story.id)
-        repos.features.save(feature)
     repos.stories.delete(story_id)
     console.print(f"Deleted story [bold]{story.name}[/bold]")

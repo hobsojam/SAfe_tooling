@@ -33,6 +33,7 @@ export default defineConfig({
       env: {
         ...process.env as Record<string, string>,
         SAFE_DB_PATH: fixtureDb,
+        SAFE_DEV_ROUTES: '1',
       },
       reuseExistingServer: false,
       timeout: 30_000,

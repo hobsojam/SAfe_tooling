@@ -302,20 +302,29 @@ class TestDependencyShow:
         assert result.exit_code == 1
 
 
-class TestDependencyROAM:
+class TestDependencyUpdateStatus:
     def test_updates_status(self, db_path, patch_console):
         pi_id, auth_id, sso_id = _setup(db_path)
         _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
-        invoke(db_path, "dependency", "roam", dep.id, "--status", "owned")
+        invoke(db_path, "dependency", "update-status", dep.id, "--status", "acknowledged")
         updated = repos_for(db_path).dependencies.get(dep.id)
-        assert updated.status == "owned"
+        assert updated.status == "acknowledged"
 
     def test_sets_owner(self, db_path, patch_console):
         pi_id, auth_id, sso_id = _setup(db_path)
         _add_dep(db_path, pi_id, auth_id, sso_id)
         dep = repos_for(db_path).dependencies.get_all()[0]
-        invoke(db_path, "dependency", "roam", dep.id, "--status", "owned", "--owner", "Alice")
+        invoke(
+            db_path,
+            "dependency",
+            "update-status",
+            dep.id,
+            "--status",
+            "acknowledged",
+            "--owner",
+            "Alice",
+        )
         updated = repos_for(db_path).dependencies.get(dep.id)
         assert updated.owner == "Alice"
 
@@ -326,7 +335,7 @@ class TestDependencyROAM:
         invoke(
             db_path,
             "dependency",
-            "roam",
+            "update-status",
             dep.id,
             "--status",
             "resolved",
@@ -337,15 +346,17 @@ class TestDependencyROAM:
         assert updated.resolution_notes == "Contract agreed"
 
     def test_unknown_exits_1(self, db_path, patch_console):
-        result = invoke(db_path, "dependency", "roam", "no-such-id", "--status", "resolved")
+        result = invoke(
+            db_path, "dependency", "update-status", "no-such-id", "--status", "resolved"
+        )
         assert result.exit_code == 1
 
     def test_all_statuses_accepted(self, db_path, patch_console):
         pi_id, auth_id, sso_id = _setup(db_path)
-        for status in ("identified", "owned", "accepted", "mitigated", "resolved"):
+        for status in ("identified", "acknowledged", "in_progress", "resolved"):
             _add_dep(db_path, pi_id, auth_id, sso_id)
             dep = repos_for(db_path).dependencies.get_all()[-1]
-            result = invoke(db_path, "dependency", "roam", dep.id, "--status", status)
+            result = invoke(db_path, "dependency", "update-status", dep.id, "--status", status)
             assert result.exit_code == 0
 
 
