@@ -90,6 +90,9 @@ jobs:
   frontend:
     name: Frontend build & type-check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -106,6 +109,13 @@ jobs:
       - name: Unit tests
         working-directory: frontend
         run: npm run test:run
+
+      - name: Coverage comment on PR
+        if: github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          working-directory: frontend
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build (tsc + vite)
         working-directory: frontend

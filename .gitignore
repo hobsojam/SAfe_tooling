@@ -13,6 +13,9 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
+coverage/
+frontend/coverage/
 
 # Mutation test report (downloaded from CI artifacts via gh run download)
 /index.html
