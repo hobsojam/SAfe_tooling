@@ -6,6 +6,7 @@ import type { CapacityPlan, CapacityPlanCreate } from '../types';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 
 interface CapacityFormState {
   team_size: number;
@@ -29,6 +30,7 @@ function countWeekdays(startDate: string, endDate: string): number {
 export function Capacity() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{ teamId: string; iterationId: string } | null>(null);
@@ -68,6 +70,7 @@ export function Capacity() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['capacity-plans', piId] });
       closeModal();
+      toast('Capacity plan saved');
     },
     onError: (e: Error) => setError(e.message),
   });

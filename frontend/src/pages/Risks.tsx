@@ -8,6 +8,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import { usePagination } from '../hooks/usePagination';
 
 const ROAM_OPTIONS: ROAMStatus[] = ['unroamed', 'owned', 'accepted', 'mitigated', 'resolved'];
@@ -31,6 +32,7 @@ const EMPTY_FORM: RiskFormState = {
 export function Risks() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Risk | null>(null);
@@ -60,19 +62,19 @@ export function Risks() {
 
   const createMut = useMutation({
     mutationFn: (body: RiskCreate) => api.createRisk(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Risk added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: RiskUpdate }) => api.updateRisk(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Risk updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteRisk(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Risk deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 

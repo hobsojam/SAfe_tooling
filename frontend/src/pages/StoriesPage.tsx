@@ -8,6 +8,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import { usePagination } from '../hooks/usePagination';
 
 const STATUS_OPTIONS: StoryStatus[] = ['not_started', 'in_progress', 'done', 'accepted'];
@@ -33,6 +34,7 @@ const EMPTY_FORM: StoryFormState = {
 export function StoriesPage() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Story | null>(null);
@@ -77,19 +79,19 @@ export function StoriesPage() {
 
   const createMut = useMutation({
     mutationFn: (body: StoryCreate) => api.createStory(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Story added'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: StoryUpdate }) => api.updateStory(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Story updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteStory(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Story deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 

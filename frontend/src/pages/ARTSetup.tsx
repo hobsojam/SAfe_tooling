@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '../api';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import type { ART, ARTCreate, ARTUpdate } from '../types';
 
 interface EditState {
@@ -11,6 +12,7 @@ interface EditState {
 
 export function ARTSetup() {
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: arts = [], isLoading } = useQuery({
     queryKey: ['arts'],
@@ -33,6 +35,7 @@ export function ARTSetup() {
       qc.invalidateQueries({ queryKey: ['arts'] });
       setEdit(null);
       setEditError('');
+      toast('ART updated');
     },
     onError: (e: Error) => setEditError(e.message),
   });
@@ -44,6 +47,7 @@ export function ARTSetup() {
       setAddOpen(false);
       setAddName('');
       setAddError('');
+      toast('ART created');
     },
     onError: (e: Error) => setAddError(e.message),
   });
@@ -54,6 +58,7 @@ export function ARTSetup() {
       qc.invalidateQueries({ queryKey: ['arts'] });
       setDeleteId(null);
       setDeleteError('');
+      toast('ART deleted');
     },
     onError: (e: Error) => setDeleteError(e.message),
   });

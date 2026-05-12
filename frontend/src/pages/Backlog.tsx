@@ -19,6 +19,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { Pagination } from '../components/Pagination';
 import { Spinner } from '../components/Spinner';
+import { useToast } from '../components/Toaster';
 import { usePagination } from '../hooks/usePagination';
 
 const FEATURE_STATUS_OPTIONS: FeatureStatus[] = ['funnel', 'analyzing', 'backlog', 'implementing', 'done'];
@@ -53,6 +54,7 @@ function StoryPanel({
   piId: string;
 }) {
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data: stories = [], isLoading } = useQuery({
     queryKey: ['stories', feature.id],
@@ -95,19 +97,20 @@ function StoryPanel({
       setAddOpen(false);
       setAddForm({ name: '', team_id: defaultTeamId, iteration_id: '', points: 3, status: 'not_started' });
       setAddError('');
+      toast('Story added');
     },
     onError: (e: Error) => setAddError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: StoryUpdate }) => api.updateStory(id, body),
-    onSuccess: () => { invalidate(); setEditId(null); setEditError(''); },
+    onSuccess: () => { invalidate(); setEditId(null); setEditError(''); toast('Story updated'); },
     onError: (e: Error) => setEditError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteStory(id),
-    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); },
+    onSuccess: () => { invalidate(); setDeleteId(null); setDeleteError(''); toast('Story deleted'); },
     onError: (e: Error) => setDeleteError(e.message),
   });
 
@@ -393,6 +396,7 @@ type NumKey = 'user_business_value' | 'time_criticality' | 'risk_reduction_oppor
 export function Backlog() {
   const { piId } = useParams<{ piId: string }>();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Feature | null>(null);
@@ -438,19 +442,20 @@ export function Backlog() {
 
   const createMut = useMutation({
     mutationFn: (body: FeatureCreate) => api.createFeature(body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Feature created'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, body }: { id: string; body: FeatureUpdate }) => api.updateFeature(id, body),
-    onSuccess: () => { invalidate(); closeModal(); },
+    onSuccess: () => { invalidate(); closeModal(); toast('Feature updated'); },
     onError: (e: Error) => setError(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => api.deleteFeature(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); toast('Feature deleted'); },
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   const sorted = [...features].sort((a, b) => b.wsjf_score - a.wsjf_score);
