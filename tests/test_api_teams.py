@@ -120,7 +120,12 @@ def test_delete_with_objectives_returns_409(client):
     art_id = _create_art(client)
     pi_id = client.post(
         "/pi",
-        json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"},
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
     ).json()["id"]
     team_id = client.post("/team", json={"name": "T", "member_count": 5}).json()["id"]
     client.post(
@@ -139,7 +144,12 @@ def test_delete_with_capacity_plans_returns_409(client):
     art_id = _create_art(client)
     pi_id = client.post(
         "/pi",
-        json={"name": "PI 1", "art_id": art_id, "start_date": "2026-01-05", "end_date": "2026-03-27"},
+        json={
+            "name": "PI 1",
+            "art_id": art_id,
+            "start_date": "2026-01-05",
+            "end_date": "2026-03-27",
+        },
     ).json()["id"]
     team_id = client.post("/team", json={"name": "T", "member_count": 5}).json()["id"]
     iter_id = client.post(

@@ -269,9 +269,7 @@ class TestFeatureAssignWithPi:
         pi_id = self._create_pi(db_path)
         invoke(db_path, "team", "create", "--name", "Alpha", "--members", "6")
         team_id = repos_for(db_path).teams.get_all()[0].id
-        result = invoke(
-            db_path, "feature", "assign", f.id, "--team-id", team_id, "--pi-id", pi_id
-        )
+        result = invoke(db_path, "feature", "assign", f.id, "--team-id", team_id, "--pi-id", pi_id)
         assert result.exit_code == 0
         assert repos_for(db_path).features.get(f.id).pi_id == pi_id
 
