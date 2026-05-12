@@ -55,10 +55,12 @@ def seed(repos: Repos) -> None:
     repos.pis.save(pi)
 
     # --- Features ---
+    # iteration_id is the board placement (majority story-point iteration from seed stories below)
     auth = Feature(
         name="Auth Service",
         pi_id=pi.id,
         team_id=alpha.id,
+        iteration_id=i1.id,  # i1: 5pts, i2: 2pts
         user_business_value=8,
         time_criticality=5,
         risk_reduction_opportunity_enablement=3,
@@ -68,6 +70,7 @@ def seed(repos: Repos) -> None:
         name="SSO Integration",
         pi_id=pi.id,
         team_id=alpha.id,
+        iteration_id=i2.id,  # i2: 5pts, i3: 3pts
         user_business_value=5,
         time_criticality=8,
         risk_reduction_opportunity_enablement=2,
@@ -77,6 +80,7 @@ def seed(repos: Repos) -> None:
         name="Observability Dashboard",
         pi_id=pi.id,
         team_id=beta.id,
+        iteration_id=i1.id,  # i1: 4pts, i2: 3pts, i3: 2pts
         user_business_value=6,
         time_criticality=3,
         risk_reduction_opportunity_enablement=8,
@@ -86,6 +90,7 @@ def seed(repos: Repos) -> None:
         name="CI/CD Pipeline Upgrade",
         pi_id=pi.id,
         team_id=beta.id,
+        iteration_id=i3.id,  # i3: 3pts, i4: 2pts
         user_business_value=4,
         time_criticality=2,
         risk_reduction_opportunity_enablement=5,
@@ -95,6 +100,7 @@ def seed(repos: Repos) -> None:
         name="Data Lake Integration",
         pi_id=pi.id,
         team_id=gamma.id,
+        iteration_id=i3.id,  # i2: 3pts, i3: 4pts
         user_business_value=7,
         time_criticality=4,
         risk_reduction_opportunity_enablement=6,
@@ -104,6 +110,7 @@ def seed(repos: Repos) -> None:
         name="API Gateway",
         pi_id=pi.id,
         team_id=delta.id,
+        iteration_id=i2.id,  # i1: 3pts, i2: 4pts
         user_business_value=9,
         time_criticality=7,
         risk_reduction_opportunity_enablement=4,
