@@ -178,110 +178,194 @@ export function Objectives() {
       {sorted.length === 0 ? (
         <EmptyState message="No PI objectives yet." />
       ) : (
-        <div className="overflow-x-auto overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
-              <tr>
-                {['Description', 'Team', 'Type', 'Planned BV', 'Actual BV', ''].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {pageSorted.map((obj) => {
-                if (deleteId === obj.id) {
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          {/* Mobile card list */}
+          <div className="block md:hidden divide-y divide-slate-100">
+            {pageSorted.map((obj) => {
+              if (deleteId === obj.id) {
+                return (
+                  <div key={obj.id} className="bg-red-50 px-4 py-4">
+                    {deleteError && <p className="mb-2 text-xs text-red-600">{deleteError}</p>}
+                    <p className="mb-3 text-sm text-slate-700">
+                      Delete <strong>{obj.description.slice(0, 50)}{obj.description.length > 50 ? '…' : ''}</strong>?
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => deleteMut.mutate(obj.id)}
+                        disabled={deleteMut.isPending}
+                        className="rounded-md bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                      >
+                        {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+                      </button>
+                      <button
+                        onClick={() => { setDeleteId(null); setDeleteError(''); }}
+                        className="rounded-md bg-white px-4 py-2.5 text-sm text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div key={obj.id} className="px-4 py-4">
+                  <button
+                    onClick={() => openEdit(obj)}
+                    className="mb-2 text-left font-medium text-slate-800 hover:text-slate-600"
+                  >
+                    {obj.description}
+                  </button>
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${obj.is_stretch ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                      {obj.is_stretch ? 'Stretch' : 'Committed'}
+                    </span>
+                    <span className="text-xs text-slate-500">{teamMap[obj.team_id] ?? '—'}</span>
+                  </div>
+                  <div className="mb-3 flex gap-6 text-xs text-slate-500">
+                    <span>Planned BV: <strong className="text-slate-700">{obj.planned_business_value}</strong></span>
+                    <span>Actual BV: <strong className="text-slate-700">
+                      {obj.actual_business_value !== null ? obj.actual_business_value : '—'}
+                    </strong></span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEdit(obj)}
+                      className="rounded-md bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => { setDeleteId(obj.id); setDeleteError(''); }}
+                      className="rounded-md bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            {committed.length > 0 && (
+              <div className="border-t-2 border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="mb-1 text-xs text-slate-500">
+                  Committed totals · {scoredCommitted.length} of {committed.length} scored
+                </p>
+                <div className="flex items-center gap-6 text-sm">
+                  <span className="text-slate-600">Planned: <strong className="text-slate-800">{committedPlannedBV}</strong></span>
+                  <span className="text-slate-600">Actual: <strong className="text-slate-800">{scoredCommitted.length > 0 ? committedActualBV : '—'}</strong></span>
+                  {predictabilityPct !== null && (
+                    <span className={predictabilityClass(predictabilityPct)}>{predictabilityPct}%</span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  {['Description', 'Team', 'Type', 'Planned BV', 'Actual BV', ''].map((h) => (
+                    <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {pageSorted.map((obj) => {
+                  if (deleteId === obj.id) {
+                    return (
+                      <tr key={obj.id} className="bg-red-50">
+                        <td colSpan={6} className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
+                            <span className="text-sm text-slate-700">
+                              Delete <strong>{obj.description.slice(0, 50)}{obj.description.length > 50 ? '…' : ''}</strong>?
+                            </span>
+                            <button
+                              onClick={() => deleteMut.mutate(obj.id)}
+                              disabled={deleteMut.isPending}
+                              className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                            >
+                              {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+                            </button>
+                            <button
+                              onClick={() => { setDeleteId(null); setDeleteError(''); }}
+                              className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+
                   return (
-                    <tr key={obj.id} className="bg-red-50">
-                      <td colSpan={6} className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          {deleteError && <span className="text-xs text-red-600">{deleteError}</span>}
-                          <span className="text-sm text-slate-700">
-                            Delete <strong>{obj.description.slice(0, 50)}{obj.description.length > 50 ? '…' : ''}</strong>?
-                          </span>
-                          <button
-                            onClick={() => deleteMut.mutate(obj.id)}
-                            disabled={deleteMut.isPending}
-                            className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
-                          >
-                            {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
-                          </button>
-                          <button
-                            onClick={() => { setDeleteId(null); setDeleteError(''); }}
-                            className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
+                    <tr key={obj.id} className="hover:bg-slate-50/60">
+                      <td className="px-4 py-2.5 text-slate-800 max-w-xs">
+                        <button
+                          onClick={() => openEdit(obj)}
+                          className="text-left hover:text-slate-600 hover:underline"
+                        >
+                          {obj.description}
+                        </button>
+                      </td>
+                      <td className="px-4 py-2.5 text-slate-600">{teamMap[obj.team_id] ?? '—'}</td>
+                      <td className="px-4 py-2.5">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${obj.is_stretch ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                          {obj.is_stretch ? 'Stretch' : 'Committed'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 tabular-nums text-slate-700">{obj.planned_business_value}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-slate-700">
+                        {obj.actual_business_value !== null
+                          ? obj.actual_business_value
+                          : <span className="text-slate-400">—</span>}
+                      </td>
+                      <td className="px-4 py-2.5 whitespace-nowrap text-right">
+                        <button
+                          onClick={() => openEdit(obj)}
+                          className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => { setDeleteId(obj.id); setDeleteError(''); }}
+                          className="text-xs text-red-400 hover:text-red-600 underline"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   );
-                }
-
-                return (
-                  <tr key={obj.id} className="hover:bg-slate-50/60">
-                    <td className="px-4 py-2.5 text-slate-800 max-w-xs">
-                      <button
-                        onClick={() => openEdit(obj)}
-                        className="text-left hover:text-slate-600 hover:underline"
-                      >
-                        {obj.description}
-                      </button>
+                })}
+              </tbody>
+              {committed.length > 0 && (
+                <tfoot className="border-t-2 border-slate-200 bg-slate-50">
+                  <tr>
+                    <td colSpan={3} className="px-4 py-2.5 text-xs text-slate-500">
+                      Committed totals · {scoredCommitted.length} of {committed.length} scored
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">{teamMap[obj.team_id] ?? '—'}</td>
-                    <td className="px-4 py-2.5">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${obj.is_stretch ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-                        {obj.is_stretch ? 'Stretch' : 'Committed'}
-                      </span>
+                    <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                      {committedPlannedBV}
                     </td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">{obj.planned_business_value}</td>
-                    <td className="px-4 py-2.5 tabular-nums text-slate-700">
-                      {obj.actual_business_value !== null
-                        ? obj.actual_business_value
-                        : <span className="text-slate-400">—</span>}
+                    <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
+                      {scoredCommitted.length > 0 ? committedActualBV : '—'}
                     </td>
-                    <td className="px-4 py-2.5 whitespace-nowrap text-right">
-                      <button
-                        onClick={() => openEdit(obj)}
-                        className="mr-3 text-xs text-slate-500 hover:text-slate-800 underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => { setDeleteId(obj.id); setDeleteError(''); }}
-                        className="text-xs text-red-400 hover:text-red-600 underline"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-4 py-2.5 text-right">
+                      {predictabilityPct !== null ? (
+                        <span className={`text-sm ${predictabilityClass(predictabilityPct)}`}>
+                          {predictabilityPct}%
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400">Not yet scored</span>
+                      )}
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-            {committed.length > 0 && (
-              <tfoot className="border-t-2 border-slate-200 bg-slate-50">
-                <tr>
-                  <td colSpan={3} className="px-4 py-2.5 text-xs text-slate-500">
-                    Committed totals · {scoredCommitted.length} of {committed.length} scored
-                  </td>
-                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
-                    {committedPlannedBV}
-                  </td>
-                  <td className="px-4 py-2.5 tabular-nums text-sm font-semibold text-slate-700">
-                    {scoredCommitted.length > 0 ? committedActualBV : '—'}
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    {predictabilityPct !== null ? (
-                      <span className={`text-sm ${predictabilityClass(predictabilityPct)}`}>
-                        {predictabilityPct}%
-                      </span>
-                    ) : (
-                      <span className="text-xs text-slate-400">Not yet scored</span>
-                    )}
-                  </td>
-                </tr>
-              </tfoot>
-            )}
-          </table>
+                </tfoot>
+              )}
+            </table>
+          </div>
           <Pagination page={page} totalPages={totalPages} onPageChange={goTo} />
         </div>
       )}
