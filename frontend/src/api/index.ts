@@ -31,9 +31,27 @@ import type {
 
 const BASE = '/api';
 
+async function extractErrorMessage(res: Response): Promise<string> {
+  try {
+    const body = (await res.json()) as { detail?: unknown };
+    if (typeof body.detail === 'string') return body.detail;
+    if (Array.isArray(body.detail)) {
+      return (body.detail as { loc?: string[]; msg: string }[])
+        .map((e) => {
+          const field = e.loc?.filter((p) => p !== 'body').join('.') ?? '';
+          return field ? `${field}: ${e.msg}` : e.msg;
+        })
+        .join('; ');
+    }
+  } catch {
+    // body wasn't JSON — fall through to status text
+  }
+  return `${res.status}: ${res.statusText}`;
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+  if (!res.ok) throw new Error(await extractErrorMessage(res));
   return res.json() as Promise<T>;
 }
 
@@ -43,7 +61,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+  if (!res.ok) throw new Error(await extractErrorMessage(res));
   return res.json() as Promise<T>;
 }
 
@@ -53,13 +71,13 @@ async function patch<T>(path: string, body: unknown): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+  if (!res.ok) throw new Error(await extractErrorMessage(res));
   return res.json() as Promise<T>;
 }
 
 async function del(path: string): Promise<void> {
   const res = await fetch(`${BASE}${path}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+  if (!res.ok) throw new Error(await extractErrorMessage(res));
 }
 
 export const api = {

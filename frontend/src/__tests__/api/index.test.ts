@@ -20,8 +20,15 @@ function resolveOk(data: unknown = null) {
   });
 }
 
-function resolveError(status: number, statusText: string) {
-  mockFetch.mockResolvedValue({ ok: false, status, statusText });
+function resolveError(status: number, statusText: string, body?: unknown) {
+  mockFetch.mockResolvedValue({
+    ok: false,
+    status,
+    statusText,
+    json: body !== undefined
+      ? () => Promise.resolve(body)
+      : () => Promise.reject(new Error('no body')),
+  });
 }
 
 beforeEach(() => {
@@ -218,29 +225,39 @@ describe('DELETE methods', () => {
 // ---------------------------------------------------------------------------
 
 describe('error handling', () => {
-  it('throws on a non-ok GET response', async () => {
-    resolveError(404, 'Not Found');
-    await expect(api.listPIs()).rejects.toThrow('API 404: Not Found');
+  it('surfaces detail string from a 404 response', async () => {
+    resolveError(404, 'Not Found', { detail: "PI 'abc' not found" });
+    await expect(api.listPIs()).rejects.toThrow("PI 'abc' not found");
   });
 
-  it('throws on a non-ok POST response', async () => {
-    resolveError(422, 'Unprocessable Entity');
-    const body: PICreate = {
-      name: 'X',
-      art_id: 'a',
-      start_date: '2026-01-01',
-      end_date: '2026-03-27',
-    };
-    await expect(api.createPI(body)).rejects.toThrow('API 422: Unprocessable Entity');
+  it('surfaces detail string from a 409 conflict response', async () => {
+    resolveError(409, 'Conflict', { detail: 'PI is already active' });
+    const body: PICreate = { name: 'X', art_id: 'a', start_date: '2026-01-01', end_date: '2026-03-27' };
+    await expect(api.createPI(body)).rejects.toThrow('PI is already active');
   });
 
-  it('throws on a non-ok PATCH response', async () => {
-    resolveError(409, 'Conflict');
-    await expect(api.updateFeature('f1', { name: 'X' })).rejects.toThrow('API 409: Conflict');
+  it('formats validation error array from a 422 response', async () => {
+    resolveError(422, 'Unprocessable Entity', {
+      detail: [
+        { loc: ['body', 'name'], msg: 'Field required', type: 'missing' },
+        { loc: ['body', 'job_size'], msg: 'Input should be less than or equal to 13', type: 'less_than_equal' },
+      ],
+    });
+    await expect(api.updateFeature('f1', {})).rejects.toThrow(
+      'name: Field required; job_size: Input should be less than or equal to 13',
+    );
   });
 
-  it('throws on a non-ok DELETE response', async () => {
+  it('falls back to status text when response body is not JSON', async () => {
     resolveError(500, 'Internal Server Error');
-    await expect(api.deletePI('x')).rejects.toThrow('API 500: Internal Server Error');
+    await expect(api.deletePI('x')).rejects.toThrow('500: Internal Server Error');
+  });
+
+  it('strips "body" segment from validation error loc path', async () => {
+    resolveError(422, 'Unprocessable Entity', {
+      detail: [{ loc: ['body', 'start_date'], msg: 'Invalid date format', type: 'value_error' }],
+    });
+    await expect(api.createPI({ name: 'X', art_id: 'a', start_date: 'bad', end_date: '2026-03-27' }))
+      .rejects.toThrow('start_date: Invalid date format');
   });
 });
