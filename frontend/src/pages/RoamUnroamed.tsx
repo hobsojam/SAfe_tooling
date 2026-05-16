@@ -120,10 +120,11 @@ export function RoamUnroamed() {
                 )}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label htmlFor={`roam-status-${r.id}`} className="mb-1 block text-xs font-medium text-slate-600">
                       ROAM Status
                     </label>
                     <select
+                      id={`roam-status-${r.id}`}
                       value={row.roam_status}
                       onChange={(e) => setField(r.id, r, 'roam_status', e.target.value)}
                       className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -134,8 +135,9 @@ export function RoamUnroamed() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">Owner</label>
+                    <label htmlFor={`owner-${r.id}`} className="mb-1 block text-xs font-medium text-slate-600">Owner</label>
                     <input
+                      id={`owner-${r.id}`}
                       type="text"
                       value={row.owner}
                       onChange={(e) => setField(r.id, r, 'owner', e.target.value)}
@@ -144,10 +146,11 @@ export function RoamUnroamed() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label htmlFor={`mitigation-notes-${r.id}`} className="mb-1 block text-xs font-medium text-slate-600">
                       Mitigation Notes
                     </label>
                     <input
+                      id={`mitigation-notes-${r.id}`}
                       type="text"
                       value={row.mitigation_notes}
                       onChange={(e) => setField(r.id, r, 'mitigation_notes', e.target.value)}
