@@ -3,7 +3,9 @@ import threading
 from collections.abc import Generator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Annotated
 
+from fastapi import Depends
 from tinydb import TinyDB
 
 from safe.store.repos import Repos
@@ -75,6 +77,9 @@ def get_repos_dep() -> Generator[Repos, None, None]:
         raise RuntimeError("Database not initialised — lifespan not running")
     with _db_lock:
         yield Repos(_db)
+
+
+ReposDep = Annotated[Repos, Depends(get_repos_dep)]
 
 
 def clear_cache() -> None:

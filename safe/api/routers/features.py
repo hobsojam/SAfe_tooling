@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from safe.api.deps import get_repos_dep
+from safe.api.deps import ReposDep
 from safe.api.schemas import FeatureAssign, FeatureCreate, FeatureUpdate
 from safe.models.backlog import Feature, FeatureStatus
 from safe.store.repos import Repos
@@ -17,11 +17,11 @@ def _get_or_404(repos: Repos, feature_id: str) -> Feature:
 
 @router.get("", response_model=list[Feature])
 def list_features(
+    repos: ReposDep,
     pi_id: str | None = Query(default=None),
     team_id: str | None = Query(default=None),
     status: FeatureStatus | None = Query(default=None),
     sort: str | None = Query(default=None, pattern="^(wsjf_desc|name_asc)$"),
-    repos: Repos = Depends(get_repos_dep),
 ):
     filters = {
         k: v
@@ -39,25 +39,25 @@ def list_features(
 
 
 @router.post("", response_model=Feature, status_code=201)
-def create_feature(body: FeatureCreate, repos: Repos = Depends(get_repos_dep)):
+def create_feature(body: FeatureCreate, repos: ReposDep):
     feature = Feature(**body.model_dump())
     return repos.features.save(feature)
 
 
 @router.get("/{feature_id}", response_model=Feature)
-def get_feature(feature_id: str, repos: Repos = Depends(get_repos_dep)):
+def get_feature(feature_id: str, repos: ReposDep):
     return _get_or_404(repos, feature_id)
 
 
 @router.patch("/{feature_id}", response_model=Feature)
-def update_feature(feature_id: str, body: FeatureUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_feature(feature_id: str, body: FeatureUpdate, repos: ReposDep):
     feature = _get_or_404(repos, feature_id)
     updated = feature.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.features.save(updated)
 
 
 @router.post("/{feature_id}/assign", response_model=Feature)
-def assign_feature(feature_id: str, body: FeatureAssign, repos: Repos = Depends(get_repos_dep)):
+def assign_feature(feature_id: str, body: FeatureAssign, repos: ReposDep):
     feature = _get_or_404(repos, feature_id)
     if repos.teams.get(body.team_id) is None:
         raise HTTPException(status_code=404, detail=f"Team '{body.team_id}' not found")
@@ -66,7 +66,7 @@ def assign_feature(feature_id: str, body: FeatureAssign, repos: Repos = Depends(
 
 
 @router.delete("/{feature_id}", status_code=204)
-def delete_feature(feature_id: str, repos: Repos = Depends(get_repos_dep)):
+def delete_feature(feature_id: str, repos: ReposDep):
     _get_or_404(repos, feature_id)
     for story in repos.stories.find(feature_id=feature_id):
         repos.stories.delete(story.id)
