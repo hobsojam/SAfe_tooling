@@ -33,11 +33,11 @@ function TopologySelect({
   value,
   onChange,
   id,
-}: {
+}: Readonly<{
   value: TeamTopologyType | null;
   onChange: (v: TeamTopologyType | null) => void;
   id?: string;
-}) {
+}>) {
   return (
     <select
       id={id}
