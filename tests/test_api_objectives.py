@@ -67,6 +67,20 @@ def test_list_filter_by_pi(client):
     assert objs[0]["pi_id"] == pi1
 
 
+def test_list_filter_by_is_stretch(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    team_id = _create_team(client)
+    _create_objective(client, team_id, pi_id)
+    _create_objective(client, team_id, pi_id, is_stretch=True)
+    stretch = client.get("/objectives?is_stretch=true").json()
+    assert len(stretch) == 1
+    assert stretch[0]["is_stretch"] is True
+    committed = client.get("/objectives?is_stretch=false").json()
+    assert len(committed) == 1
+    assert committed[0]["is_stretch"] is False
+
+
 def test_get_unknown_returns_404(client):
     assert client.get("/objectives/no-such-id").status_code == 404
 

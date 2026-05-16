@@ -18,11 +18,11 @@ def _get_or_404(repos: Repos, pi_id: str) -> PI:
 @router.get("", response_model=list[PI])
 def list_pis(
     art_id: str | None = Query(default=None),
+    status: PIStatus | None = Query(default=None),
     repos: Repos = Depends(get_repos_dep),
 ):
-    if art_id is not None:
-        return repos.pis.find(art_id=art_id)
-    return repos.pis.get_all()
+    filters = {k: v for k, v in {"art_id": art_id, "status": status}.items() if v is not None}
+    return repos.pis.find(**filters) if filters else repos.pis.get_all()
 
 
 @router.post("", response_model=PI, status_code=201)

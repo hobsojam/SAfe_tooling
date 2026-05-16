@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from safe.api.deps import get_repos_dep
 from safe.api.schemas import RiskCreate, RiskROAM, RiskUpdate
-from safe.models.risk import Risk
+from safe.models.risk import Risk, ROAMStatus
 from safe.store.repos import Repos
 
 router = APIRouter(prefix="/risks", tags=["Risks"])
@@ -18,11 +18,16 @@ def _get_or_404(repos: Repos, risk_id: str) -> Risk:
 @router.get("", response_model=list[Risk])
 def list_risks(
     pi_id: str | None = Query(default=None),
+    team_id: str | None = Query(default=None),
+    roam_status: ROAMStatus | None = Query(default=None),
     repos: Repos = Depends(get_repos_dep),
 ):
-    if pi_id is not None:
-        return repos.risks.find(pi_id=pi_id)
-    return repos.risks.get_all()
+    filters = {
+        k: v
+        for k, v in {"pi_id": pi_id, "team_id": team_id, "roam_status": roam_status}.items()
+        if v is not None
+    }
+    return repos.risks.find(**filters) if filters else repos.risks.get_all()
 
 
 @router.post("", response_model=Risk, status_code=201)
