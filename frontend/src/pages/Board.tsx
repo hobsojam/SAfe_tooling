@@ -41,7 +41,7 @@ function buildBoard(features: Feature[]): BoardGrid {
   return grid;
 }
 
-function FeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
+function FeatureCard({ feature, atRisk }: Readonly<{ feature: Feature; atRisk?: boolean }>) {
   const cardCls = atRisk
     ? 'rounded border border-red-300 bg-red-50 px-2 py-1.5 shadow-sm'
     : 'rounded border border-slate-200 bg-white px-2 py-1.5 shadow-sm';
@@ -56,7 +56,7 @@ function FeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }
   );
 }
 
-function DraggableFeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: boolean }) {
+function DraggableFeatureCard({ feature, atRisk }: Readonly<{ feature: Feature; atRisk?: boolean }>) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: feature.id,
     data: { feature },
@@ -78,7 +78,7 @@ function DraggableFeatureCard({ feature, atRisk }: { feature: Feature; atRisk?: 
   );
 }
 
-function DroppableCell({ id, children }: { id: string; children: React.ReactNode }) {
+function DroppableCell({ id, children }: Readonly<{ id: string; children: React.ReactNode }>) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <div
@@ -90,7 +90,7 @@ function DroppableCell({ id, children }: { id: string; children: React.ReactNode
   );
 }
 
-function UnassignedDropZone({ children }: { children: React.ReactNode }) {
+function UnassignedDropZone({ children }: Readonly<{ children: React.ReactNode }>) {
   const { setNodeRef, isOver } = useDroppable({ id: 'unassigned' });
   return (
     <div

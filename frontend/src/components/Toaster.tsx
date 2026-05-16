@@ -23,7 +23,7 @@ const STYLES: Record<Variant, string> = {
   info:    'bg-blue-50 border-blue-200 text-blue-800',
 };
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const counterRef = useRef(0);
 

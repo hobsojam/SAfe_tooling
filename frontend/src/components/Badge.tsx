@@ -11,7 +11,7 @@ const STYLES: Record<Variant, string> = {
   purple: 'bg-purple-100 text-purple-800',
 };
 
-export function Badge({ label, variant }: { label: string; variant: Variant }) {
+export function Badge({ label, variant }: Readonly<{ label: string; variant: Variant }>) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STYLES[variant]}`}
@@ -21,7 +21,7 @@ export function Badge({ label, variant }: { label: string; variant: Variant }) {
   );
 }
 
-export function ROAMBadge({ status }: { status: string }) {
+export function ROAMBadge({ status }: Readonly<{ status: string }>) {
   const map: Record<string, Variant> = {
     unroamed: 'red',
     owned: 'yellow',
@@ -32,7 +32,7 @@ export function ROAMBadge({ status }: { status: string }) {
   return <Badge label={status} variant={map[status] ?? 'gray'} />;
 }
 
-export function DepBadge({ status }: { status: string }) {
+export function DepBadge({ status }: Readonly<{ status: string }>) {
   const map: Record<string, Variant> = {
     identified: 'red',
     acknowledged: 'yellow',
@@ -42,7 +42,7 @@ export function DepBadge({ status }: { status: string }) {
   return <Badge label={status.replace(/_/g, ' ')} variant={map[status] ?? 'gray'} />;
 }
 
-export function PIStatusBadge({ status }: { status: string }) {
+export function PIStatusBadge({ status }: Readonly<{ status: string }>) {
   const map: Record<string, Variant> = {
     planning: 'blue',
     active: 'green',
@@ -51,7 +51,7 @@ export function PIStatusBadge({ status }: { status: string }) {
   return <Badge label={status} variant={map[status] ?? 'gray'} />;
 }
 
-export function FeatureStatusBadge({ status }: { status: string }) {
+export function FeatureStatusBadge({ status }: Readonly<{ status: string }>) {
   const map: Record<string, Variant> = {
     funnel: 'purple',
     analyzing: 'blue',
@@ -62,7 +62,7 @@ export function FeatureStatusBadge({ status }: { status: string }) {
   return <Badge label={status} variant={map[status] ?? 'gray'} />;
 }
 
-export function StoryStatusBadge({ status }: { status: string }) {
+export function StoryStatusBadge({ status }: Readonly<{ status: string }>) {
   const map: Record<string, Variant> = {
     not_started: 'gray',
     in_progress: 'blue',
@@ -79,7 +79,7 @@ export const TOPOLOGY_LABELS: Record<string, string> = {
   platform: 'Platform',
 };
 
-export function TopologyBadge({ type }: { type: string | null }) {
+export function TopologyBadge({ type }: Readonly<{ type: string | null }>) {
   if (!type) return null;
   const map: Record<string, Variant> = {
     stream_aligned: 'blue',

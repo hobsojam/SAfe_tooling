@@ -7,10 +7,10 @@ import { ToastProvider, useToast } from '../../components/Toaster';
 function ToastTrigger({
   message,
   variant,
-}: {
+}: Readonly<{
   message: string;
   variant?: 'success' | 'error' | 'info';
-}) {
+}>) {
   const toast = useToast();
   return (
     <button onClick={() => toast(message, variant)}>

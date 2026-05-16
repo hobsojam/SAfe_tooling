@@ -47,12 +47,12 @@ function StoryPanel({
   teams,
   nonIpIterations,
   piId,
-}: {
+}: Readonly<{
   feature: Feature;
   teams: Team[];
   nonIpIterations: Iteration[];
   piId: string;
-}) {
+}>) {
   const qc = useQueryClient();
   const toast = useToast();
 

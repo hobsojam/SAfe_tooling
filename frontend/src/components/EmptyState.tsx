@@ -1,4 +1,4 @@
-export function EmptyState({ message }: { message: string }) {
+export function EmptyState({ message }: Readonly<{ message: string }>) {
   return (
     <div
       className="flex flex-col items-center justify-center py-16 text-slate-400"
