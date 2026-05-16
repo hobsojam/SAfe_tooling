@@ -1,0 +1,96 @@
+name: Test Quality Analysis
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  tqa:
+    name: TQA
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Python ────────────────────────────────────────────────────────────
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -e ".[dev]" "mutmut>=2,<3" "git+https://github.com/hobsojam/test-analysis.git"
+
+      - name: Run Python tests with coverage
+        run: pytest --cov=safe --cov-report=xml
+
+      - name: Run Python mutation tests
+        run: mutmut run --no-progress
+        continue-on-error: true
+
+      - name: Export mutmut JUnit XML
+        run: mutmut junitxml > mutmut.xml
+
+      # ── Frontend ──────────────────────────────────────────────────────────
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: npm run test:run
+
+      - name: Run frontend mutation tests
+        working-directory: frontend
+        run: npm run stryker
+        continue-on-error: true
+
+      # ── TQA ───────────────────────────────────────────────────────────────
+      - name: Analyse with TQA
+        id: tqa
+        run: tqa analyze --config tqa.toml --format github > tqa-summary.md
+        continue-on-error: true
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && steps.tqa.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('tqa-summary.md', 'utf8');
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const existing = comments.findLast(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.startsWith('# TQA Report Summary')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: summary,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: summary,
+              });
+            }

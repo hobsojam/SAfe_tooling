@@ -1,0 +1,7 @@
+[components.python]
+cobertura = "coverage.xml"
+mutmut    = "mutmut.xml"
+
+[components.frontend]
+lcov    = "frontend/coverage/lcov.info"
+stryker = "frontend/reports/mutation/mutation.json"
