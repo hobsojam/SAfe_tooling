@@ -33,6 +33,9 @@ dev = [
 [tool.setuptools.packages.find]
 include = ["safe*"]
 
+[tool.coverage.run]
+relative_files = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
