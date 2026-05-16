@@ -11,7 +11,7 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
-      reporter: ['json-summary', 'json', 'text'],
+      reporter: ['json-summary', 'json', 'text', 'lcov'],
       reportOnFailure: true,
     },
   },
