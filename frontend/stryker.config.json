@@ -6,9 +6,12 @@
     "src/components/**/*.{ts,tsx}"
   ],
   "ignoreStatic": true,
-  "reporters": ["html", "progress"],
+  "reporters": ["html", "progress", "json"],
   "htmlReporter": {
     "fileName": "reports/mutation/index.html"
+  },
+  "jsonReporter": {
+    "fileName": "reports/mutation/mutation.json"
   },
   "coverageAnalysis": "perTest",
   "thresholds": {
