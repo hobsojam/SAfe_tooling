@@ -46,6 +46,28 @@ def test_list_filter_by_pi(client):
     assert len(risks) == 1
 
 
+def test_list_filter_by_team(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    team_id = client.post("/team", json={"name": "Alpha", "member_count": 5}).json()["id"]
+    _create_risk(client, pi_id, team_id=team_id)
+    _create_risk(client, pi_id)
+    risks = client.get(f"/risks?team_id={team_id}").json()
+    assert len(risks) == 1
+    assert risks[0]["team_id"] == team_id
+
+
+def test_list_filter_by_roam_status(client):
+    art_id = _create_art(client)
+    pi_id = _create_pi(client, art_id)
+    rid = _create_risk(client, pi_id).json()["id"]
+    _create_risk(client, pi_id)
+    client.post(f"/risks/{rid}/roam", json={"roam_status": "owned"})
+    owned = client.get("/risks?roam_status=owned").json()
+    assert len(owned) == 1
+    assert owned[0]["roam_status"] == "owned"
+
+
 def test_get_unknown_returns_404(client):
     assert client.get("/risks/no-such-id").status_code == 404
 

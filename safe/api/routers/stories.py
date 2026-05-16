@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from safe.api.deps import get_repos_dep
 from safe.api.schemas import StoryCreate, StoryUpdate
-from safe.models.backlog import Story
+from safe.models.backlog import Story, StoryStatus
 from safe.store.repos import Repos
 
 router = APIRouter(prefix="/stories", tags=["Stories"])
@@ -18,11 +18,22 @@ def _get_or_404(repos: Repos, story_id: str) -> Story:
 @router.get("", response_model=list[Story])
 def list_stories(
     feature_id: str | None = Query(default=None),
+    team_id: str | None = Query(default=None),
+    iteration_id: str | None = Query(default=None),
+    status: StoryStatus | None = Query(default=None),
     repos: Repos = Depends(get_repos_dep),
 ):
-    if feature_id is not None:
-        return repos.stories.find(feature_id=feature_id)
-    return repos.stories.get_all()
+    filters = {
+        k: v
+        for k, v in {
+            "feature_id": feature_id,
+            "team_id": team_id,
+            "iteration_id": iteration_id,
+            "status": status,
+        }.items()
+        if v is not None
+    }
+    return repos.stories.find(**filters) if filters else repos.stories.get_all()
 
 
 @router.post("", response_model=Story, status_code=201)

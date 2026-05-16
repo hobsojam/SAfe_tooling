@@ -73,6 +73,17 @@ class TestPIList:
         assert len(pis) == 1
         assert pis[0]["art_id"] == art1
 
+    def test_filter_by_status(self, client):
+        art_id = _create_art(client)
+        pi1 = _create_pi(client, art_id, "PI A")
+        _create_pi(client, art_id, "PI B")
+        client.post(f"/pi/{pi1}/activate")
+        active = client.get("/pi?status=active").json()
+        assert len(active) == 1
+        assert active[0]["id"] == pi1
+        planning = client.get("/pi?status=planning").json()
+        assert len(planning) == 1
+
 
 class TestPIPatch:
     def test_patch_name(self, client):

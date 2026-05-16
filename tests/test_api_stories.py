@@ -76,6 +76,52 @@ class TestStoryList:
         _create_story(client, fid, tid, name="S2")
         assert len(client.get("/stories").json()) == 2
 
+    def test_filter_by_team_id(self, client):
+        fid, tid1 = _setup(client)
+        tid2 = client.post("/team", json={"name": "Beta", "member_count": 4}).json()["id"]
+        _create_story(client, fid, tid1, name="S1")
+        _create_story(client, fid, tid2, name="S2")
+        stories = client.get(f"/stories?team_id={tid1}").json()
+        assert len(stories) == 1
+        assert stories[0]["team_id"] == tid1
+
+    def test_filter_by_status(self, client):
+        fid, tid = _setup(client)
+        sid1 = _create_story(client, fid, tid, name="S1").json()["id"]
+        _create_story(client, fid, tid, name="S2")
+        client.patch(f"/stories/{sid1}", json={"status": "done"})
+        done = client.get("/stories?status=done").json()
+        assert len(done) == 1
+        assert done[0]["id"] == sid1
+
+    def test_filter_by_iteration_id(self, client):
+        fid, tid = _setup(client)
+        art_id = client.post("/art", json={"name": "ART"}).json()["id"]
+        pi_id = client.post(
+            "/pi",
+            json={
+                "name": "PI 1",
+                "art_id": art_id,
+                "start_date": "2026-01-05",
+                "end_date": "2026-03-27",
+            },
+        ).json()["id"]
+        iter_id = client.post(
+            "/iterations",
+            json={
+                "pi_id": pi_id,
+                "number": 1,
+                "start_date": "2026-01-05",
+                "end_date": "2026-01-16",
+            },
+        ).json()["id"]
+        sid1 = _create_story(client, fid, tid, name="S1").json()["id"]
+        _create_story(client, fid, tid, name="S2")
+        client.patch(f"/stories/{sid1}", json={"iteration_id": iter_id})
+        stories = client.get(f"/stories?iteration_id={iter_id}").json()
+        assert len(stories) == 1
+        assert stories[0]["id"] == sid1
+
 
 class TestStoryGet:
     def test_returns_story(self, client):

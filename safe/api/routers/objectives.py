@@ -19,9 +19,14 @@ def _get_or_404(repos: Repos, objective_id: str) -> PIObjective:
 def list_objectives(
     pi_id: str | None = Query(default=None),
     team_id: str | None = Query(default=None),
+    is_stretch: bool | None = Query(default=None),
     repos: Repos = Depends(get_repos_dep),
 ):
-    filters = {k: v for k, v in {"pi_id": pi_id, "team_id": team_id}.items() if v is not None}
+    filters = {
+        k: v
+        for k, v in {"pi_id": pi_id, "team_id": team_id, "is_stretch": is_stretch}.items()
+        if v is not None
+    }
     return repos.objectives.find(**filters) if filters else repos.objectives.get_all()
 
 

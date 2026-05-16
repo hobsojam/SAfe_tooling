@@ -91,21 +91,21 @@ def test_list_filter_by_pi(client):
     assert len(deps) == 1
 
 
-def test_update_status_sets_status(client):
+def test_roam_sets_status(client):
     art_id = _create_art(client)
     pi_id = _create_pi(client, art_id)
     f1, f2 = _create_features(client, pi_id)
     did = _create_dep(client, pi_id, f1, f2).json()["id"]
     r = client.post(
-        f"/dependencies/{did}/update-status",
+        f"/dependencies/{did}/roam",
         json={"status": "resolved", "resolution_notes": "Done"},
     )
     assert r.status_code == 200
     assert r.json()["status"] == "resolved"
 
 
-def test_update_status_unknown_returns_404(client):
-    r = client.post("/dependencies/no-such-id/update-status", json={"status": "resolved"})
+def test_roam_unknown_returns_404(client):
+    r = client.post("/dependencies/no-such-id/roam", json={"status": "resolved"})
     assert r.status_code == 404
 
 
@@ -150,7 +150,7 @@ def test_list_filter_by_status(client):
     f1, f2 = _create_features(client, pi_id)
     did = _create_dep(client, pi_id, f1, f2).json()["id"]
     _create_dep(client, pi_id, f2, f1)
-    client.post(f"/dependencies/{did}/update-status", json={"status": "resolved"})
+    client.post(f"/dependencies/{did}/roam", json={"status": "resolved"})
     deps = client.get("/dependencies?status=resolved").json()
     assert len(deps) == 1
     assert deps[0]["status"] == "resolved"

@@ -155,9 +155,7 @@ def test_full_pi_planning_flow(client):
             "to_feature_id": f2["id"],
         },
     ).json()
-    resolved = client.post(
-        f"/dependencies/{dep['id']}/update-status", json={"status": "resolved"}
-    ).json()
+    resolved = client.post(f"/dependencies/{dep['id']}/roam", json={"status": "resolved"}).json()
     assert resolved["status"] == "resolved"
 
     # 12. Close the PI

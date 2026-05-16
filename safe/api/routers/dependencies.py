@@ -53,8 +53,8 @@ def update_dependency(
     return repos.dependencies.save(updated)
 
 
-@router.post("/{dependency_id}/update-status", response_model=Dependency)
-def update_dependency_status(
+@router.post("/{dependency_id}/roam", response_model=Dependency)
+def roam_dependency(
     dependency_id: str, body: DependencyStatusUpdate, repos: Repos = Depends(get_repos_dep)
 ):
     dep = _get_or_404(repos, dependency_id)
