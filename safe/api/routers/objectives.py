@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from safe.api.deps import get_repos_dep
+from safe.api.deps import ReposDep
 from safe.api.schemas import PIObjectiveCreate, PIObjectiveUpdate
 from safe.models.objectives import PIObjective
 from safe.store.repos import Repos
@@ -17,10 +17,10 @@ def _get_or_404(repos: Repos, objective_id: str) -> PIObjective:
 
 @router.get("", response_model=list[PIObjective])
 def list_objectives(
+    repos: ReposDep,
     pi_id: str | None = Query(default=None),
     team_id: str | None = Query(default=None),
     is_stretch: bool | None = Query(default=None),
-    repos: Repos = Depends(get_repos_dep),
 ):
     filters = {
         k: v
@@ -31,26 +31,24 @@ def list_objectives(
 
 
 @router.post("", response_model=PIObjective, status_code=201)
-def create_objective(body: PIObjectiveCreate, repos: Repos = Depends(get_repos_dep)):
+def create_objective(body: PIObjectiveCreate, repos: ReposDep):
     obj = PIObjective(**body.model_dump())
     return repos.objectives.save(obj)
 
 
 @router.get("/{objective_id}", response_model=PIObjective)
-def get_objective(objective_id: str, repos: Repos = Depends(get_repos_dep)):
+def get_objective(objective_id: str, repos: ReposDep):
     return _get_or_404(repos, objective_id)
 
 
 @router.patch("/{objective_id}", response_model=PIObjective)
-def update_objective(
-    objective_id: str, body: PIObjectiveUpdate, repos: Repos = Depends(get_repos_dep)
-):
+def update_objective(objective_id: str, body: PIObjectiveUpdate, repos: ReposDep):
     obj = _get_or_404(repos, objective_id)
     updated = obj.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.objectives.save(updated)
 
 
 @router.delete("/{objective_id}", status_code=204)
-def delete_objective(objective_id: str, repos: Repos = Depends(get_repos_dep)):
+def delete_objective(objective_id: str, repos: ReposDep):
     _get_or_404(repos, objective_id)
     repos.objectives.delete(objective_id)

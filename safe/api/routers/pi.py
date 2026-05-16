@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from safe.api.deps import get_repos_dep
+from safe.api.deps import ReposDep
 from safe.api.schemas import PICreate, PIUpdate
 from safe.models.pi import PI, PIStatus
 from safe.store.repos import Repos
@@ -17,16 +17,16 @@ def _get_or_404(repos: Repos, pi_id: str) -> PI:
 
 @router.get("", response_model=list[PI])
 def list_pis(
+    repos: ReposDep,
     art_id: str | None = Query(default=None),
     status: PIStatus | None = Query(default=None),
-    repos: Repos = Depends(get_repos_dep),
 ):
     filters = {k: v for k, v in {"art_id": art_id, "status": status}.items() if v is not None}
     return repos.pis.find(**filters) if filters else repos.pis.get_all()
 
 
 @router.post("", response_model=PI, status_code=201)
-def create_pi(body: PICreate, repos: Repos = Depends(get_repos_dep)):
+def create_pi(body: PICreate, repos: ReposDep):
     if repos.arts.get(body.art_id) is None:
         raise HTTPException(status_code=404, detail=f"ART '{body.art_id}' not found")
     pi = PI(**body.model_dump())
@@ -34,19 +34,19 @@ def create_pi(body: PICreate, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.get("/{pi_id}", response_model=PI)
-def get_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+def get_pi(pi_id: str, repos: ReposDep):
     return _get_or_404(repos, pi_id)
 
 
 @router.patch("/{pi_id}", response_model=PI)
-def update_pi(pi_id: str, body: PIUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_pi(pi_id: str, body: PIUpdate, repos: ReposDep):
     pi = _get_or_404(repos, pi_id)
     updated = pi.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.pis.save(updated)
 
 
 @router.delete("/{pi_id}", status_code=204)
-def delete_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+def delete_pi(pi_id: str, repos: ReposDep):
     _get_or_404(repos, pi_id)
     if repos.features.find(pi_id=pi_id):
         raise HTTPException(status_code=409, detail="PI has features — delete them first")
@@ -62,7 +62,7 @@ def delete_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.post("/{pi_id}/activate", response_model=PI)
-def activate_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+def activate_pi(pi_id: str, repos: ReposDep):
     pi = _get_or_404(repos, pi_id)
     if pi.status != PIStatus.PLANNING:
         raise HTTPException(
@@ -80,7 +80,7 @@ def activate_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.post("/{pi_id}/close", response_model=PI)
-def close_pi(pi_id: str, repos: Repos = Depends(get_repos_dep)):
+def close_pi(pi_id: str, repos: ReposDep):
     pi = _get_or_404(repos, pi_id)
     if pi.status != PIStatus.ACTIVE:
         raise HTTPException(

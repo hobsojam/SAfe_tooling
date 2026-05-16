@@ -1,8 +1,8 @@
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from safe.api.deps import get_repos_dep
+from safe.api.deps import ReposDep
 from safe.api.schemas import CapacityPlanCreate, CapacityPlanSeed, CapacityPlanUpdate
 from safe.models.capacity_plan import CapacityPlan
 from safe.store.repos import Repos
@@ -29,10 +29,10 @@ def _get_or_404(repos: Repos, plan_id: str) -> CapacityPlan:
 
 @router.get("", response_model=list[CapacityPlan])
 def list_capacity_plans(
+    repos: ReposDep,
     pi_id: str | None = Query(default=None),
     team_id: str | None = Query(default=None),
     iteration_id: str | None = Query(default=None),
-    repos: Repos = Depends(get_repos_dep),
 ):
     filters = {
         k: v
@@ -43,8 +43,7 @@ def list_capacity_plans(
 
 
 @router.post("/seed", response_model=list[CapacityPlan], status_code=201)
-def seed_capacity_plans(body: CapacityPlanSeed, repos: Repos = Depends(get_repos_dep)):
-    """Create default capacity plans for every team×iteration cell that has no plan yet."""
+def seed_capacity_plans(body: CapacityPlanSeed, repos: ReposDep):
     pi = repos.pis.get(body.pi_id)
     if pi is None:
         raise HTTPException(status_code=404, detail=f"PI '{body.pi_id}' not found")
@@ -70,7 +69,7 @@ def seed_capacity_plans(body: CapacityPlanSeed, repos: Repos = Depends(get_repos
 
 
 @router.post("", response_model=CapacityPlan, status_code=201)
-def create_or_update_capacity_plan(body: CapacityPlanCreate, repos: Repos = Depends(get_repos_dep)):
+def create_or_update_capacity_plan(body: CapacityPlanCreate, repos: ReposDep):
     existing = repos.capacity_plans.find(
         pi_id=body.pi_id, team_id=body.team_id, iteration_id=body.iteration_id
     )
@@ -82,20 +81,18 @@ def create_or_update_capacity_plan(body: CapacityPlanCreate, repos: Repos = Depe
 
 
 @router.get("/{plan_id}", response_model=CapacityPlan)
-def get_capacity_plan(plan_id: str, repos: Repos = Depends(get_repos_dep)):
+def get_capacity_plan(plan_id: str, repos: ReposDep):
     return _get_or_404(repos, plan_id)
 
 
 @router.patch("/{plan_id}", response_model=CapacityPlan)
-def update_capacity_plan(
-    plan_id: str, body: CapacityPlanUpdate, repos: Repos = Depends(get_repos_dep)
-):
+def update_capacity_plan(plan_id: str, body: CapacityPlanUpdate, repos: ReposDep):
     plan = _get_or_404(repos, plan_id)
     updated = plan.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.capacity_plans.save(updated)
 
 
 @router.delete("/{plan_id}", status_code=204)
-def delete_capacity_plan(plan_id: str, repos: Repos = Depends(get_repos_dep)):
+def delete_capacity_plan(plan_id: str, repos: ReposDep):
     _get_or_404(repos, plan_id)
     repos.capacity_plans.delete(plan_id)

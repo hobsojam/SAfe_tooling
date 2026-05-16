@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from safe.api.deps import get_repos_dep
+from safe.api.deps import ReposDep
 from safe.api.schemas import StoryCreate, StoryUpdate
 from safe.models.backlog import Story, StoryStatus
 from safe.store.repos import Repos
@@ -17,11 +17,11 @@ def _get_or_404(repos: Repos, story_id: str) -> Story:
 
 @router.get("", response_model=list[Story])
 def list_stories(
+    repos: ReposDep,
     feature_id: str | None = Query(default=None),
     team_id: str | None = Query(default=None),
     iteration_id: str | None = Query(default=None),
     status: StoryStatus | None = Query(default=None),
-    repos: Repos = Depends(get_repos_dep),
 ):
     filters = {
         k: v
@@ -37,7 +37,7 @@ def list_stories(
 
 
 @router.post("", response_model=Story, status_code=201)
-def create_story(body: StoryCreate, repos: Repos = Depends(get_repos_dep)):
+def create_story(body: StoryCreate, repos: ReposDep):
     if repos.features.get(body.feature_id) is None:
         raise HTTPException(status_code=404, detail=f"Feature '{body.feature_id}' not found")
     if repos.teams.get(body.team_id) is None:
@@ -47,12 +47,12 @@ def create_story(body: StoryCreate, repos: Repos = Depends(get_repos_dep)):
 
 
 @router.get("/{story_id}", response_model=Story)
-def get_story(story_id: str, repos: Repos = Depends(get_repos_dep)):
+def get_story(story_id: str, repos: ReposDep):
     return _get_or_404(repos, story_id)
 
 
 @router.patch("/{story_id}", response_model=Story)
-def update_story(story_id: str, body: StoryUpdate, repos: Repos = Depends(get_repos_dep)):
+def update_story(story_id: str, body: StoryUpdate, repos: ReposDep):
     story = _get_or_404(repos, story_id)
     update_data = body.model_dump(exclude_unset=True)
     if "iteration_id" in update_data and update_data["iteration_id"] is not None:
@@ -66,6 +66,6 @@ def update_story(story_id: str, body: StoryUpdate, repos: Repos = Depends(get_re
 
 
 @router.delete("/{story_id}", status_code=204)
-def delete_story(story_id: str, repos: Repos = Depends(get_repos_dep)):
+def delete_story(story_id: str, repos: ReposDep):
     _get_or_404(repos, story_id)
     repos.stories.delete(story_id)

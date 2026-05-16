@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 
-from safe.api.deps import get_repos_dep
+from safe.api.deps import ReposDep
 from safe.api.schemas import DependencyCreate, DependencyStatusUpdate, DependencyUpdate
 from safe.models.dependency import Dependency
 from safe.store.repos import Repos
@@ -17,11 +17,11 @@ def _get_or_404(repos: Repos, dependency_id: str) -> Dependency:
 
 @router.get("", response_model=list[Dependency])
 def list_dependencies(
+    repos: ReposDep,
     pi_id: str | None = Query(default=None),
     from_feature_id: str | None = Query(default=None),
     to_feature_id: str | None = Query(default=None),
     status: str | None = Query(default=None),
-    repos: Repos = Depends(get_repos_dep),
 ):
     deps = repos.dependencies.find(pi_id=pi_id) if pi_id else repos.dependencies.get_all()
     if from_feature_id:
@@ -34,35 +34,31 @@ def list_dependencies(
 
 
 @router.post("", response_model=Dependency, status_code=201)
-def create_dependency(body: DependencyCreate, repos: Repos = Depends(get_repos_dep)):
+def create_dependency(body: DependencyCreate, repos: ReposDep):
     dep = Dependency(**body.model_dump())
     return repos.dependencies.save(dep)
 
 
 @router.get("/{dependency_id}", response_model=Dependency)
-def get_dependency(dependency_id: str, repos: Repos = Depends(get_repos_dep)):
+def get_dependency(dependency_id: str, repos: ReposDep):
     return _get_or_404(repos, dependency_id)
 
 
 @router.patch("/{dependency_id}", response_model=Dependency)
-def update_dependency(
-    dependency_id: str, body: DependencyUpdate, repos: Repos = Depends(get_repos_dep)
-):
+def update_dependency(dependency_id: str, body: DependencyUpdate, repos: ReposDep):
     dep = _get_or_404(repos, dependency_id)
     updated = dep.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.dependencies.save(updated)
 
 
 @router.post("/{dependency_id}/roam", response_model=Dependency)
-def roam_dependency(
-    dependency_id: str, body: DependencyStatusUpdate, repos: Repos = Depends(get_repos_dep)
-):
+def roam_dependency(dependency_id: str, body: DependencyStatusUpdate, repos: ReposDep):
     dep = _get_or_404(repos, dependency_id)
     updated = dep.model_copy(update=body.model_dump(exclude_unset=True))
     return repos.dependencies.save(updated)
 
 
 @router.delete("/{dependency_id}", status_code=204)
-def delete_dependency(dependency_id: str, repos: Repos = Depends(get_repos_dep)):
+def delete_dependency(dependency_id: str, repos: ReposDep):
     _get_or_404(repos, dependency_id)
     repos.dependencies.delete(dependency_id)
